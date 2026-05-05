@@ -1,0 +1,127 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>SuperAutoAccessibility</AssemblyName>
+    <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- MelonLoader Core -->
+    <Reference Include="MelonLoader">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Super Auto Pets\MelonLoader\net6\MelonLoader.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+
+    <!-- Modern Il2CppInterop Libraries (replaces deprecated UnhollowerBaseLib) -->
+    <Reference Include="Il2CppInterop.Runtime">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Super Auto Pets\MelonLoader\net6\Il2CppInterop.Runtime.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Il2CppInterop.Common">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Super Auto Pets\MelonLoader\net6\Il2CppInterop.Common.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+
+    <!-- Essential Il2Cpp System Libraries -->
+    <Reference Include="Il2Cppmscorlib">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Super Auto Pets\MelonLoader\Il2CppAssemblies\Il2Cppmscorlib.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Il2CppSystem">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Super Auto Pets\MelonLoader\Il2CppAssemblies\Il2CppSystem.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+
+    <!-- Game Assemblies -->
+    <Reference Include="Assembly-CSharp">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Super Auto Pets\MelonLoader\Il2CppAssemblies\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Il2CppSpacewoodCore2">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Super Auto Pets\MelonLoader\Il2CppAssemblies\Il2CppSpacewoodCore2.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+
+    <!-- Unity Engine Modules -->
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Super Auto Pets\MelonLoader\Il2CppAssemblies\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Super Auto Pets\MelonLoader\Il2CppAssemblies\UnityEngine.InputLegacyModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Super Auto Pets\MelonLoader\Il2CppAssemblies\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Super Auto Pets\MelonLoader\Il2CppAssemblies\Unity.TextMeshPro.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Super Auto Pets\MelonLoader\Il2CppAssemblies\UnityEngine.IMGUIModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Super Auto Pets\MelonLoader\Il2CppAssemblies\UnityEngine.UIModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.AudioModule">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Super Auto Pets\MelonLoader\Il2CppAssemblies\UnityEngine.AudioModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestAudioModule">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Super Auto Pets\MelonLoader\Il2CppAssemblies\UnityEngine.UnityWebRequestAudioModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestModule">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Super Auto Pets\MelonLoader\Il2CppAssemblies\UnityEngine.UnityWebRequestModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+
+    <!-- Harmony for patching -->
+    <Reference Include="0Harmony">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Super Auto Pets\MelonLoader\net6\0Harmony.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Il2CppInterop.HarmonySupport">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Super Auto Pets\MelonLoader\net6\Il2CppInterop.HarmonySupport.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Embed Tolk DLLs as resources -->
+    <EmbeddedResource Include="..\..\DLLs and stuff\Tolk.dll">
+      <LogicalName>SuperAutoAccessibility.Tolk.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\DLLs and stuff\TolkDotNet.dll">
+      <LogicalName>SuperAutoAccessibility.TolkDotNet.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\DLLs and stuff\nvdaControllerClient64.dll">
+      <LogicalName>SuperAutoAccessibility.nvdaControllerClient64.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\DLLs and stuff\SAAPI64.dll">
+      <LogicalName>SuperAutoAccessibility.SAAPI64.dll</LogicalName>
+    </EmbeddedResource>
+
+    <!-- Embed sound effects -->
+    <EmbeddedResource Include="..\..\sounds\SAP_IsFrozen.ogg">
+      <LogicalName>SuperAutoAccessibility.Sounds.SAP_IsFrozen.ogg</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\sounds\SAP_CanCombine.ogg">
+      <LogicalName>SuperAutoAccessibility.Sounds.SAP_CanCombine.ogg</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\sounds\SAP_CanCombineAndWillLevelUp.ogg">
+      <LogicalName>SuperAutoAccessibility.Sounds.SAP_CanCombineAndWillLevelUp.ogg</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\sounds\SAP_Chained.ogg">
+      <LogicalName>SuperAutoAccessibility.Sounds.SAP_Chained.ogg</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\sounds\SAP_Unchained.ogg">
+      <LogicalName>SuperAutoAccessibility.Sounds.SAP_Unchained.ogg</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

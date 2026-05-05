@@ -1,0 +1,91 @@
+# ---- Build output ----
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+[Oo]ut/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+build/
+bld/
+
+# ---- Visual Studio / Rider / VS Code ----
+.vs/
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+*.rsuser
+*.swp
+
+# ---- ReSharper ----
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# ---- NuGet ----
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+!**/[Pp]ackages/build/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# ---- MSBuild / build artifacts ----
+*.binlog
+*.tlog
+*.cache
+*.VisualState.xml
+TestResult.xml
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+# ---- Coverage / profiling ----
+*.coverage
+*.coveragexml
+coverage*.json
+coverage*.xml
+coverage*.info
+*.dotCover
+*.psess
+*.vsp
+*.vspx
+
+# ---- Roslyn / analyzers ----
+.ionide/
+*.gpState
+.localhistory/
+
+# ---- OS junk ----
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+.Spotlight-V100
+.Trashes
+
+# ---- Editor backups ----
+*~
+*.bak
+*.tmp
+*.orig
+*.rej
+
+# ---- Secrets / local ----
+*.pfx
+*.snk
+secrets.json
+appsettings.*.local.json
+.env
+.env.*
+!.env.example
