@@ -94,33 +94,33 @@
 
   <ItemGroup>
     <!-- Embed Tolk DLLs as resources -->
-    <EmbeddedResource Include="..\..\DLLs and stuff\Tolk.dll">
+    <EmbeddedResource Include="..\lib\Tolk.dll">
       <LogicalName>SuperAutoAccessibility.Tolk.dll</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\..\DLLs and stuff\TolkDotNet.dll">
+    <EmbeddedResource Include="..\lib\TolkDotNet.dll">
       <LogicalName>SuperAutoAccessibility.TolkDotNet.dll</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\..\DLLs and stuff\nvdaControllerClient64.dll">
+    <EmbeddedResource Include="..\lib\nvdaControllerClient64.dll">
       <LogicalName>SuperAutoAccessibility.nvdaControllerClient64.dll</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\..\DLLs and stuff\SAAPI64.dll">
+    <EmbeddedResource Include="..\lib\SAAPI64.dll">
       <LogicalName>SuperAutoAccessibility.SAAPI64.dll</LogicalName>
     </EmbeddedResource>
 
     <!-- Embed sound effects -->
-    <EmbeddedResource Include="..\..\sounds\SAP_IsFrozen.ogg">
+    <EmbeddedResource Include="..\Sounds\SAP_IsFrozen.ogg">
       <LogicalName>SuperAutoAccessibility.Sounds.SAP_IsFrozen.ogg</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\..\sounds\SAP_CanCombine.ogg">
+    <EmbeddedResource Include="..\Sounds\SAP_CanCombine.ogg">
       <LogicalName>SuperAutoAccessibility.Sounds.SAP_CanCombine.ogg</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\..\sounds\SAP_CanCombineAndWillLevelUp.ogg">
+    <EmbeddedResource Include="..\Sounds\SAP_CanCombineAndWillLevelUp.ogg">
       <LogicalName>SuperAutoAccessibility.Sounds.SAP_CanCombineAndWillLevelUp.ogg</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\..\sounds\SAP_Chained.ogg">
+    <EmbeddedResource Include="..\Sounds\SAP_Chained.ogg">
       <LogicalName>SuperAutoAccessibility.Sounds.SAP_Chained.ogg</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\..\sounds\SAP_Unchained.ogg">
+    <EmbeddedResource Include="..\Sounds\SAP_Unchained.ogg">
       <LogicalName>SuperAutoAccessibility.Sounds.SAP_Unchained.ogg</LogicalName>
     </EmbeddedResource>
   </ItemGroup>
