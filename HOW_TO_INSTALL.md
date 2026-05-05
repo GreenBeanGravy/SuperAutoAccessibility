@@ -55,7 +55,7 @@ If you see both messages, your mod is working perfectly! ðŸŽ‰
 If you make changes to `SuperAutoAccessibility.cs`, rebuild using:
 
 ```powershell
-cd "c:\Users\green\Desktop\decomp\SuperAutoAccessibility\SuperAutoAccessibility"
+cd SuperAutoAccessibility
 dotnet build -c Release
 ```
 

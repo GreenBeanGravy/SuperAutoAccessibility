@@ -97,13 +97,6 @@ namespace SuperAutoAccessibility
                         {
                             targetPath = externalPath;
                         }
-                        else
-                        {
-                            // Dev fallback
-                            string devPath = Path.Combine(@"D:\decomp\sounds", $"{name}.ogg");
-                            if (File.Exists(devPath))
-                                targetPath = devPath;
-                        }
                     }
 
                     if (File.Exists(targetPath))
