@@ -1,117 +1,144 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 using MelonLoader;
 
 namespace SuperAutoAccessibility
 {
     /// <summary>
-    /// Checks for mod updates on game start by comparing the local DLL's git blob SHA
-    /// against the remote SHA from the GitHub Contents API. Zero maintenance â€” just push
-    /// a new DLL to the repo and it auto-detects. No version file needed.
-    ///
-    /// If a new version is found, prompts the user with a native MessageBox (screen-reader
-    /// accessible), downloads the new DLL, writes a PowerShell script to replace it after
-    /// the game exits, and restarts the game via Steam.
+    /// On game start, fetches the latest release of GreenBeanGravy/SuperAutoAccessibility,
+    /// reads the SuperAutoAccessibility.dll asset's SHA-256 digest from the API response
+    /// (no asset download needed), and compares against the local DLL. If they differ
+    /// (content update) or the local file is named with the legacy SuperAutoPetsMod.dll
+    /// filename (migration), prompts the user to update and hands off to a PowerShell
+    /// script that performs the replace/rename after the game exits, then relaunches
+    /// via Steam.
     /// </summary>
     public static class AutoUpdater
     {
-        // Native MessageBox via P/Invoke (avoids System.Windows.Forms dependency)
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
         private static extern int MessageBoxW(IntPtr hWnd, string text, string caption, uint type);
         private const uint MB_YESNO = 0x04;
         private const uint MB_ICONINFORMATION = 0x40;
         private const int IDYES = 6;
 
-        // GitHub API endpoint returns JSON with a "sha" field (git blob SHA-1)
-        private const string API_URL =
-            "https://api.github.com/repos/GreenBeanGravy/SAPAccess-Release/contents/SuperAutoAccessibility.dll";
-        private const string DLL_URL =
-            "https://raw.githubusercontent.com/GreenBeanGravy/SAPAccess-Release/main/SuperAutoAccessibility.dll";
+        private const string EXPECTED_DLL_NAME = "SuperAutoAccessibility.dll";
+        private const string LEGACY_DLL_NAME = "SuperAutoPetsMod.dll";
+        private const string LATEST_RELEASE_API =
+            "https://api.github.com/repos/GreenBeanGravy/SuperAutoAccessibility/releases/latest";
 
-        /// <summary>
-        /// Kicks off the update check on a background thread so it doesn't block game startup.
-        /// </summary>
         public static void CheckForUpdate()
         {
             Task.Run(CheckForUpdateAsync);
         }
 
-        /// <summary>
-        /// Computes the git blob SHA-1 hash for a file, matching what GitHub stores.
-        /// Git blob hash = SHA1("blob {fileSize}\0{fileContents}")
-        /// </summary>
-        private static string ComputeGitBlobSha(byte[] fileBytes)
+        private static string ComputeSha256(byte[] bytes)
         {
-            string header = $"blob {fileBytes.Length}\0";
-            byte[] headerBytes = Encoding.UTF8.GetBytes(header);
-            byte[] fullBytes = new byte[headerBytes.Length + fileBytes.Length];
-            Buffer.BlockCopy(headerBytes, 0, fullBytes, 0, headerBytes.Length);
-            Buffer.BlockCopy(fileBytes, 0, fullBytes, headerBytes.Length, fileBytes.Length);
-            using var sha1 = SHA1.Create();
-            byte[] hash = sha1.ComputeHash(fullBytes);
+            using var sha = SHA256.Create();
+            byte[] hash = sha.ComputeHash(bytes);
             return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
         }
 
-        /// <summary>
-        /// Extracts the "sha" value from the GitHub Contents API JSON response.
-        /// Simple string parsing to avoid needing a JSON library.
-        /// </summary>
-        private static string ExtractShaFromJson(string json)
+        // Find the asset whose "name" equals targetName, then read its "digest" and
+        // "browser_download_url" fields. GitHub release-asset digests are formatted as
+        // "sha256:<hex>"; we return just the lowercase hex digest along with the URL.
+        // Returns (null, null) on not-found / parse failure.
+        private static (string digest, string url) FindAssetDigestAndUrl(string json, string targetName)
         {
-            // Look for "sha":"<40-char hex>"
-            const string marker = "\"sha\":\"";
-            int idx = json.IndexOf(marker, StringComparison.Ordinal);
+            int assetsIdx = json.IndexOf("\"assets\":[", StringComparison.Ordinal);
+            if (assetsIdx < 0) return (null, null);
+
+            const string nameMarker = "\"name\":\"";
+            const string digestMarker = "\"digest\":\"";
+            const string urlMarker = "\"browser_download_url\":\"";
+            int cursor = assetsIdx;
+
+            while (true)
+            {
+                int nameIdx = json.IndexOf(nameMarker, cursor, StringComparison.Ordinal);
+                if (nameIdx < 0) return (null, null);
+                int nameStart = nameIdx + nameMarker.Length;
+                int nameEnd = json.IndexOf('"', nameStart);
+                if (nameEnd < 0) return (null, null);
+                string name = json.Substring(nameStart, nameEnd - nameStart);
+
+                if (name == targetName)
+                {
+                    string digest = ReadStringField(json, digestMarker, nameEnd);
+                    string url = ReadStringField(json, urlMarker, nameEnd);
+                    if (!string.IsNullOrEmpty(digest))
+                    {
+                        const string prefix = "sha256:";
+                        if (digest.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                            digest = digest.Substring(prefix.Length);
+                        digest = digest.ToLowerInvariant();
+                    }
+                    return (digest, url);
+                }
+                cursor = nameEnd + 1;
+            }
+        }
+
+        private static string ReadStringField(string json, string marker, int from)
+        {
+            int idx = json.IndexOf(marker, from, StringComparison.Ordinal);
             if (idx < 0) return null;
             int start = idx + marker.Length;
             int end = json.IndexOf('"', start);
-            if (end < 0 || end - start != 40) return null;
-            return json.Substring(start, 40);
+            if (end < 0) return null;
+            return json.Substring(start, end - start);
         }
 
         private static async Task CheckForUpdateAsync()
         {
             try
             {
-                // Compute local DLL hash
                 string localDllPath = typeof(AutoUpdater).Assembly.Location;
-                if (!File.Exists(localDllPath))
+                if (string.IsNullOrEmpty(localDllPath) || !File.Exists(localDllPath))
                 {
-                    MelonLogger.Warning("[AutoUpdater] Cannot find local DLL path.");
+                    MelonLogger.Warning("[AutoUpdater] Cannot resolve local DLL path.");
                     return;
                 }
-                byte[] localBytes = File.ReadAllBytes(localDllPath);
-                string localSha = ComputeGitBlobSha(localBytes);
 
-                // Fetch remote SHA from GitHub Contents API
+                string modsDir = Path.GetDirectoryName(localDllPath);
+                string localFileName = Path.GetFileName(localDllPath);
+                bool isLegacyName = string.Equals(localFileName, LEGACY_DLL_NAME, StringComparison.OrdinalIgnoreCase);
+
+                string localSha = ComputeSha256(File.ReadAllBytes(localDllPath));
+
                 using var http = new HttpClient();
-                http.Timeout = TimeSpan.FromSeconds(10);
+                http.Timeout = TimeSpan.FromSeconds(15);
                 http.DefaultRequestHeaders.Add("User-Agent", "SAPAccessMod-AutoUpdater");
+                http.DefaultRequestHeaders.Add("Accept", "application/vnd.github+json");
 
-                string json = await http.GetStringAsync(API_URL);
-                string remoteSha = ExtractShaFromJson(json);
-
-                if (string.IsNullOrEmpty(remoteSha))
+                string releaseJson = await http.GetStringAsync(LATEST_RELEASE_API);
+                var (remoteSha, assetUrl) = FindAssetDigestAndUrl(releaseJson, EXPECTED_DLL_NAME);
+                if (string.IsNullOrEmpty(assetUrl) || string.IsNullOrEmpty(remoteSha))
                 {
-                    MelonLogger.Warning("[AutoUpdater] Could not parse remote SHA from GitHub API.");
+                    MelonLogger.Warning($"[AutoUpdater] Could not find {EXPECTED_DLL_NAME} asset (or its digest) in latest release.");
                     return;
                 }
 
-                MelonLogger.Msg($"[AutoUpdater] Local SHA: {localSha}, Remote SHA: {remoteSha}");
+                bool contentDiffers = !string.Equals(localSha, remoteSha, StringComparison.OrdinalIgnoreCase);
 
-                if (localSha == remoteSha)
-                    return; // Already up to date
+                MelonLogger.Msg($"[AutoUpdater] Local SHA: {localSha} ({localFileName}), Remote SHA: {remoteSha}");
 
-                // Prompt user via native MessageBox (screen-reader accessible)
+                if (!contentDiffers && !isLegacyName)
+                    return; // Up to date and correctly named.
+
+                string promptText = contentDiffers
+                    ? "A new version of the Super Auto Pets Accessibility Mod is available.\n\n" +
+                      "Would you like to update now? The game will restart automatically."
+                    : "The Super Auto Pets Accessibility Mod needs to migrate to its new filename.\n\n" +
+                      "Apply now? The game will restart automatically.";
+
                 int result = MessageBoxW(
                     IntPtr.Zero,
-                    "A new version of the Super Auto Pets Accessibility Mod is available.\n\n" +
-                    "Would you like to update now? The game will restart automatically.",
+                    promptText,
                     "Mod Update Available",
                     MB_YESNO | MB_ICONINFORMATION);
 
@@ -121,32 +148,34 @@ namespace SuperAutoAccessibility
                     return;
                 }
 
-                MelonLogger.Msg("[AutoUpdater] Downloading update...");
+                MelonLogger.Msg("[AutoUpdater] Downloading new DLL...");
+                byte[] remoteBytes = await http.GetByteArrayAsync(assetUrl);
 
-                // Download new DLL to a temp path next to the current one
-                string modsDir = Path.GetDirectoryName(localDllPath);
-                string dllPath = Path.Combine(modsDir, "SuperAutoAccessibility.dll");
-                string updatePath = Path.Combine(modsDir, "SuperAutoAccessibility.dll.update");
+                string targetDllPath = Path.Combine(modsDir, EXPECTED_DLL_NAME);
+                string updatePath = Path.Combine(modsDir, EXPECTED_DLL_NAME + ".update");
+                File.WriteAllBytes(updatePath, remoteBytes);
+                MelonLogger.Msg($"[AutoUpdater] Wrote {remoteBytes.Length} bytes to {updatePath}");
 
-                byte[] dllBytes = await http.GetByteArrayAsync(DLL_URL);
-                File.WriteAllBytes(updatePath, dllBytes);
+                // Delete the legacy-named DLL only when it's a different file from the target
+                // (avoid deleting the file we just wrote over via Copy-Item).
+                string legacyDeleteLine = "";
+                if (isLegacyName &&
+                    !string.Equals(localDllPath, targetDllPath, StringComparison.OrdinalIgnoreCase))
+                {
+                    legacyDeleteLine = $"Remove-Item -Path '{localDllPath}' -ErrorAction SilentlyContinue\n";
+                }
 
-                MelonLogger.Msg($"[AutoUpdater] Downloaded {dllBytes.Length} bytes to {updatePath}");
-
-                // Write a PowerShell script that waits for the game to exit,
-                // replaces the DLL, relaunches via Steam, then self-deletes
                 string scriptPath = Path.Combine(modsDir, "sap_update.ps1");
                 string scriptContent =
 $@"Start-Sleep -Seconds 2
 while (Get-Process 'Super Auto Pets' -ErrorAction SilentlyContinue) {{ Start-Sleep -Seconds 1 }}
-Copy-Item -Path '{updatePath}' -Destination '{dllPath}' -Force
+Copy-Item -Path '{updatePath}' -Destination '{targetDllPath}' -Force
 Remove-Item -Path '{updatePath}' -ErrorAction SilentlyContinue
-Start-Process 'steam://rungameid/1714040'
+{legacyDeleteLine}Start-Process 'steam://rungameid/1714040'
 Remove-Item -Path '{scriptPath}' -ErrorAction SilentlyContinue
 ";
                 File.WriteAllText(scriptPath, scriptContent);
 
-                // Launch the update script as a detached hidden process
                 Process.Start(new ProcessStartInfo
                 {
                     FileName = "powershell.exe",
