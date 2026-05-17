@@ -166,9 +166,14 @@ namespace SuperAutoAccessibility
                 }
 
                 string scriptPath = Path.Combine(modsDir, "sap_update.ps1");
+                // Bounded wait + force-kill fallback: Application.Quit() and even
+                // Process.Kill() can race against Unity 6 / Il2CPP shutdown.
                 string scriptContent =
 $@"Start-Sleep -Seconds 2
-while (Get-Process 'Super Auto Pets' -ErrorAction SilentlyContinue) {{ Start-Sleep -Seconds 1 }}
+$deadline = (Get-Date).AddSeconds(15)
+while ((Get-Process 'Super Auto Pets' -ErrorAction SilentlyContinue) -and ((Get-Date) -lt $deadline)) {{ Start-Sleep -Seconds 1 }}
+Stop-Process -Name 'Super Auto Pets' -Force -ErrorAction SilentlyContinue
+Start-Sleep -Seconds 1
 Copy-Item -Path '{updatePath}' -Destination '{targetDllPath}' -Force
 Remove-Item -Path '{updatePath}' -ErrorAction SilentlyContinue
 {legacyDeleteLine}Start-Process 'steam://rungameid/1714040'
@@ -184,8 +189,9 @@ Remove-Item -Path '{scriptPath}' -ErrorAction SilentlyContinue
                     CreateNoWindow = true
                 });
 
-                MelonLogger.Msg("[AutoUpdater] Update script launched. Quitting game...");
-                UnityEngine.Application.Quit();
+                MelonLogger.Msg("[AutoUpdater] Update script launched. Killing process...");
+                // Application.Quit() hangs mid-bootstrap on Il2CPP/Unity 6; kill hard.
+                Process.GetCurrentProcess().Kill();
             }
             catch (Exception ex)
             {
