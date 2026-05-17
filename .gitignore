@@ -13,6 +13,11 @@ x86/
 build/
 bld/
 
+# ---- PyInstaller (installer/) ----
+dist/
+*.spec
+__pycache__/
+
 # ---- Visual Studio / Rider / VS Code ----
 .vs/
 .vscode/

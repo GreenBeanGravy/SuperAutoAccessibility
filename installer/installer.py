@@ -45,7 +45,7 @@ MELON_ZIP_ASSET_NAME = "MelonLoader.x64.zip"
 SELF_RELEASE_API_URL = (
     "https://api.github.com/repos/GreenBeanGravy/SuperAutoAccessibility/releases/latest"
 )
-INSTALLER_ASSET_NAME = "SAPAccess Installer.exe"
+INSTALLER_ASSET_NAME = "SAPAccess.Installer.exe"
 
 DEFAULT_GAME_PATH = r"C:\Program Files (x86)\Steam\steamapps\common\Super Auto Pets"
 
