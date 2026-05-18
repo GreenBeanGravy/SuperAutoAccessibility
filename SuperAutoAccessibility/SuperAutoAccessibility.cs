@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 using HarmonyLib;
 using Il2CppSpacewood.Unity.UI;
 
-[assembly: MelonInfo(typeof(SuperAutoAccessibility.SAPMod), "Super Auto Pets Accessibility Mod", "1.0.0", "GreenBean")]
+[assembly: MelonInfo(typeof(SuperAutoAccessibility.SAPMod), "Super Auto Pets Accessibility Mod", "1.1.0", "GreenBean")]
 [assembly: MelonGame("Team Wood", "Super Auto Pets")]
 
 namespace SuperAutoAccessibility
@@ -30,8 +30,17 @@ namespace SuperAutoAccessibility
         {
             LoggerInstance.Msg("Super Auto Pets Accessibility Mod initializing... (update test build)");
 
-            // Check for updates in background (non-blocking)
-            AutoUpdater.CheckForUpdate();
+            // Check for updates in background (non-blocking).
+            // Skip when a dev-mode marker file exists alongside the mod, so local
+            // development builds don't trip the "update available" prompt on every
+            // launch. The release build will not have this marker.
+            string devMarker = System.IO.Path.Combine(
+                System.IO.Path.GetDirectoryName(typeof(SAPMod).Assembly.Location) ?? "",
+                "SAPAccess.dev");
+            if (!System.IO.File.Exists(devMarker))
+                AutoUpdater.CheckForUpdate();
+            else
+                LoggerInstance.Msg("[AutoUpdater] Skipped (dev marker present)");
 
             TolkSpeech.Initialize();
             TolkSpeech.Speak("Super Auto Pets Accessibility Mod loaded!", true);
@@ -161,6 +170,33 @@ namespace SuperAutoAccessibility
 
             // Poll for arena rank changes (tally screen)
             Patches.GameplayPatches.PollArenaRankChange();
+
+            // ----- Dictionary overlay: must come BEFORE any other input handler -----
+            // While the dictionary is open, EVERY keystroke is consumed by it. Navigation
+            // keys (arrows, Tab, Enter, Space, Home/End) never reach the shop nav, the
+            // game's EventSystem, or any other mod keybind. The overlay disables the
+            // EventSystem on open and re-enables it on close (see DictionaryMenu.OpenBrowse).
+            if (DictionaryMenu.IsActive)
+            {
+                DictionaryMenu.HandleInput();
+                return;
+            }
+            // After the dictionary closes, swallow input until the keys held at close
+            // time are released. Without this, the Escape that closed the dictionary
+            // immediately propagates to whatever menu was underneath.
+            if (DictionaryMenu.ShouldSwallowInput()) return;
+            // J: open the dictionary in categorized browse mode. Ctrl+F is only honoured
+            // FROM INSIDE the dictionary (see DictionaryMenu.HandleInput) — it is not a
+            // global app-wide hotkey.
+            if (Input.GetKeyDown(KeyCode.J))
+            {
+                var sel = EventSystem.current?.currentSelectedGameObject;
+                if (sel?.GetComponent<InputFieldBase>() == null)
+                {
+                    DictionaryMenu.OpenBrowse();
+                    return;
+                }
+            }
 
             // Bootstrap terms input: R reads terms, Enter/Space accepts
             if (_bootstrapTermsDetected && _bootstrap != null)
@@ -976,6 +1012,9 @@ namespace SuperAutoAccessibility
             PollTallyArenaFinale();
             PollTallyArenaReward();
             PollTallyArenaMenu();
+
+            // Poll Daily-mode (BullyRush) moustache-score screen
+            PollTallyBullyScore();
 
             // Poll tier upgrade overlay
             PollTierOverlay();
@@ -2899,6 +2938,9 @@ namespace SuperAutoAccessibility
 
         // TallyArena (battle result) tracking
         private static bool _lastTallyArenaOpen = false;
+
+        // TallyBullyScore (Daily-mode moustache score) tracking
+        private static bool _lastTallyBullyScoreOpen = false;
         private static bool _tallyArenaActive = false;
 
         // TallyArenaFinale (end-of-run EXP/bones summary) tracking
@@ -3617,6 +3659,120 @@ namespace SuperAutoAccessibility
             new List<(string, List<string>)>();
 
         /// <summary>
+        /// Keyword dictionary entries split into four sub-categories so the user can
+        /// Tab between Triggers / Food perks / Statuses / Mechanics rather than
+        /// scrolling through one long list.
+        /// </summary>
+        private static readonly List<string> _keywordDictionaryTriggers = new List<string>
+        {
+            "Start of battle: Triggers once when combat begins, before any pet attacks.",
+            "Start of turn: Triggers at the start of each shop phase.",
+            "End of turn: Triggers when you press End Turn, before the battle starts.",
+            "Faint: Triggers when this pet dies in battle.",
+            "Hurt: Triggers when this pet takes damage but survives.",
+            "Friend hurt: Triggers when an allied pet takes damage.",
+            "Friend faints: Triggers when an allied pet dies.",
+            "Friend ahead faints: Triggers when the ally directly in front of this pet dies.",
+            "Friend ahead attacks: Triggers when the ally directly in front of this pet attacks.",
+            "Friend attacks: Triggers when any allied pet attacks.",
+            "Friend summoned: Triggers when a new allied pet is summoned during battle.",
+            "Friend bought: Triggers when you buy a pet from the shop.",
+            "Friend sold: Triggers when you sell an allied pet.",
+            "Friend ate food: Triggers when an allied pet consumes food.",
+            "Eat food: Triggers when this pet itself eats food.",
+            "Summoned: Triggers when this pet enters the team, whether bought or summoned during battle.",
+            "Sell: Triggers when this pet is sold.",
+            "Buy: Triggers when this pet is purchased from the shop.",
+            "Level up: Triggers when this pet reaches a new level by combining.",
+            "Friend leveled up: Triggers when an allied pet levels up.",
+            "Knockout: Triggers when this pet defeats an enemy in a single attack.",
+            "Before attack: Triggers in the instant before this pet attacks.",
+            "After attack: Triggers immediately after this pet attacks.",
+            "Shop rolled: Triggers each time the shop is rolled.",
+            "Break: Triggers when this pet's toy or relic breaks.",
+            "Toy summoned: Triggers when a toy is granted to this pet.",
+            "Gain perk: Triggers when this pet gains a perk like Honey or Melon.",
+            "Lose perk: Triggers when this pet loses a perk it was holding.",
+            "Friend transformed: Triggers when an allied pet changes into a different pet.",
+            "Friend jumped: Triggers when an allied pet performs a jump attack.",
+            "Friend gained attack: Triggers when an allied pet's attack is permanently increased.",
+            "Friend gained health: Triggers when an allied pet's health is permanently increased.",
+            "Spend gold: Triggers when you spend the listed amount of gold this turn.",
+            "Anyone attacks: Triggers when any pet on the board attacks.",
+            "Enemy hurt: Triggers when an enemy pet takes damage.",
+            "Enemy faints: Triggers when an enemy pet dies.",
+        };
+
+        private static readonly List<string> _keywordDictionaryFoodPerks = new List<string>
+        {
+            "Apple: Permanent plus 1 attack, plus 1 health.",
+            "Pear: Permanent plus 2 attack, plus 2 health.",
+            "Cupcake: Plus 3 attack, plus 3 health for the next battle only.",
+            "Croissant: The carrier gains plus 1 attack at the end of each turn.",
+            "Salad Bowl: Plus 1 attack, plus 1 health to two random allies.",
+            "Canned Food: Plus 1 attack, plus 1 health to all current and future shop pets.",
+            "Sleeping Pill: Makes one pet faint, triggering its faint ability. Always on sale at 1 gold.",
+            "Honey: When this pet faints, summons a 1 attack, 1 health Bee.",
+            "Mushroom: Revives this pet once at 1 attack, 1 health when it faints.",
+            "Garlic: The carrier takes 2 less damage from each hit, but never less than 2.",
+            "Melon: Blocks the next 20 damage taken, then breaks.",
+            "Coconut: Blocks the first instance of damage taken, then breaks.",
+            "Steak: First attack deals plus 20 damage, then breaks.",
+            "Meat Bone: The carrier's attack deals plus 3 damage.",
+            "Chili: On attack, also deals 5 damage to the second enemy.",
+            "Pepper: The carrier's health cannot drop below 1; removed after taking damage.",
+            "Pineapple: The carrier's ability damage is increased by 2.",
+            "Strawberry: When the carrier faints, gives the back-most friend plus 1 attack, plus 1 health.",
+            "Cake: The carrier increases sell value by 1 gold at the end of each turn.",
+            "Egg: Before the carrier attacks, deals 2 damage to the target, once.",
+            "Cheese: The carrier's next attack deals at least 15 damage, then breaks.",
+            "Lemon: The carrier takes 7 less damage, twice.",
+            "Popcorn: When this pet faints, summons a random tier pet of the same tier.",
+            "Cucumber: The carrier gains plus 1 health at the end of each turn.",
+            "Carrot: Gains plus 1 attack, plus 1 health at the end of each turn.",
+            "Grapes: Earn plus 1 gold at the start of each turn.",
+            "Banana: When the carrier faints, summons a 4 attack, 4 health Monkey.",
+            "Bread: The carrier gains plus 7 health until next turn, at the end of each turn.",
+            "Onion: Before the carrier attacks, it moves to the back of the team, once.",
+            "Sushi: Plus 1 attack, plus 1 health to three random friends.",
+            "Fortune Cookie: The carrier's attacks have a 50 percent chance to deal double damage.",
+            "Skewer: On attack, also deals 3 damage to the second and third enemies.",
+            "Tomato: Before the carrier attacks, deals 10 damage to the last enemy, once.",
+            "Pancakes: Before battle, gives all friends plus 2 attack, plus 2 health.",
+            "Doughnut: The carrier is prioritized as the target of friendly random abilities.",
+            "Eggplant: Before battle, pushes the opposite enemy 1 space forward.",
+            "Pie: Before battle, the carrier gains plus 4 attack, plus 4 health.",
+            "Magic Beans: At the start of next turn, the carrier gains the Golden Egg perk and sell value increases by 4 gold.",
+            "Fairy Dust: When the front space is empty, the carrier jumps to the front and gains 2 mana, once.",
+            "Golden Egg: Before the carrier attacks, deals 6 damage to the target, once.",
+            "Easter Egg: When the carrier faints, summons a 3 attack, 3 health Bunny that attacks for double damage.",
+        };
+
+        private static readonly List<string> _keywordDictionaryStatuses = new List<string>
+        {
+            "Weak: The afflicted pet takes plus 3 damage from incoming attacks.",
+            "Confused: Before the afflicted pet's first attack, it transforms into a random pet one tier below, once.",
+            "Cursed: When the afflicted pet faints, makes one random friend Cursed.",
+            "Silly: The afflicted pet's ability has random targets in battle.",
+            "Sleepy: Halves damage dealt by the afflicted pet, once.",
+        };
+
+        private static readonly List<string> _keywordDictionaryMechanics = new List<string>
+        {
+            "Tier: A pet's tier determines how soon it appears in the shop. Tier 1 is earliest.",
+            "Roll: Replaces all unfrozen pets and food in the shop for 1 gold.",
+            "Freeze: Locks a shop pet or food so it stays through rolls and into the next turn. Free.",
+            "Combine: Place two of the same pet on top of each other to merge. Two of the same pet make a level 2; three more make level 3.",
+            "Level: Each pet levels from 1 to 3. Higher level usually means stronger abilities.",
+            "Toy: A special item earned at certain shop tiers that grants a permanent perk.",
+            "Relic: A special bonus item in Daily mode, displayed beside the bully team.",
+            "Mana: Resource used by certain pets to trigger powerful abilities.",
+            "Trumpets: An accumulating buff that summons a Golden Retriever with attack and health equal to its count when the team is nearly wiped.",
+            "Moustache Score: Daily-mode score, earned by collecting moustaches across battles.",
+            "Bullies: The pre-built enemy teams faced in Daily mode.",
+        };
+
+        /// <summary>
         /// Builds context-dependent help categories based on current game phase.
         /// </summary>
         private static void BuildHelpCategories()
@@ -3664,6 +3820,14 @@ namespace SuperAutoAccessibility
                     "Escape: Pause menu or close overlay",
                     "H: Open or close help"
                 }));
+                _helpCategories.Add(("Dictionary: Triggers",
+                    new List<string>(_keywordDictionaryTriggers)));
+                _helpCategories.Add(("Dictionary: Food and Perks",
+                    new List<string>(_keywordDictionaryFoodPerks)));
+                _helpCategories.Add(("Dictionary: Statuses",
+                    new List<string>(_keywordDictionaryStatuses)));
+                _helpCategories.Add(("Dictionary: Game Mechanics",
+                    new List<string>(_keywordDictionaryMechanics)));
             }
             else if (Gameplay.GameplayPhaseDetector.IsBattlePhase())
             {
@@ -3680,6 +3844,14 @@ namespace SuperAutoAccessibility
                     "Escape: Pause menu",
                     "H: Open or close help"
                 }));
+                _helpCategories.Add(("Dictionary: Triggers",
+                    new List<string>(_keywordDictionaryTriggers)));
+                _helpCategories.Add(("Dictionary: Food and Perks",
+                    new List<string>(_keywordDictionaryFoodPerks)));
+                _helpCategories.Add(("Dictionary: Statuses",
+                    new List<string>(_keywordDictionaryStatuses)));
+                _helpCategories.Add(("Dictionary: Game Mechanics",
+                    new List<string>(_keywordDictionaryMechanics)));
             }
             else
             {
@@ -3700,6 +3872,14 @@ namespace SuperAutoAccessibility
                 {
                     "H: Open or close help"
                 }));
+                _helpCategories.Add(("Dictionary: Triggers",
+                    new List<string>(_keywordDictionaryTriggers)));
+                _helpCategories.Add(("Dictionary: Food and Perks",
+                    new List<string>(_keywordDictionaryFoodPerks)));
+                _helpCategories.Add(("Dictionary: Statuses",
+                    new List<string>(_keywordDictionaryStatuses)));
+                _helpCategories.Add(("Dictionary: Game Mechanics",
+                    new List<string>(_keywordDictionaryMechanics)));
             }
         }
 
@@ -4302,14 +4482,39 @@ namespace SuperAutoAccessibility
                     {
                         try
                         {
-                            int victories = model.Victories;
-                            int victoriesMax = model.VictoriesMax;
-                            // Victories hasn't been incremented yet when TallyArena appears after a win
-                            if (tallyOutcomeStr == "PlayerWon") victories++;
-                            if (victoriesMax > 0)
-                                parts.Add($"{victories} of {victoriesMax} trophies");
+                            bool isBullyRush = false;
+                            try
+                            {
+                                isBullyRush = Il2CppSpacewood.Unity.Memory.Mode ==
+                                    Il2CppSpacewood.Core.Enums.Mode.BullyRush;
+                            }
+                            catch { }
+
+                            if (isBullyRush)
+                            {
+                                // Daily mode (BullyRush) scores by moustaches, not trophies.
+                                // The HUD shows MoustachesCollected as a running total. The
+                                // model.Victories/VictoriesMax fields don't map to anything
+                                // the user sees on the screen.
+                                int moustaches = 0;
+                                try { moustaches = model.Board?.MoustachesCollected ?? 0; }
+                                catch { }
+                                if (moustaches > 0)
+                                    parts.Add(moustaches == 1
+                                        ? "1 moustache"
+                                        : $"{moustaches} moustaches");
+                            }
                             else
-                                parts.Add($"{victories} trophies");
+                            {
+                                int victories = model.Victories;
+                                int victoriesMax = model.VictoriesMax;
+                                // Victories hasn't been incremented yet when TallyArena appears after a win
+                                if (tallyOutcomeStr == "PlayerWon") victories++;
+                                if (victoriesMax > 0)
+                                    parts.Add($"{victories} of {victoriesMax} trophies");
+                                else
+                                    parts.Add($"{victories} trophies");
+                            }
                         }
                         catch { }
 
@@ -4341,7 +4546,7 @@ namespace SuperAutoAccessibility
                                     catch { }
                                 }
                                 if (enemyNames.Count > 0)
-                                    parts.Add($"Enemy team: {string.Join(", ", enemyNames)}");
+                                    parts.Add($"Enemy remaining team: {string.Join(", ", enemyNames)}");
                             }
                         }
                         catch { }
@@ -4352,6 +4557,69 @@ namespace SuperAutoAccessibility
                 return parts.Count > 0 ? string.Join(". ", parts) : null;
             }
             catch { return null; }
+        }
+
+        // =====================================================================
+        // DAILY-MODE (BullyRush) MOUSTACHE-SCORE SCREEN: TallyBullyScore
+        // =====================================================================
+
+        /// <summary>
+        /// Polls for the TallyBullyScore screen (post-battle moustache score with optional
+        /// win-bonus). Reads the live TextMeshProUGUI fields the game already populates
+        /// (FinalScoreLabel / ScoreAmount / PersonalBestLabel) so we announce whatever the
+        /// game itself displays — e.g. "Moustache Score. 13. Plus 5 win bonus."
+        /// </summary>
+        private static void PollTallyBullyScore()
+        {
+            try
+            {
+                var tbs = UnityEngine.Object.FindObjectOfType<
+                    Il2CppSpacewood.Unity.TallyBullyScore>();
+                bool isOpen = tbs != null && tbs.gameObject.activeInHierarchy;
+
+                if (isOpen && !_lastTallyBullyScoreOpen)
+                {
+                    var parts = new System.Collections.Generic.List<string>();
+                    try
+                    {
+                        string label = tbs.FinalScoreLabel?.text?.Trim();
+                        if (!string.IsNullOrEmpty(label)) parts.Add(label);
+                    }
+                    catch { }
+                    try
+                    {
+                        string amount = tbs.ScoreAmount?.text?.Trim();
+                        if (!string.IsNullOrEmpty(amount)) parts.Add(amount);
+                    }
+                    catch { }
+                    try
+                    {
+                        string bonus = tbs.PersonalBestLabel?.text?.Trim();
+                        if (!string.IsNullOrEmpty(bonus))
+                        {
+                            // "+5 Win Bonus" reads better as "plus 5 win bonus" through TTS.
+                            string spoken = bonus.StartsWith("+")
+                                ? "plus " + bonus.Substring(1).Trim()
+                                : bonus;
+                            parts.Add(spoken);
+                        }
+                    }
+                    catch { }
+
+                    if (parts.Count > 0)
+                    {
+                        string announcement = string.Join(". ", parts) + ".";
+                        AccessibilityManager.Announce(announcement);
+                        MelonLogger.Msg($"[TallyBullyScore] Announced: {announcement}");
+                    }
+                }
+
+                _lastTallyBullyScoreOpen = isOpen;
+            }
+            catch (System.Exception ex)
+            {
+                MelonLogger.Warning($"PollTallyBullyScore error: {ex.Message}");
+            }
         }
 
         // =====================================================================

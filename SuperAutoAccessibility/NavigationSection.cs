@@ -1279,7 +1279,10 @@ namespace SuperAutoAccessibility
         {
             var section = new NavigationSection("Game Modes");
             TryAddWithLabel(section, modeMenu.ArenaButton, "Arena");
-            TryAddWithLabel(section, modeMenu.BullyButton, "Bully");
+            // BullyButton is the internal name for the "Daily" mode button in current
+            // SAP builds. Label override "Bully" was prepended on top of the on-screen
+            // "Daily" TMP, producing "Bully, Daily, button, 2 of 4". Match the visible label.
+            TryAddWithLabel(section, modeMenu.BullyButton, "Daily");
             TryAddWithLabel(section, modeMenu.ListButton, "List");
             TryAddWithLabel(section, modeMenu.VersusButton, "Versus");
             TryAddWithLabel(section, modeMenu.PrivateButton, "Private");

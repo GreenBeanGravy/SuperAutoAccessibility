@@ -299,7 +299,9 @@ namespace SuperAutoAccessibility.Gameplay
 
         /// <summary>
         /// Reads the board status (gold, turn, tier, lives, wins/losses).
-        /// e.g. "Turn 3, 10 gold, tier 2, 5 lives, 2 wins, 0 losses"
+        /// Daily (BullyRush) also appends the moustache score.
+        /// e.g. Arena → "Turn 3, 10 gold, tier 2, 5 lives, 2 wins, 0 losses"
+        ///      Daily → "Turn 3, 10 gold, tier 2, 5 lives, 2 wins, 0 losses, 13 moustaches"
         /// </summary>
         public static string ReadBoardStatus(BoardModel board)
         {
@@ -322,6 +324,23 @@ namespace SuperAutoAccessibility.Gameplay
                 try { parts.Add($"{board.Lives} of {board.LivesMax} lives"); } catch { }
                 try { parts.Add($"{board.Victories} wins"); } catch { }
                 try { parts.Add($"{board.Losses} losses"); } catch { }
+
+                bool isBullyRush = false;
+                try
+                {
+                    isBullyRush = Il2CppSpacewood.Unity.Memory.Mode ==
+                        Il2CppSpacewood.Core.Enums.Mode.BullyRush;
+                }
+                catch { }
+                if (isBullyRush)
+                {
+                    try
+                    {
+                        int moustaches = board.MoustachesCollected;
+                        parts.Add(moustaches == 1 ? "1 moustache" : $"{moustaches} moustaches");
+                    }
+                    catch { }
+                }
 
                 return string.Join(", ", parts);
             }
@@ -376,14 +395,29 @@ namespace SuperAutoAccessibility.Gameplay
         }
 
         /// <summary>
-        /// Reads wins/losses for the W key query.
+        /// Reads wins/losses for the W key query. In Daily mode (BullyRush) also
+        /// appends the moustache score.
         /// </summary>
         public static string ReadWinsStatus(BoardModel board)
         {
             if (board == null) return "Wins unknown";
             try
             {
-                return $"{board.Victories} wins, {board.Losses} losses";
+                string baseStr = $"{board.Victories} wins, {board.Losses} losses";
+                bool isBullyRush = false;
+                try
+                {
+                    isBullyRush = Il2CppSpacewood.Unity.Memory.Mode ==
+                        Il2CppSpacewood.Core.Enums.Mode.BullyRush;
+                }
+                catch { }
+                if (isBullyRush)
+                {
+                    int moustaches = board.MoustachesCollected;
+                    string mLabel = moustaches == 1 ? "1 moustache" : $"{moustaches} moustaches";
+                    return $"{baseStr}, {mLabel}";
+                }
+                return baseStr;
             }
             catch { return "Wins unknown"; }
         }

@@ -26,7 +26,8 @@ namespace SuperAutoAccessibility.Gameplay
         PetShop,   // S key
         FoodShop,  // F key
         Team,      // T key
-        Actions    // D key
+        Actions,   // D key
+        Bullies    // V key â€” read-only browse of the upcoming Daily-mode opponent team
     }
 
     public enum CombineStatus
@@ -46,6 +47,12 @@ namespace SuperAutoAccessibility.Gameplay
 
         // For Actions zone, we store button references
         private static List<(SelectableBase button, string label)> _actionButtons = new List<(SelectableBase, string)>();
+
+        // For Bullies zone, we store MinionModel references (read-only browse of the
+        // upcoming Daily-mode opponent team). BullyBoardView exposes pets as MinionViews,
+        // not as Spaces, so we can't reuse _currentSlots.
+        private static List<Il2CppSpacewood.Core.Models.MinionModel> _currentBullies =
+            new List<Il2CppSpacewood.Core.Models.MinionModel>();
 
         // Track hangar state machine for food targeting detection
         private static HangarState _lastHangarState = HangarState.Default;
@@ -247,6 +254,7 @@ namespace SuperAutoAccessibility.Gameplay
             else if (Input.GetKeyDown(KeyCode.W)) AnnounceWins(hangar);
             else if (Input.GetKeyDown(KeyCode.I)) AnnounceDetailedInfo(hangar);
             else if (Input.GetKeyDown(KeyCode.O)) OpenScoreboard(hangar);
+            else if (Input.GetKeyDown(KeyCode.V)) SwitchToZone(ShopZone.Bullies, hangar);
 
             // Global shop action keys â€” blocked if turn ended
             else if (Input.GetKeyDown(KeyCode.Q))
@@ -461,9 +469,37 @@ namespace SuperAutoAccessibility.Gameplay
             _currentDetailLines.Clear();
             _currentDetailLineIndex = 0;
 
-            if (_currentZone == ShopZone.Actions || _currentSlots.Count == 0 ||
-                _currentIndex >= _currentSlots.Count)
+            if (_currentZone == ShopZone.Actions) return;
+
+            // Bullies zone is sourced from _currentBullies (MinionModel list), not _currentSlots.
+            if (_currentZone == ShopZone.Bullies)
+            {
+                if (_currentBullies.Count == 0 || _currentIndex >= _currentBullies.Count) return;
+                try
+                {
+                    var bullyMinion = _currentBullies[_currentIndex];
+                    if (bullyMinion == null) return;
+                    // Find the matching MinionView from BullyBoardView for richer detail lines.
+                    MinionView bullyView = null;
+                    try
+                    {
+                        var minionsContainer = hangar.transform.Find("Board/BullyBoardView/Minions");
+                        Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppArrayBase<MinionView> views = null;
+                        if (minionsContainer != null)
+                            views = minionsContainer.GetComponentsInChildren<MinionView>(true);
+                        if (views != null && _currentIndex < views.Count)
+                            bullyView = views[_currentIndex];
+                    }
+                    catch { }
+                    // Reuse the team detail-line builder. The bully board is structurally a
+                    // team-side board (minions with stats/perks/abilities), just owned by World.
+                    _currentDetailLines = DetailLineProvider.BuildMinionTeamLines(bullyMinion, bullyView);
+                }
+                catch { }
                 return;
+            }
+
+            if (_currentSlots.Count == 0 || _currentIndex >= _currentSlots.Count) return;
 
             var space = _currentSlots[_currentIndex];
             if (space == null) return;
@@ -593,6 +629,7 @@ namespace SuperAutoAccessibility.Gameplay
             _currentIndex = 0;
             _currentSlots.Clear();
             _actionButtons.Clear();
+            _currentBullies.Clear();
             _pendingSell = false; // Cancel any deferred sell on zone change
 
             switch (zone)
@@ -608,6 +645,9 @@ namespace SuperAutoAccessibility.Gameplay
                     break;
                 case ShopZone.Actions:
                     PopulateActionButtons(hangar);
+                    break;
+                case ShopZone.Bullies:
+                    PopulateBullySlots(hangar);
                     break;
             }
 
@@ -692,6 +732,61 @@ namespace SuperAutoAccessibility.Gameplay
             }
         }
 
+        /// <summary>
+        /// Populates _currentBullies with the upcoming Daily-mode opponent team
+        /// from /Build/Hangar/Board/BullyBoardView. Reads pets first, then any
+        /// relics the bully owns (the special-item slot to the right of the team).
+        /// Read-only — used by the V keybind to let the user arrow through the
+        /// next opponent's lineup exactly like their own team.
+        /// </summary>
+        private static void PopulateBullySlots(HangarMain hangar)
+        {
+            try
+            {
+                var bvGo = UnityEngine.GameObject.Find("/Build/Hangar/Board/BullyBoardView");
+                var view = bvGo?.GetComponent<Il2CppSpacewood.Unity.Views.BoardView>();
+                var model = view?.Model;
+                if (model == null) return;
+
+                var items = model.Minions?.Items;
+                if (items != null)
+                {
+                    for (int i = 0; i < items.Count; i++)
+                    {
+                        try
+                        {
+                            var m = items[i];
+                            if (m != null) _currentBullies.Add(m);
+                        }
+                        catch { }
+                    }
+                }
+
+                // Append any non-null relics so V → → → … lands on them after the pets.
+                try
+                {
+                    var relics = model.Relics?.Items;
+                    if (relics != null)
+                    {
+                        for (int i = 0; i < relics.Count; i++)
+                        {
+                            try
+                            {
+                                var r = relics[i];
+                                if (r != null) _currentBullies.Add(r);
+                            }
+                            catch { }
+                        }
+                    }
+                }
+                catch { }
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Warning($"PopulateBullySlots error: {ex.Message}");
+            }
+        }
+
         private static void PopulateActionButtons(HangarMain hangar)
         {
             try
@@ -743,6 +838,7 @@ namespace SuperAutoAccessibility.Gameplay
             int savedIndex = _currentIndex;
             _currentSlots.Clear();
             _actionButtons.Clear();
+            _currentBullies.Clear();
             _currentDetailLines.Clear();
             _currentDetailLineIndex = 0;
 
@@ -760,12 +856,18 @@ namespace SuperAutoAccessibility.Gameplay
                 case ShopZone.Actions:
                     PopulateActionButtons(hangar);
                     break;
+                case ShopZone.Bullies:
+                    PopulateBullySlots(hangar);
+                    break;
             }
 
             // Clamp index to new bounds
-            int maxIndex = (_currentZone == ShopZone.Actions)
-                ? _actionButtons.Count - 1
-                : _currentSlots.Count - 1;
+            int maxIndex = _currentZone switch
+            {
+                ShopZone.Actions => _actionButtons.Count - 1,
+                ShopZone.Bullies => _currentBullies.Count - 1,
+                _ => _currentSlots.Count - 1,
+            };
             _currentIndex = Math.Min(savedIndex, Math.Max(0, maxIndex));
 
             // Rebuild detail lines for the (possibly changed) current slot
@@ -779,17 +881,14 @@ namespace SuperAutoAccessibility.Gameplay
 
         private static void MoveInZone(int direction, HangarMain hangar)
         {
-            if (_currentZone == ShopZone.Actions)
+            int total = _currentZone switch
             {
-                if (_actionButtons.Count == 0) return;
-                _currentIndex = (_currentIndex + direction + _actionButtons.Count) % _actionButtons.Count;
-            }
-            else
-            {
-                if (_currentSlots.Count == 0) return;
-                _currentIndex = (_currentIndex + direction + _currentSlots.Count) % _currentSlots.Count;
-            }
-
+                ShopZone.Actions => _actionButtons.Count,
+                ShopZone.Bullies => _currentBullies.Count,
+                _ => _currentSlots.Count,
+            };
+            if (total == 0) return;
+            _currentIndex = (_currentIndex + direction + total) % total;
             AnnounceCurrentItem(hangar);
         }
 
@@ -801,11 +900,13 @@ namespace SuperAutoAccessibility.Gameplay
 
         private static void MoveToEnd(HangarMain hangar)
         {
-            if (_currentZone == ShopZone.Actions)
-                _currentIndex = Math.Max(0, _actionButtons.Count - 1);
-            else
-                _currentIndex = Math.Max(0, _currentSlots.Count - 1);
-
+            int total = _currentZone switch
+            {
+                ShopZone.Actions => _actionButtons.Count,
+                ShopZone.Bullies => _currentBullies.Count,
+                _ => _currentSlots.Count,
+            };
+            _currentIndex = Math.Max(0, total - 1);
             AnnounceCurrentItem(hangar);
         }
 
@@ -822,9 +923,55 @@ namespace SuperAutoAccessibility.Gameplay
                     ShopZone.FoodShop => "Food Shop",
                     ShopZone.Team => "Team",
                     ShopZone.Actions => "Actions",
+                    ShopZone.Bullies => "Upcoming Bullies",
                     _ => ""
                 };
                 zonePrefix = zoneName + ", ";
+            }
+
+            if (_currentZone == ShopZone.Bullies)
+            {
+                if (_currentBullies.Count == 0)
+                {
+                    AccessibilityManager.Announce($"{zonePrefix}no upcoming bullies");
+                    return;
+                }
+                if (_currentIndex < 0 || _currentIndex >= _currentBullies.Count) return;
+
+                // Build the detail lines for this bully so Up/Down arrow can browse
+                // them line-by-line, exactly like the player's own team.
+                BuildDetailLinesForCurrentSlot(hangar);
+
+                var current = _currentBullies[_currentIndex];
+                string position = $"{_currentIndex + 1} of {_currentBullies.Count}";
+                bool isRelic = false;
+                try { isRelic = current.Type == Il2CppSpacewood.Core.Enums.MinionType.Relic; }
+                catch { }
+
+                if (isRelic)
+                {
+                    // Relics don't have meaningful Attack/Health — announce as
+                    // "Relic: Radio, level 1" so the user knows it's the special item.
+                    string relicName = "";
+                    int relicLevel = 1;
+                    try { relicName = PetStatsReader.GetLocalizedName(current); } catch { }
+                    try { relicLevel = current.Level; } catch { }
+                    if (string.IsNullOrEmpty(relicName)) relicName = "unknown";
+                    AccessibilityManager.Announce(
+                        $"{zonePrefix}Relic: {relicName}, level {relicLevel}, {position}");
+                }
+                else if (_currentDetailLines.Count > 0)
+                {
+                    // First detail line is "Name, X/Y" — same shape as team announcements.
+                    AccessibilityManager.Announce(
+                        $"{zonePrefix}{_currentDetailLines[0]}, {position}");
+                }
+                else
+                {
+                    string desc = PetStatsReader.ReadMinionNameAndStats(current);
+                    AccessibilityManager.Announce($"{zonePrefix}{desc}, {position}");
+                }
+                return;
             }
 
             if (_currentZone == ShopZone.Actions)
@@ -1220,6 +1367,70 @@ namespace SuperAutoAccessibility.Gameplay
                 }
             }
             catch { AccessibilityManager.Announce("Wins unknown"); }
+        }
+
+        /// <summary>
+        /// V key: read the upcoming bully team that's visually shown on the right side
+        /// of the Daily-mode shop. Reads BoardView.Model on /Build/Hangar/Board/BullyBoardView
+        /// — that's the BoardModel for the next opponent. Announces pet names + stats.
+        /// </summary>
+        private static void AnnounceUpcomingBullies(HangarMain hangar)
+        {
+            try
+            {
+                bool isBullyRush = false;
+                try
+                {
+                    isBullyRush = Il2CppSpacewood.Unity.Memory.Mode ==
+                        Il2CppSpacewood.Core.Enums.Mode.BullyRush;
+                }
+                catch { }
+                if (!isBullyRush)
+                {
+                    AccessibilityManager.Announce("Upcoming bullies only available in Daily mode");
+                    return;
+                }
+
+                Il2CppSpacewood.Unity.Views.BoardView view = null;
+                try
+                {
+                    var bvGo = UnityEngine.GameObject.Find("/Build/Hangar/Board/BullyBoardView");
+                    if (bvGo != null)
+                        view = bvGo.GetComponent<Il2CppSpacewood.Unity.Views.BoardView>();
+                }
+                catch { }
+                if (view?.Model?.Minions?.Items == null)
+                {
+                    AccessibilityManager.Announce("No upcoming bullies");
+                    return;
+                }
+
+                var items = view.Model.Minions.Items;
+                var parts = new System.Collections.Generic.List<string>();
+                for (int i = 0; i < items.Count; i++)
+                {
+                    try
+                    {
+                        var m = items[i];
+                        if (m == null) continue;
+                        string desc = PetStatsReader.ReadMinionNameAndStats(m);
+                        if (!string.IsNullOrEmpty(desc) && desc != "Empty")
+                            parts.Add(desc);
+                    }
+                    catch { }
+                }
+
+                if (parts.Count == 0)
+                    AccessibilityManager.Announce("No upcoming bullies");
+                else
+                    AccessibilityManager.Announce(
+                        $"Upcoming bullies: {string.Join(", ", parts)}");
+            }
+            catch (System.Exception ex)
+            {
+                MelonLogger.Warning($"AnnounceUpcomingBullies error: {ex.Message}");
+                AccessibilityManager.Announce("Could not read upcoming bullies");
+            }
         }
 
         private static void AnnounceDetailedInfo(HangarMain hangar)

@@ -381,8 +381,13 @@ namespace SuperAutoAccessibility
             try
             {
                 string tooltipText = null;
-                // Get just the button's direct label text, NOT all children (which includes tooltip)
-                string elementText = GetDirectLabelText(go);
+                // Dedup against what was ACTUALLY spoken for the element. Re-computing
+                // elementText here is timing-dependent (tooltip TMPs may have activated
+                // between the element announcement and now) and produced both flavours
+                // of bug: re-computing always → double-announce; re-computing too late →
+                // wrongly suppress the tooltip. Comparing against the literal spoken
+                // string is unambiguous.
+                string elementText = _lastAnnouncedText ?? "";
 
                 // Strategy 1: Check ButtonBase.Tooltip
                 var buttonBase = go.GetComponent<ButtonBase>();
@@ -729,7 +734,19 @@ namespace SuperAutoAccessibility
                 sb.Append("disabled");
             }
 
-            return sb.ToString();
+            // Guard against degenerate "button" / "slider" / etc announcements:
+            // when an icon-only control has no element text AND no page/section
+            // context, the StringBuilder ends up with just the role word. Suppress
+            // those — they tell the user nothing. Callers should add a label
+            // override (TryAddWithLabel) for any control they want surfaced.
+            string final = sb.ToString().Trim();
+            if (final == "button" || final == "slider" ||
+                final == "dropdown" || final == "edit box")
+            {
+                return "";
+            }
+
+            return final;
         }
 
         /// <summary>

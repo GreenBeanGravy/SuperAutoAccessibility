@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using MelonLoader;
 using UnityEngine;
 using Il2CppBoardEvents;
@@ -32,9 +33,14 @@ namespace SuperAutoAccessibility.Gameplay
         private static BoardModel _playerBoard;
         private static BoardModel _opponentBoard;
 
-        // Track minion lookup cache during battle
-        // Maps ItemId.Unique (int) -> pet name for both player and opponent pets
-        private static Dictionary<int, string> _minionNameCache = new Dictionary<int, string>();
+        // Track minion lookup cache during battle.
+        // Keyed by (side, unique) where side: 0=unknown/world, 1=player, 2=opponent.
+        // Shop-phase IDs frequently collide between boards (both player and opponent
+        // can have a pet at unique=7 in turn 1) — keying on unique alone caused the
+        // second board's PopulateNameCacheFromBoard to overwrite the first's pets,
+        // producing "Your Gecko fainted" when the player's Horse died.
+        private static Dictionary<(int side, int unique), string> _minionNameCache =
+            new Dictionary<(int, int), string>();
 
         // Track which side (1=Player, 2=Opponent) each battle-resolver ID belongs to.
         // Populated by CacheMinionTradeNames and SummonMinion events.
@@ -102,7 +108,7 @@ namespace SuperAutoAccessibility.Gameplay
             }
 
             // Pre-populate name cache from player board (shop-phase IDs)
-            PopulateNameCacheFromBoard(_playerBoard);
+            PopulateNameCacheFromBoard(_playerBoard, side: 1);
 
             // Build positional name lists from shop-phase boards.
             // These are used by CacheMinionTradeNames to map battle-resolver IDs
@@ -174,7 +180,7 @@ namespace SuperAutoAccessibility.Gameplay
                     {
                         _opponentBoard = oppBoard;
                         _opponentBoardLoaded = true;
-                        PopulateNameCacheFromBoard(oppBoard);
+                        PopulateNameCacheFromBoard(oppBoard, side: 2);
                         MelonLogger.Msg($"[BattleNarrator] Opponent board loaded from Memory.Battle, cache has {_minionNameCache.Count} entries");
                         return;
                     }
@@ -186,7 +192,7 @@ namespace SuperAutoAccessibility.Gameplay
                         if (userBoard != null)
                         {
                             _playerBoard = userBoard;
-                            PopulateNameCacheFromBoard(userBoard);
+                            PopulateNameCacheFromBoard(userBoard, side: 1);
                             MelonLogger.Msg($"[BattleNarrator] Player board loaded from Memory.Battle");
                         }
                     }
@@ -213,9 +219,11 @@ namespace SuperAutoAccessibility.Gameplay
         }
 
         /// <summary>
-        /// Populate name cache from a board model's minions.
+        /// Populate name cache from a board model's minions, scoped to `side`
+        /// (1 = player, 2 = opponent). Side-keying is required because shop-phase
+        /// unique IDs collide across boards (both start at 5, 6, 7…).
         /// </summary>
-        private static void PopulateNameCacheFromBoard(BoardModel board)
+        private static void PopulateNameCacheFromBoard(BoardModel board, int side)
         {
             if (board == null) return;
 
@@ -234,9 +242,9 @@ namespace SuperAutoAccessibility.Gameplay
                             {
                                 int key = m.Id.Unique;
                                 string name = PetStatsReader.GetLocalizedName(m);
-                                MelonLogger.Msg($"[BattleNarrator] Cache from Items: unique={key}, name={name}, enum={m.Enum}");
+                                MelonLogger.Msg($"[BattleNarrator] Cache from Items: side={side}, unique={key}, name={name}, enum={m.Enum}");
                                 if (!string.IsNullOrEmpty(name) && name != "Unknown pet")
-                                    _minionNameCache[key] = name;
+                                    _minionNameCache[(side, key)] = name;
                             }
                         }
                         catch { }
@@ -262,12 +270,12 @@ namespace SuperAutoAccessibility.Gameplay
                             if (m != null)
                             {
                                 int key = m.Id.Unique;
-                                if (!_minionNameCache.ContainsKey(key))
+                                if (!_minionNameCache.ContainsKey((side, key)))
                                 {
                                     string name = PetStatsReader.GetLocalizedName(m);
-                                    MelonLogger.Msg($"[BattleNarrator] Cache from FindMinions: unique={key}, name={name}");
+                                    MelonLogger.Msg($"[BattleNarrator] Cache from FindMinions: side={side}, unique={key}, name={name}");
                                     if (!string.IsNullOrEmpty(name) && name != "Unknown pet")
-                                        _minionNameCache[key] = name;
+                                        _minionNameCache[(side, key)] = name;
                                 }
                             }
                         }
@@ -276,6 +284,37 @@ namespace SuperAutoAccessibility.Gameplay
                 }
             }
             catch { }
+        }
+
+        /// <summary>
+        /// Lookup helper. When sideHint &gt; 0, looks up that side's entry directly —
+        /// this is the authoritative path because shop-phase IDs and battle-resolver
+        /// IDs share a namespace and the same `unique` can legitimately belong to both
+        /// player and opponent at once (one's shop pet, the other's mid-battle pet).
+        /// sideHint=0 means "caller doesn't know"; we then consult _minionOwnerCache
+        /// and fall back to scanning both sides.
+        /// </summary>
+        private static string LookupCachedName(int unique, int sideHint = 0)
+        {
+            if (sideHint > 0)
+            {
+                if (_minionNameCache.TryGetValue((sideHint, unique), out var sideName))
+                    return sideName;
+                // No entry for the hinted side — return null rather than the wrong side's
+                // name. Caller (ResolveName) will then try FindMinion on that side's board.
+                return null;
+            }
+
+            if (_minionOwnerCache.TryGetValue(unique, out int side))
+            {
+                if (_minionNameCache.TryGetValue((side, unique), out var name))
+                    return name;
+            }
+            if (_minionNameCache.TryGetValue((1, unique), out var playerName))
+                return playerName;
+            if (_minionNameCache.TryGetValue((2, unique), out var opponentName))
+                return opponentName;
+            return null;
         }
 
         /// <summary>
@@ -378,8 +417,9 @@ namespace SuperAutoAccessibility.Gameplay
                         // (amount, remaining health, target name)
                         return;
                     case "PhaseStartBattle":
-                        message = "Battle starting";
-                        break;
+                        // Suppressed: GameplayPhaseDetector.AnnounceBattleStart fires
+                        // earlier and carries richer context (VS screen, team names).
+                        return;
                     case "MoveMinion":
                     case "SpendGold":
                     case "PlaySpell":
@@ -467,7 +507,9 @@ namespace SuperAutoAccessibility.Gameplay
                 var damage = EventUnwrapper.ExtractDone<DamageMinion>(wrapper);
                 if (damage == null) return null;
 
-                string targetName = ResolveName(damage.TargetId);
+                // wrapper.Owner is the side of the target (defender) in damage events.
+                int targetSide = 0; try { targetSide = (int)wrapper.Owner; } catch { }
+                string targetName = ResolveName(damage.TargetId, targetSide);
                 int amount = damage.Amount;
 
                 // Resolve source (attacker) name and side
@@ -478,20 +520,26 @@ namespace SuperAutoAccessibility.Gameplay
                     var sourceId = damage.SourceId;
                     if (sourceId != null && sourceId.HasValue)
                     {
-                        sourceName = ResolveName(sourceId.Value);
+                        // Source is the OPPOSITE side of the target in most damage events.
+                        int sourceSide = targetSide == 1 ? 2 : (targetSide == 2 ? 1 : 0);
+                        sourceName = ResolveName(sourceId.Value, sourceSide);
                         sourcePrefix = ResolveOwnerPrefix(sourceId.Value);
                     }
                 }
                 catch { }
 
-                // Health remaining
+                // Health remaining — clamp to 0 and use "lethal" wording for the
+                // fatal hit so the user gets a clean "takes 4 damage, lethal" instead
+                // of "takes 4 damage, -2 health remaining" (a Faint announcement
+                // follows on the next event).
                 string healthRemaining = "";
                 try
                 {
                     var resultHealth = damage.ResultHealth;
                     if (resultHealth != null)
                     {
-                        healthRemaining = $", {resultHealth.Total} health remaining";
+                        int hp = resultHealth.Total;
+                        healthRemaining = hp <= 0 ? ", lethal" : $", {hp} health remaining";
                     }
                 }
                 catch { }
@@ -603,9 +651,8 @@ namespace SuperAutoAccessibility.Gameplay
                         try
                         {
                             int key = minion.Id.Unique;
-                            _minionNameCache[key] = minionName;
-                            // Track ownership: Owner=1 â†’ player, Owner=2 â†’ opponent
                             int ownerSide = (int)wrapper.Owner;
+                            _minionNameCache[(ownerSide, key)] = minionName;
                             _minionOwnerCache[key] = ownerSide;
                         }
                         catch { }
@@ -625,7 +672,8 @@ namespace SuperAutoAccessibility.Gameplay
                 var buff = EventUnwrapper.ExtractDone<BuffMinion>(wrapper);
                 if (buff == null) return null;
 
-                string targetName = ResolveName(buff.TargetId);
+                int targetSide = 0; try { targetSide = (int)wrapper.Owner; } catch { }
+                string targetName = ResolveName(buff.TargetId, targetSide);
                 int attack = buff.ResultAttackGained;
                 int health = buff.ResultHealthGained;
 
@@ -661,33 +709,41 @@ namespace SuperAutoAccessibility.Gameplay
                 var ability = EventUnwrapper.ExtractDone<AbilityActivate>(wrapper);
                 if (ability == null) return null;
 
-                // KEY FIX: AbilityActivate.Ability IS the pet type name (e.g. Blowfish, Skunk, Kangaroo).
-                // MinionId carries the battle-resolver ID. This gives us a direct battleId â†’ petName mapping.
-                // Cache BEFORE calling ResolveName so the name is available for this and all subsequent events.
+                // AbilityActivate.Ability is the ABILITY enum (e.g. Blowfish, GeckoAbility,
+                // SkunkAbility). For pets where the enum equals the pet name (Blowfish, Skunk
+                // as bare names) it doubles as the pet name; for pets named "*Ability" the
+                // suffix has to be stripped so the cache holds "Gecko" not "Gecko Ability".
                 string abilityName = "";
+                string petNameFromAbility = "";
                 try
                 {
                     abilityName = PetStatsReader.SplitCamelCase(ability.Ability.ToString());
+                    petNameFromAbility = System.Text.RegularExpressions.Regex.Replace(
+                        abilityName ?? "", @"\s*Ability$", "").Trim();
                 }
                 catch { }
 
                 int battleId = ability.MinionId.Unique;
-                if (!_minionNameCache.ContainsKey(battleId) && !string.IsNullOrEmpty(abilityName))
+                // Owner IS reliable for AbilityActivate (unlike MinionTrade where Owner=World)
+                int abilityOwnerSide = 0;
+                try { abilityOwnerSide = (int)wrapper.Owner; } catch { }
+                if (abilityOwnerSide > 0 &&
+                    !_minionNameCache.ContainsKey((abilityOwnerSide, battleId)) &&
+                    !string.IsNullOrEmpty(petNameFromAbility))
                 {
-                    _minionNameCache[battleId] = abilityName;
-                    // Owner IS reliable for AbilityActivate (unlike MinionTrade where Owner=World)
-                    int ownerSide = 0;
-                    try { ownerSide = (int)wrapper.Owner; } catch { }
-                    if (ownerSide > 0)
-                        _minionOwnerCache[battleId] = ownerSide;
-                    MelonLogger.Msg($"[BattleNarrator] AbilityActivate cached: battleId={battleId} -> {abilityName} (owner={ownerSide})");
+                    _minionNameCache[(abilityOwnerSide, battleId)] = petNameFromAbility;
+                    _minionOwnerCache[battleId] = abilityOwnerSide;
+                    MelonLogger.Msg($"[BattleNarrator] AbilityActivate cached: battleId={battleId} -> {petNameFromAbility} (owner={abilityOwnerSide})");
                 }
 
-                string minionName = ResolveName(ability.MinionId);
+                string minionName = ResolveName(ability.MinionId, abilityOwnerSide);
 
-                // Since Ability enum IS the pet type name (e.g. Blowfish), the ability name
-                // and pet name are often the same. Avoid "Blowfish's Blowfish triggers".
-                if (!string.IsNullOrEmpty(abilityName) && abilityName != minionName)
+                // Avoid "Blowfish's Blowfish triggers" by case-insensitive name compare after
+                // stripping leading articles. Use the pet-name (suffix-stripped) for dedup,
+                // but spell out the full ability name in the trigger phrasing.
+                if (!string.IsNullOrEmpty(abilityName) &&
+                    !SameName(petNameFromAbility, minionName) &&
+                    !SameName(abilityName, minionName))
                     return $"{ownerPrefix} {minionName}'s {abilityName} triggers";
                 else
                     return $"{ownerPrefix} {minionName}'s ability triggers";
@@ -702,8 +758,11 @@ namespace SuperAutoAccessibility.Gameplay
                 var jumpAttack = EventUnwrapper.ExtractDone<MinionJumpAttack>(wrapper);
                 if (jumpAttack == null) return null;
 
-                string attackerName = ResolveName(jumpAttack.TargetToThrow);
-                string targetName = ResolveName(jumpAttack.TargetToThrowAt);
+                // Jump-attack: attacker is the event owner, target is the opposite side.
+                int attackerSide = 0; try { attackerSide = (int)wrapper.Owner; } catch { }
+                int defenderSide = attackerSide == 1 ? 2 : (attackerSide == 2 ? 1 : 0);
+                string attackerName = ResolveName(jumpAttack.TargetToThrow, attackerSide);
+                string targetName = ResolveName(jumpAttack.TargetToThrowAt, defenderSide);
                 return $"{ownerPrefix} {attackerName} attacks {targetName}";
             }
             catch { return null; }
@@ -716,7 +775,8 @@ namespace SuperAutoAccessibility.Gameplay
                 var abilityDmg = EventUnwrapper.ExtractDone<MinionAbilityDamage>(wrapper);
                 if (abilityDmg == null) return null;
 
-                string targetName = ResolveName(abilityDmg.TargetId);
+                int targetSide = 0; try { targetSide = (int)wrapper.Owner; } catch { }
+                string targetName = ResolveName(abilityDmg.TargetId, targetSide);
                 int amount = abilityDmg.Amount;
 
                 if (amount > 0)
@@ -733,7 +793,8 @@ namespace SuperAutoAccessibility.Gameplay
                 var givePerk = EventUnwrapper.ExtractDone<GiveMinionPerk>(wrapper);
                 if (givePerk == null) return null;
 
-                string targetName = ResolveName(givePerk.TargetId);
+                int targetSide = 0; try { targetSide = (int)wrapper.Owner; } catch { }
+                string targetName = ResolveName(givePerk.TargetId, targetSide);
                 string perkName = ReadPerkName(givePerk);
                 return $"{ownerPrefix} {targetName} gains {perkName}";
             }
@@ -747,7 +808,8 @@ namespace SuperAutoAccessibility.Gameplay
                 var losePerk = EventUnwrapper.ExtractDone<LoseMinionPerk>(wrapper);
                 if (losePerk == null) return null;
 
-                string targetName = ResolveName(losePerk.Target);
+                int targetSide = 0; try { targetSide = (int)wrapper.Owner; } catch { }
+                string targetName = ResolveName(losePerk.Target, targetSide);
                 string perkName = ReadPerkNullable(losePerk.Perk);
                 return $"{ownerPrefix} {targetName} loses {perkName}";
             }
@@ -761,8 +823,11 @@ namespace SuperAutoAccessibility.Gameplay
                 var stealPerk = EventUnwrapper.ExtractDone<StealMinionPerk>(wrapper);
                 if (stealPerk == null) return null;
 
-                string sourceName = ResolveName(stealPerk.Source);
-                string targetName = ResolveName(stealPerk.Target);
+                // StealMinionPerk: source is the event owner; target is the opposite side.
+                int sourceSide = 0; try { sourceSide = (int)wrapper.Owner; } catch { }
+                int targetSide = sourceSide == 1 ? 2 : (sourceSide == 2 ? 1 : 0);
+                string sourceName = ResolveName(stealPerk.Source, sourceSide);
+                string targetName = ResolveName(stealPerk.Target, targetSide);
                 string perkName = ReadPerkNullable(stealPerk.ResultPerk);
                 return $"{ownerPrefix} {sourceName} steals {perkName} from {targetName}";
             }
@@ -776,7 +841,8 @@ namespace SuperAutoAccessibility.Gameplay
                 var debuff = EventUnwrapper.ExtractDone<DebuffMinion>(wrapper);
                 if (debuff == null) return null;
 
-                string targetName = ResolveName(debuff.Target);
+                int targetSide = 0; try { targetSide = (int)wrapper.Owner; } catch { }
+                string targetName = ResolveName(debuff.Target, targetSide);
                 int attack = debuff.Attack;
                 int health = debuff.Health;
 
@@ -800,7 +866,8 @@ namespace SuperAutoAccessibility.Gameplay
                 var markDead = EventUnwrapper.ExtractDone<MarkMinionDead>(wrapper);
                 if (markDead == null) return null;
 
-                string targetName = ResolveName(markDead.TargetId);
+                int targetSide = 0; try { targetSide = (int)wrapper.Owner; } catch { }
+                string targetName = ResolveName(markDead.TargetId, targetSide);
 
                 // Track fainted pets for survivor announcement â€” use NAMES with COUNTS since
                 // battle-resolver IDs don't match shop-phase board IDs.
@@ -847,7 +914,8 @@ namespace SuperAutoAccessibility.Gameplay
                 var forcePerk = EventUnwrapper.ExtractDone<ForceActivatePerk>(wrapper);
                 if (forcePerk == null) return null;
 
-                string targetName = ResolveName(forcePerk.TargetId);
+                int targetSide = 0; try { targetSide = (int)wrapper.Owner; } catch { }
+                string targetName = ResolveName(forcePerk.TargetId, targetSide);
                 string perkName = ReadPerkNullable(forcePerk.Perk);
                 return $"{ownerPrefix} {targetName}'s {perkName} activates";
             }
@@ -926,14 +994,20 @@ namespace SuperAutoAccessibility.Gameplay
         /// dead/destroyed minions and all board locations.
         /// Checks name cache first, then live Memory.Battle boards via FindMinion.
         /// </summary>
-        private static string ResolveName(ItemId id)
+        private static string ResolveName(ItemId id, int sideHint = 0)
         {
             try
             {
-                // Use Unique int as cache key â€” more reliable than Guid.ToString()
                 int uniqueKey = id.Unique;
-                if (_minionNameCache.TryGetValue(uniqueKey, out string cached))
-                    return cached;
+
+                // Environmental / world-source events come with uniqueKey == 0;
+                // they don't refer to a real pet — skip the diagnostic spam.
+                if (uniqueKey == 0) return "pet";
+
+                // Caller-provided side wins because the same `unique` can belong to
+                // both sides at once (shop-phase IDs and battle-resolver IDs collide).
+                var cached = LookupCachedName(uniqueKey, sideHint);
+                if (!string.IsNullOrEmpty(cached)) return cached;
 
                 // Eagerly retry loading opponent board if not yet loaded
                 if (!_opponentBoardLoaded && _opponentBoardRetryCount < MAX_OPPONENT_BOARD_RETRIES)
@@ -956,7 +1030,8 @@ namespace SuperAutoAccessibility.Gameplay
                                 string name = PetStatsReader.GetLocalizedName(minion);
                                 if (!string.IsNullOrEmpty(name))
                                 {
-                                    _minionNameCache[uniqueKey] = name;
+                                    _minionNameCache[(1, uniqueKey)] = name;
+                                    _minionOwnerCache[uniqueKey] = 1;
                                     return name;
                                 }
                             }
@@ -972,7 +1047,8 @@ namespace SuperAutoAccessibility.Gameplay
                                 string name = PetStatsReader.GetLocalizedName(minion);
                                 if (!string.IsNullOrEmpty(name))
                                 {
-                                    _minionNameCache[uniqueKey] = name;
+                                    _minionNameCache[(2, uniqueKey)] = name;
+                                    _minionOwnerCache[uniqueKey] = 2;
                                     return name;
                                 }
                             }
@@ -995,7 +1071,8 @@ namespace SuperAutoAccessibility.Gameplay
                             string name = PetStatsReader.GetLocalizedName(minion);
                             if (!string.IsNullOrEmpty(name))
                             {
-                                _minionNameCache[uniqueKey] = name;
+                                _minionNameCache[(1, uniqueKey)] = name;
+                                _minionOwnerCache[uniqueKey] = 1;
                                 return name;
                             }
                         }
@@ -1013,7 +1090,8 @@ namespace SuperAutoAccessibility.Gameplay
                             string name = PetStatsReader.GetLocalizedName(minion);
                             if (!string.IsNullOrEmpty(name))
                             {
-                                _minionNameCache[uniqueKey] = name;
+                                _minionNameCache[(2, uniqueKey)] = name;
+                                _minionOwnerCache[uniqueKey] = 2;
                                 return name;
                             }
                         }
@@ -1049,11 +1127,11 @@ namespace SuperAutoAccessibility.Gameplay
                             }
                             oppIds = string.Join(",", ids);
                         }
-                        MelonLogger.Warning($"[BattleNarrator] MISS unique={uniqueKey} | UserBoard=[{userIds}] | OppBoard=[{oppIds}] | Cache=[{string.Join(",", _minionNameCache.Keys)}]");
+                        MelonLogger.Warning($"[BattleNarrator] MISS unique={uniqueKey} | UserBoard=[{userIds}] | OppBoard=[{oppIds}] | Cache=[{string.Join(",", _minionNameCache.Keys.Select(k => $"{k.side}:{k.unique}"))}]");
                     }
                     else
                     {
-                        MelonLogger.Warning($"[BattleNarrator] MISS unique={uniqueKey} | Memory.Battle is null | Cache=[{string.Join(",", _minionNameCache.Keys)}]");
+                        MelonLogger.Warning($"[BattleNarrator] MISS unique={uniqueKey} | Memory.Battle is null | Cache=[{string.Join(",", _minionNameCache.Keys.Select(k => $"{k.side}:{k.unique}"))}]");
                     }
                 }
                 catch (Exception diagEx)
@@ -1081,6 +1159,25 @@ namespace SuperAutoAccessibility.Gameplay
         public static string GetBattleSurvivors()
         {
             return null;
+        }
+
+        /// <summary>
+        /// Case-insensitive name compare that ignores leading articles ("the", "a", "an").
+        /// Used to dedup pet names against ability names in NarrateAbility, where
+        /// localization can introduce "The Gecko" vs "Gecko" mismatches.
+        /// </summary>
+        private static bool SameName(string a, string b)
+        {
+            return string.Equals(StripArticle(a), StripArticle(b),
+                StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static string StripArticle(string s)
+        {
+            if (string.IsNullOrWhiteSpace(s)) return "";
+            return System.Text.RegularExpressions.Regex.Replace(
+                s.Trim(), @"^(the|a|an)\s+", "",
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
         }
 
         /// <summary>
@@ -1178,8 +1275,8 @@ namespace SuperAutoAccessibility.Gameplay
                 {
                     // No info â€” try to infer from name cache
                     // If one ID is already in the name cache, the other must be the opposite side
-                    bool attackerCached = _minionNameCache.ContainsKey(attackerKey);
-                    bool defenderCached = _minionNameCache.ContainsKey(defenderKey);
+                    bool attackerCached = LookupCachedName(attackerKey) != null;
+                    bool defenderCached = LookupCachedName(defenderKey) != null;
                     if (attackerCached && !defenderCached)
                     {
                         // We know attacker name but not side â€” fall through with best guess
@@ -1216,10 +1313,10 @@ namespace SuperAutoAccessibility.Gameplay
                 // occupies a positional slot that needs to be consumed.
                 if (playerIsNew && _playerPositionIndex < _playerPositionalNames.Count)
                 {
-                    if (!_minionNameCache.ContainsKey(playerKey))
+                    if (!_minionNameCache.ContainsKey((1, playerKey)))
                     {
                         string name = _playerPositionalNames[_playerPositionIndex];
-                        _minionNameCache[playerKey] = name;
+                        _minionNameCache[(1, playerKey)] = name;
                         MelonLogger.Msg($"[BattleNarrator] MinionTrade cached player: battleId={playerKey} -> {name} (pos={_playerPositionIndex})");
                     }
                     _playerPositionIndex++;
@@ -1228,10 +1325,10 @@ namespace SuperAutoAccessibility.Gameplay
                 // Cache opponent name from positional list (same logic as player)
                 if (opponentIsNew && _opponentPositionIndex < _opponentPositionalNames.Count)
                 {
-                    if (!_minionNameCache.ContainsKey(opponentKey))
+                    if (!_minionNameCache.ContainsKey((2, opponentKey)))
                     {
                         string name = _opponentPositionalNames[_opponentPositionIndex];
-                        _minionNameCache[opponentKey] = name;
+                        _minionNameCache[(2, opponentKey)] = name;
                         MelonLogger.Msg($"[BattleNarrator] MinionTrade cached opponent: battleId={opponentKey} -> {name} (pos={_opponentPositionIndex})");
                     }
                     _opponentPositionIndex++;
@@ -1250,7 +1347,8 @@ namespace SuperAutoAccessibility.Gameplay
                 var changeMana = EventUnwrapper.ExtractDone<ChangeMinionMana>(wrapper);
                 if (changeMana == null) return null;
 
-                string targetName = ResolveName(changeMana.TargetId);
+                int targetSide = 0; try { targetSide = (int)wrapper.Owner; } catch { }
+                string targetName = ResolveName(changeMana.TargetId, targetSide);
                 int amount = 0;
                 try { amount = changeMana.ResultAmount; } catch { }
                 if (amount == 0)
@@ -1274,7 +1372,8 @@ namespace SuperAutoAccessibility.Gameplay
                 var spendMana = EventUnwrapper.ExtractDone<SpendMinionMana>(wrapper);
                 if (spendMana == null) return null;
 
-                string targetName = ResolveName(spendMana.TargetId);
+                int targetSide = 0; try { targetSide = (int)wrapper.Owner; } catch { }
+                string targetName = ResolveName(spendMana.TargetId, targetSide);
                 return $"{ownerPrefix} {targetName} mana ability activated";
             }
             catch { return null; }

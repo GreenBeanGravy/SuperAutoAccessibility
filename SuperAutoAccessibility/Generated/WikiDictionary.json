@@ -1,0 +1,3542 @@
+[
+    {
+        "category": "Pet",
+        "name": "???",
+        "description": "Tier 1. End turn: Give plus 1 attack and Spooked until the next turn to the nearest friend ahead."
+    },
+    {
+        "category": "Pet",
+        "name": "Abomination",
+        "description": "Tier 4. End turn: Swallow and copy the left-most unfrozen shop pets until next turn."
+    },
+    {
+        "category": "Pet",
+        "name": "African Penguin",
+        "description": "Tier 2. Buy: Give three random friends plus 1 attack."
+    },
+    {
+        "category": "Pet",
+        "name": "African Wild Dog",
+        "description": "Tier 1. Start of battle: Jump attack the second enemy for 3 damage."
+    },
+    {
+        "category": "Pet",
+        "name": "Alchemedes",
+        "description": "Tier 1. Start of battle: Give the nearest friend ahead plus 1 Mana."
+    },
+    {
+        "category": "Pet",
+        "name": "Alpaca",
+        "description": "Tier 6. Friend summoned: Give it plus 1 experience. Tripled in battle. Works 1 time per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Amalgamation",
+        "description": "Tier 5. Friend summoned: Give it plus 3 attack and plus 4 mana and Spooked. Works 2 times per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Amami Rabbit",
+        "description": "Tier 3. Start of battle: Gain plus 1 attack permanently and jump-attack the highest attack enemy."
+    },
+    {
+        "category": "Pet",
+        "name": "Amargasaurus",
+        "description": "Tier 6. Friend hurt: Restore its Health. Can restore up to 15 Health per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Amazon River Dolphin",
+        "description": "Tier 4. Adjacent friend attacked: Deal 3 damage to its target, or gain plus 3 attack."
+    },
+    {
+        "category": "Pet",
+        "name": "Ammonite",
+        "description": "Tier 6. Faint: Transform friend behind into a level 1 Mimic Octopus. Give it plus 1 XP in battle for every 2 roll."
+    },
+    {
+        "category": "Pet",
+        "name": "Amsterdam Albatross",
+        "description": "Tier 6. Friend transformed: Give it permanent plus 2 attack and plus 2 health. Works 2 times per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Angelshark",
+        "description": "Tier 4. Start of turn: Give friends plus 1 to their highest stat."
+    },
+    {
+        "category": "Pet",
+        "name": "Anglerfish",
+        "description": "Tier 6. Buy: Choose one free pet from your last opponent to stock."
+    },
+    {
+        "category": "Pet",
+        "name": "Angry Pygmy Hog",
+        "description": "Tier 2. Really angry!."
+    },
+    {
+        "category": "Pet",
+        "name": "Ant",
+        "description": "Tier 1. Faint: Give a random friend plus 1 attack and plus 1 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Anteater",
+        "description": "Tier 3. Faint: Summon one 1/1 level 3 Ant."
+    },
+    {
+        "category": "Pet",
+        "name": "Araripe Manakin",
+        "description": "Tier 2. Friend jumped or transformed: Gain plus 3 health until next turn. Works 2 times per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Armadillo",
+        "description": "Tier 5. Start of battle: Give ALL pets plus 8 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Axolotl",
+        "description": "Tier 5. Friendly gained perk: Give it permanent plus 1 attack and plus 1 health. Works 3 times per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Aye-aye",
+        "description": "Tier 5. Seven enemy attacks: Summon two Lemurs and give all friends plus 3 attack and plus 3 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Baboon",
+        "description": "Tier 3. End Turn: Give one random friend from the current or higher tier plus 1 attack and plus 1 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Bad Dog",
+        "description": "Tier 5. Buy: Choose one level 1 Toy that brings doom and chaos!."
+    },
+    {
+        "category": "Pet",
+        "name": "Badger",
+        "description": "Tier 3. Faint: Deal 50 percent attack damage to adjacent pets."
+    },
+    {
+        "category": "Pet",
+        "name": "Baku",
+        "description": "Tier 1. End turn: If turn number is even, replace random ailments with plus 1 health on two friends."
+    },
+    {
+        "category": "Pet",
+        "name": "Banggai Cardinalfish",
+        "description": "Tier 5. Start of battle: Remove 6 attack from everyone to a minimum of 4 attack."
+    },
+    {
+        "category": "Pet",
+        "name": "Barghest",
+        "description": "Tier 1. Start of battle: Make the last perk-less enemy Spooked."
+    },
+    {
+        "category": "Pet",
+        "name": "Barnacle",
+        "description": "Tier 3. End turn: If you did not roll this turn, gain plus 1 experience."
+    },
+    {
+        "category": "Pet",
+        "name": "Bass",
+        "description": "Tier 2. Faint and Sell: Give one level 2 Sell friend plus 1 experience."
+    },
+    {
+        "category": "Pet",
+        "name": "Bat",
+        "description": "Tier 2. Before attack: Make one random enemy Weak. Works 1 time per battle."
+    },
+    {
+        "category": "Pet",
+        "name": "Bay Cat",
+        "description": "Tier 6. Faint: Summon ANY one useful Start of Battle pet from tier 4 and activate its ability."
+    },
+    {
+        "category": "Pet",
+        "name": "Beaver",
+        "description": "Tier 1. Sell: Give two random friends plus 1 attack."
+    },
+    {
+        "category": "Pet",
+        "name": "Bee",
+        "description": "Token. The Bee is a token that spawns when a pet with Honey perk faints."
+    },
+    {
+        "category": "Pet",
+        "name": "Beetle",
+        "description": "Tier 1. Start of battle: Give Walnut perk to nearest friend behind."
+    },
+    {
+        "category": "Pet",
+        "name": "Behemoth",
+        "description": "Tier 6. End Turn: Gain plus 2attack and plus 2health. Attack and health can go up to 100!."
+    },
+    {
+        "category": "Pet",
+        "name": "Beluga Sturgeon",
+        "description": "Tier 2. Faint: Summon one 2/3 Dolphin in the back and give it Rice."
+    },
+    {
+        "category": "Pet",
+        "name": "Beluga Whale",
+        "description": "Tier 5. Eats food: Swallow the left-most shop pet and summon it as level 1 with base stats on faint."
+    },
+    {
+        "category": "Pet",
+        "name": "Betta Fish",
+        "description": "Tier 3. Friend lost perk: Give it the Guava perk. Works on one friend per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Bigfoot",
+        "description": "Tier 2. Faint: Give one free roll next turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Bilby",
+        "description": "Tier 2. Friend lost perk: Give it Garlic. Works 1 time per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Bird of Paradise",
+        "description": "Tier 6. Spend 7 gold: Give three random friends plus 1 attack and plus 1 health. Works 3 times per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Bison",
+        "description": "Tier 4. End turn: If this has a level 3 friend, gain plus 1 attack and plus 2 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Black Necked Stilt",
+        "description": "Tier 2. Faint: Gain plus 2 Trumpets."
+    },
+    {
+        "category": "Pet",
+        "name": "Black Rhino",
+        "description": "Tier 6. Seven enemy attacks: Deal 30 damage to one random enemy."
+    },
+    {
+        "category": "Pet",
+        "name": "Blobfish",
+        "description": "Tier 5. Faint: Give the nearest friend behind plus 1 Experience. Give to one more friend in battle."
+    },
+    {
+        "category": "Pet",
+        "name": "Bloodhound",
+        "description": "Tier 4. Friend sold: Stock one copy of it. Works 1 time per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Blowfish",
+        "description": "Tier 4. Hurt: Deal 3 damage to one random enemy."
+    },
+    {
+        "category": "Pet",
+        "name": "Blue Ringed Octopus",
+        "description": "Tier 5. Buy: Give all friends plus 1 attack and plus 1 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Blue Whale",
+        "description": "Tier 6. Start of turn: Sell friends for plus 2 extra gold each and give future shop pets plus 2 attack and plus 2 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Blue-Throated Macaw",
+        "description": "Tier 3. Friend transformed: If it is ahead, give it plus 3 attack until next turn. Otherwise give health."
+    },
+    {
+        "category": "Pet",
+        "name": "Bluebird",
+        "description": "Tier 1. End turn: Give one random friend plus 1 attack."
+    },
+    {
+        "category": "Pet",
+        "name": "Boar",
+        "description": "Tier 6. Before attack: Gain plus 4 attack and plus 2 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Bombus Dahlbomii",
+        "description": "Tier 1. Two enemy attacks: Deal 1 damage to the first enemy. Works 2 times per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Bonobo",
+        "description": "Tier 4. Start of turn: Transform into the front-most friend."
+    },
+    {
+        "category": "Pet",
+        "name": "Brahma Chicken",
+        "description": "Tier 5. Faint: Give three friends that dealt damage this battle permanent plus 1 Attack and plus 1 Health."
+    },
+    {
+        "category": "Pet",
+        "name": "Brain Cramp",
+        "description": "Tier 3. Empty front space: Jump to the front and gain plus 2 attack and Melon perk in battle."
+    },
+    {
+        "category": "Pet",
+        "name": "Budgie",
+        "description": "Tier 1. Start of battle: Gain the Popcorn perk and plus 1 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Buffalo",
+        "description": "Tier 4. Friend sold: Gain plus 2 attack and plus 2 health until next turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Bulldog",
+        "description": "Tier 1. After first attack: Gain plus 2 attack."
+    },
+    {
+        "category": "Pet",
+        "name": "Bunyip",
+        "description": "Tier 1. Start of battle: Gain plus 1 health for each roll (max 2)."
+    },
+    {
+        "category": "Pet",
+        "name": "Bus",
+        "description": "Token. The Bus is a Token that is summoned when a Deer faints."
+    },
+    {
+        "category": "Pet",
+        "name": "Butterfly",
+        "description": "Tier 4. Transformed: Copy 33 percent attack and health health from the strongest enemy."
+    },
+    {
+        "category": "Pet",
+        "name": "California Condor",
+        "description": "Tier 6. Friend transformed: Gain its level 1 ability. Works 2 times per battle."
+    },
+    {
+        "category": "Pet",
+        "name": "Calygreyhound",
+        "description": "Tier 3. Faint: Spend mana to remove 1 health per mana from the two most healthy enemies."
+    },
+    {
+        "category": "Pet",
+        "name": "Camel",
+        "description": "Tier 3. Hurt: Give the nearest friend behind plus 1 attack and plus 2 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Capybara",
+        "description": "Tier 3. Roll and Sell: Give newly rolled shop pets plus 1 attack and plus 1 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Cardinal",
+        "description": "Tier 3. End turn: Gain and stock one copy of the nearest perk ahead and discount it by 1 gold."
+    },
+    {
+        "category": "Pet",
+        "name": "Cassowary",
+        "description": "Tier 3. Friendly gained strawberry: Gain plus 1 health. Also gain plus 1 attack until next turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Cat",
+        "description": "Tier 6. Shop food gives two times more attack and health. Works 2 times per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Caterpillar",
+        "description": "Tier 4. Start of turn: Gain plus 1 experience."
+    },
+    {
+        "category": "Pet",
+        "name": "Catfish",
+        "description": "Tier 6. Start of turn: Activate Buy ability on the nearest friend ahead once, or give it plus 4 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Centipede",
+        "description": "Tier 3. Friend bought: Gain plus 1 attack and plus 1 health times its tier until next turn. Works 1 time per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Cerberus",
+        "description": "Tier 6. Empty front space: Summon one 8/8 Fire Pup at level 3 up front. Works 1 time per battle."
+    },
+    {
+        "category": "Pet",
+        "name": "Chameleon",
+        "description": "Tier 4. End turn: Copy friendly toy ability as level 1 until end of battle."
+    },
+    {
+        "category": "Pet",
+        "name": "Chick",
+        "description": "Token. The Chick is a token that is summoned when a Rooster faints."
+    },
+    {
+        "category": "Pet",
+        "name": "Chicken",
+        "description": "Tier 5. Start of turn: Give future shop pets plus 1 attack and plus 1 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Chihuahua",
+        "description": "Tier 1. Start of battle: Push most healthy enemy 1 space forward."
+    },
+    {
+        "category": "Pet",
+        "name": "Chimera",
+        "description": "Tier 4. Faint: Summon one 3/3 pet. Spend mana to give it plus 1 attack and plus 2 health per 2 mana."
+    },
+    {
+        "category": "Pet",
+        "name": "Chinchilla",
+        "description": "Tier 1. Sell: Summon one 2/2 level 1 Loyal Chinchilla."
+    },
+    {
+        "category": "Pet",
+        "name": "Chipmunk",
+        "description": "Tier 1. Sell: Stock one free copy of this pet's Food Perk."
+    },
+    {
+        "category": "Pet",
+        "name": "Clownfish",
+        "description": "Tier 4. Friendly level-up: Give it plus 2 Attack and plus 2 Health."
+    },
+    {
+        "category": "Pet",
+        "name": "Cobra",
+        "description": "Tier 6. Friend ahead attacks: Deal 20 percent attack damage to one random enemy."
+    },
+    {
+        "category": "Pet",
+        "name": "Cockatoo",
+        "description": "Tier 4. Buy: Give the highest tier friend plus 2 attack and plus 2 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Cockroach",
+        "description": "Tier 1. Faint: Summon one 1/1 Cockroach and give it plus 1 Experience."
+    },
+    {
+        "category": "Pet",
+        "name": "Cone Snail",
+        "description": "Tier 1. Start of battle: Give the nearest friend behind plus 2 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Cooked Roach",
+        "description": "Token. The Cooked Roach is a token which is summoned when a Cockroach faints."
+    },
+    {
+        "category": "Pet",
+        "name": "Cow",
+        "description": "Tier 5. Buy: Replace shop food with two free Milk."
+    },
+    {
+        "category": "Pet",
+        "name": "Crab",
+        "description": "Tier 2. Start of battle: Gain health equal to 25 percent of the most healthy friend."
+    },
+    {
+        "category": "Pet",
+        "name": "Cracked Egg",
+        "description": "Token. The Cracked Egg is a token that is summoned when a Sneaky Egg faints."
+    },
+    {
+        "category": "Pet",
+        "name": "Crane",
+        "description": "Tier 5. Friend ahead hurt: Give it Melon perk and plus 5 Attack. Works 1 time a turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Cricket",
+        "description": "Tier 1. Faint: Summon one 1/1 Cricket."
+    },
+    {
+        "category": "Pet",
+        "name": "Crocodile",
+        "description": "Tier 5. Start of battle: Deal 8 damage to the last enemy."
+    },
+    {
+        "category": "Pet",
+        "name": "Cuddle Toad",
+        "description": "Tier 1. Sell: Choose one witch toy that breaks after 2 turns."
+    },
+    {
+        "category": "Pet",
+        "name": "Cuttlefish",
+        "description": "Tier 4. Faint: Remove 3 health from the last enemy and make it Inked."
+    },
+    {
+        "category": "Pet",
+        "name": "Cyclops",
+        "description": "Tier 4. Friend level-up: Give it plus 2 mana. Also give plus 1 experience on the first trigger this turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Darwin's Fox",
+        "description": "Tier 2. Friend faints: Jump-attack the attacker, or the first enemy. Works 1 time per battle."
+    },
+    {
+        "category": "Pet",
+        "name": "Daycrawler",
+        "description": "Token. The Daycrawler is a token that is summoned when a Nightcrawler faints."
+    },
+    {
+        "category": "Pet",
+        "name": "Deer",
+        "description": "Tier 4. Faint: Summon one 5/3 Bus with Chili."
+    },
+    {
+        "category": "Pet",
+        "name": "Deinocheirus",
+        "description": "Tier 4. Ailments on this work in reverse."
+    },
+    {
+        "category": "Pet",
+        "name": "Dimetrodon",
+        "description": "Tier 3. Start of battle: Summon one 5/5 friend if able. Otherwise give friends plus 1 Attack and plus 1 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Dirty Rat",
+        "description": "Token. The Dirty Rat is a Token that is summoned when Rat faints."
+    },
+    {
+        "category": "Pet",
+        "name": "Doberman",
+        "description": "Tier 4. Start of battle: Gain plus 8 attack. If all friends are higher tiers, also gain Coconut perk."
+    },
+    {
+        "category": "Pet",
+        "name": "Dodo",
+        "description": "Tier 3. Start of battle: Give 50 percent of attack to nearest friend ahead."
+    },
+    {
+        "category": "Pet",
+        "name": "Dog",
+        "description": "Tier 3. Friend summoned: Gain plus 2 attack and plus 1 health until end of battle."
+    },
+    {
+        "category": "Pet",
+        "name": "Dolphin",
+        "description": "Tier 3. Start of battle: Deal 4 damage to the lowest health enemy."
+    },
+    {
+        "category": "Pet",
+        "name": "Donkey",
+        "description": "Tier 4. Friend faints: Push last enemy to the front and remove 3 attack. Works 1 time per battle."
+    },
+    {
+        "category": "Pet",
+        "name": "Door Head Ant",
+        "description": "Tier 2. Empty Front Space: If in battle, push this to the front and gain plus 4 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Dove",
+        "description": "Tier 2. Faint: Activate three friendly Strawberries."
+    },
+    {
+        "category": "Pet",
+        "name": "Dragon",
+        "description": "Tier 6. Tier 1 friend bought: Give friends plus 1 attack and plus 1 health. Works 4 times per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Dromedary",
+        "description": "Tier 2. Start of turn: Give the 2 left-most shop pets plus 1 attack and plus 1 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Drop Bear",
+        "description": "Tier 2. Empty front space: Jump to the front and deal 3 damage to the last enemy in battle."
+    },
+    {
+        "category": "Pet",
+        "name": "Duck",
+        "description": "Tier 1. Sell: Give shop pets plus 1 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Duckling",
+        "description": "Tier 1. Sell: Give left-most shop pet plus 2 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Dugong",
+        "description": "Tier 3. Faint: Give friends that aren't from your pack plus 2 attack and plus 2 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Dumbo Octopus",
+        "description": "Tier 2. Roll 3 times: Stock ANY food from the 3 most recent tiers and discount it by 1 Gold."
+    },
+    {
+        "category": "Pet",
+        "name": "Dunkleosteus",
+        "description": "Tier 6. Before attack: Move ailment to the first two enemies."
+    },
+    {
+        "category": "Pet",
+        "name": "Eagle",
+        "description": "Tier 5. Faint: Summon one 5/5 level 1 pet from the next shop tier."
+    },
+    {
+        "category": "Pet",
+        "name": "Elephant",
+        "description": "Tier 3. After attack: Deal 1 damage to the nearest friend behind."
+    },
+    {
+        "category": "Pet",
+        "name": "Elephant Seal",
+        "description": "Tier 6. Gain perk: Give three friends plus 4 attack and plus 4 health until next turn. Works 1 time per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Elk",
+        "description": "Tier 4. End turn: Increase sell value of one random Sell friend by 2 gold."
+    },
+    {
+        "category": "Pet",
+        "name": "Emu",
+        "description": "Tier 5. Empty front space: Give nearest friend ahead plus 4 health and move it to the front in battle."
+    },
+    {
+        "category": "Pet",
+        "name": "Estemmenosuchus",
+        "description": "Tier 5. Faint: Summon one 3/3 friend with plus 1 attack and plus 1 health for each ailment gained."
+    },
+    {
+        "category": "Pet",
+        "name": "Ethiopian Wolf",
+        "description": "Tier 1. Faint: Remove 1 attack from the first enemy."
+    },
+    {
+        "category": "Pet",
+        "name": "European Mink",
+        "description": "Tier 2. Adjacent friend attacked: Give adjacent friends plus 1 attack. Works 3 times per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Fairy Armadillo",
+        "description": "Tier 4. Hurt: If still standing, gain permanent plus 2 health and transform into a protective ball."
+    },
+    {
+        "category": "Pet",
+        "name": "Fairy Ball",
+        "description": "Tier 4. Takes 2 less damage."
+    },
+    {
+        "category": "Pet",
+        "name": "Falcon",
+        "description": "Tier 4. Knock out: Summon one 3/3 level 1 copy of it. Works 3 times per battle."
+    },
+    {
+        "category": "Pet",
+        "name": "Fan Mussel",
+        "description": "Tier 1. Takes 1 less damage. Works 2 times per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Farmer Mouse",
+        "description": "Tier 1. Faint: Feed one Corncob to the nearest friend behind."
+    },
+    {
+        "category": "Pet",
+        "name": "Ferret",
+        "description": "Tier 1. Start of turn: Choose one level 1 Ferret toy."
+    },
+    {
+        "category": "Pet",
+        "name": "Fire Ant",
+        "description": "Tier 5. Faint: Give attack to the highest tier friend."
+    },
+    {
+        "category": "Pet",
+        "name": "Fire Pup",
+        "description": "Token. The Fire Pup is a Token that is summoned by Cerberus when the front space is empty."
+    },
+    {
+        "category": "Pet",
+        "name": "Firefly",
+        "description": "Tier 1. Faint: Deal 1 damage to ALL pets within one space."
+    },
+    {
+        "category": "Pet",
+        "name": "Fish",
+        "description": "Tier 1. Level-up: Give two friends plus 1 attack and plus 1 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Flamingo",
+        "description": "Tier 2. Faint: Give the two nearest friends behind plus 1 attack and plus 1 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Flea",
+        "description": "Tier 3. Faint: Make the most healthy enemy Weak."
+    },
+    {
+        "category": "Pet",
+        "name": "Fly",
+        "description": "Tier 6. Friend faints: Summon one 4/4 fly in its place. Works 3 times per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Flying Fish",
+        "description": "Tier 3. Friend summoned: If in battle, give it plus 2 experience. Works 2 times per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Flying Squirrel",
+        "description": "Tier 3. Friendly toy broke: Gain plus 2 attack and re-summon the toy at up to level 1."
+    },
+    {
+        "category": "Pet",
+        "name": "Fossa",
+        "description": "Tier 4. Start of battle: Remove 1 health from the first two enemies for each roll this turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Frilled Dragon",
+        "description": "Tier 1. Start of battle: Gain plus 1 attack and plus 1 health per faint friend."
+    },
+    {
+        "category": "Pet",
+        "name": "Frog",
+        "description": "Tier 1. Sell: If both adjacent pets are tier 2 or lower, swap their stats."
+    },
+    {
+        "category": "Pet",
+        "name": "Frost Wolf",
+        "description": "Tier 2. Faint: Make the first enemy Cold."
+    },
+    {
+        "category": "Pet",
+        "name": "Fruit Fly",
+        "description": "Tier 2. Start of battle: Give Blueberry perk to opposite enemy and deal 2 damage to it."
+    },
+    {
+        "category": "Pet",
+        "name": "Fur-Bearing Trout",
+        "description": "Tier 3. Faint: Give Rambutan perk to the nearest friend behind."
+    },
+    {
+        "category": "Pet",
+        "name": "Gargoyle",
+        "description": "Tier 2. Faint: Give the nearest friend behind plus 2 health. Spend mana to give 1 more per mana."
+    },
+    {
+        "category": "Pet",
+        "name": "Gecko",
+        "description": "Tier 1. Start of battle: If you have a toy, gain plus 2 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Geometric Tortoise",
+        "description": "Tier 5. Hurt: Deal 33 percent of damage taken as damage to one random enemy."
+    },
+    {
+        "category": "Pet",
+        "name": "Gerenuk",
+        "description": "Tier 3. Start of battle: Remove the highest tier perk from one enemy."
+    },
+    {
+        "category": "Pet",
+        "name": "German Shepherd",
+        "description": "Tier 6. Friend summoned: Give 25 percent of attack to it until end of battle."
+    },
+    {
+        "category": "Pet",
+        "name": "Gharial",
+        "description": "Tier 3. Start of turn: Choose one level 1 Gharial toy."
+    },
+    {
+        "category": "Pet",
+        "name": "Ghost Kitten",
+        "description": "Tier 2. Take 3 less damage from abilities."
+    },
+    {
+        "category": "Pet",
+        "name": "Giant Eyes Dog",
+        "description": "Token. The Giant Eyes Dog is a Token that is summoned by the Tinder Box Toy when the front space is empty."
+    },
+    {
+        "category": "Pet",
+        "name": "Giant Otter",
+        "description": "Tier 4. Before battle: Give friends plus 2 attack and plus 5 health until after the first non-jump attack."
+    },
+    {
+        "category": "Pet",
+        "name": "Giant Pangasius",
+        "description": "Tier 5. Faint: Deal 4 damage to one random enemy for each friendly transformation this turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Giant Squirrel",
+        "description": "Tier 2. After attack: Copy perk to the backmost pets from BOTH teams. Works 1 time per battle."
+    },
+    {
+        "category": "Pet",
+        "name": "Giant Tortoise",
+        "description": "Tier 4. End turn: Gain plus 2 health, and set attack to 4. Health can go to 100!."
+    },
+    {
+        "category": "Pet",
+        "name": "Gibbon",
+        "description": "Tier 1. Shop Tier Upgraded: Give the two pets behind plus 1 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Giraffe",
+        "description": "Tier 3. Start of turn: Give the nearest friend ahead plus 1 attack and plus 1 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Goat",
+        "description": "Tier 5. Friend bought: Gain plus 1 Gold. Works 2 times per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Goblin Shark",
+        "description": "Tier 4. Start of battle: Swallow the first enemy with 6 health or less. Release it with 1 health on faint."
+    },
+    {
+        "category": "Pet",
+        "name": "Gold Fish",
+        "description": "Tier 2. Start of turn: Increase sell value by 1 gold."
+    },
+    {
+        "category": "Pet",
+        "name": "Golden Retriever",
+        "description": "Token. The Golden Retriever is a Token that is automatically summoned through the use of trumpets."
+    },
+    {
+        "category": "Pet",
+        "name": "Golden Tamarin",
+        "description": "Tier 4. Before battle: Transform into ANY useful level 1 Start of Battle pet from tier 5."
+    },
+    {
+        "category": "Pet",
+        "name": "Good Dog",
+        "description": "Tier 1. Start of battle: Give friends plenty of useful perks! health."
+    },
+    {
+        "category": "Pet",
+        "name": "Goose",
+        "description": "Tier 1. Start of battle: Remove 1 attack from the first enemy."
+    },
+    {
+        "category": "Pet",
+        "name": "Gorilla",
+        "description": "Tier 6. Hurt: Gain Coconut. Works 1 times per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Great Potoo",
+        "description": "Tier 3. Anyone hurt: If nobody has attacked, gain plus 3 Health until next turn. Works 4 times per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Green Sea Turtle",
+        "description": "Tier 6. Five enemy attacks: Give all friendly pets Melon that blocks 20 damage. Works 1 time per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Griffin",
+        "description": "Tier 3. Buy: Choose one level 1 toy from Griffin's collection."
+    },
+    {
+        "category": "Pet",
+        "name": "Grizzly Bear",
+        "description": "Tier 6. Five friendly attacks: Deal 6 damage to 2 random enemies."
+    },
+    {
+        "category": "Pet",
+        "name": "Groundhog",
+        "description": "Tier 1. Faint: Gain plus 1 Trumpet."
+    },
+    {
+        "category": "Pet",
+        "name": "Guinea Pig",
+        "description": "Tier 2. Buy: Summon one 1/1 Guinea Pig."
+    },
+    {
+        "category": "Pet",
+        "name": "Guineafowl",
+        "description": "Tier 3. Hurt: Gain plus 2 trumpets."
+    },
+    {
+        "category": "Pet",
+        "name": "Hamster",
+        "description": "Tier 5. Roll: Gain one free roll. Works 2 times per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Hare",
+        "description": "Tier 3. Before attack: Copy a useful food perk from one random enemy. Works 1 time per battle."
+    },
+    {
+        "category": "Pet",
+        "name": "Hatching Chick",
+        "description": "Tier 3. End turn: Give the nearest friend ahead plus 3 attack and plus 3 health until end of battle."
+    },
+    {
+        "category": "Pet",
+        "name": "Hawaiian Monk Seal",
+        "description": "Tier 5. Friend attacks: If still standing, give it permanent plus 2 health. Works on three friends per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Hawk",
+        "description": "Tier 4. Start of battle: Deal 7 damage to the opposite enemy."
+    },
+    {
+        "category": "Pet",
+        "name": "Hedgehog",
+        "description": "Tier 2. Faint: Deal 2 damage to ALL pets."
+    },
+    {
+        "category": "Pet",
+        "name": "Helmeted Hornbill",
+        "description": "Tier 6. End turn: Give three friends plus 2 to their lowest stat."
+    },
+    {
+        "category": "Pet",
+        "name": "Hercules Beetle",
+        "description": "Tier 2. Sell: Give friends plus 1 attack for each battle this has fought evenly spread."
+    },
+    {
+        "category": "Pet",
+        "name": "Highland Cow",
+        "description": "Tier 6. Start of battle: Gain plus 4 trumpets and 1 more for each 3 health this has."
+    },
+    {
+        "category": "Pet",
+        "name": "Hippo",
+        "description": "Tier 4. Knock out: Gain plus 3 attack and plus 3 health. Works 3 times per battle."
+    },
+    {
+        "category": "Pet",
+        "name": "Hippogriff",
+        "description": "Tier 5. Faint: Summon one 5/5 level 1 pet from the next shop tier. Friend summoned: Give it plus 1 attack until next turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Hirola",
+        "description": "Tier 3. Faint: Summon one 4/3 Ethiopian Wolf."
+    },
+    {
+        "category": "Pet",
+        "name": "Hooded Seal",
+        "description": "Tier 6. Friend transformed: Transform it back and down to level 1. Works 2 times per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Hoopoe Bird",
+        "description": "Tier 3. Faint: Deal 2 damage to the first and last enemy."
+    },
+    {
+        "category": "Pet",
+        "name": "Horse",
+        "description": "Tier 1. Friend summoned: Give it plus 1 attack until next turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Hummingbird",
+        "description": "Tier 1. Faint: Give Strawberry perk to the nearest friend behind."
+    },
+    {
+        "category": "Pet",
+        "name": "Humphead Wrasse",
+        "description": "Tier 4. Start of battle: Remove 30 percent attack from the highest attack enemy."
+    },
+    {
+        "category": "Pet",
+        "name": "Hydra",
+        "description": "Tier 6. Faint: Summon one 5/5 Head for each 10 attack this has."
+    },
+    {
+        "category": "Pet",
+        "name": "Hydra Head",
+        "description": "Token. The Hydra Head is a Token Pet with no abilities."
+    },
+    {
+        "category": "Pet",
+        "name": "Ibex",
+        "description": "Tier 5. Enemy hurt or pushed: Remove 70 percent health from it. Works on one enemy per battle."
+    },
+    {
+        "category": "Pet",
+        "name": "Iguana",
+        "description": "Tier 2. Enemy summoned or pushed: Deal 2 damage to it."
+    },
+    {
+        "category": "Pet",
+        "name": "Ili Pika",
+        "description": "Tier 1. Friend transformed: Give it plus 1 to its highest stat."
+    },
+    {
+        "category": "Pet",
+        "name": "Iriomote Cat",
+        "description": "Tier 1. Before battle: Transform into ANY useful level 1 pet from tier 1."
+    },
+    {
+        "category": "Pet",
+        "name": "Jackal",
+        "description": "Tier 5. Pet flung: Set Attack and Health to 13."
+    },
+    {
+        "category": "Pet",
+        "name": "Jackalope",
+        "description": "Tier 2. Before friend attacks: Give it plus 1 attack. Double if it jumped. Works 3 times per battle."
+    },
+    {
+        "category": "Pet",
+        "name": "Jellyfish",
+        "description": "Tier 2. Friend level-up: Gain plus 1 Attack and plus 1 Health."
+    },
+    {
+        "category": "Pet",
+        "name": "Kakapo",
+        "description": "Tier 4. After first attack: Make the highest attack enemy Spooked and push it to the back."
+    },
+    {
+        "category": "Pet",
+        "name": "Kangaroo",
+        "description": "Tier 2. Friend ahead attacks: Gain plus 1 attack and plus 1 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Kitsune",
+        "description": "Tier 5. Friend faints: Transfer all friendly mana+ 2 to nearest friend ahead."
+    },
+    {
+        "category": "Pet",
+        "name": "Kiwi",
+        "description": "Tier 1. Hurt and Sell: Give the back-most friendly Strawberry pet plus 1 attack."
+    },
+    {
+        "category": "Pet",
+        "name": "Koala",
+        "description": "Tier 2. Friend hurt: Give it the Eucalyptus perk. Works 1 time per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Kraken",
+        "description": "Tier 4. Start of battle: Remove 15 percent health from ALL other pets."
+    },
+    {
+        "category": "Pet",
+        "name": "Ladybug",
+        "description": "Tier 1. Friendly gained perk: Gain plus 2 attack until next turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Leaf Gecko",
+        "description": "Tier 4. Faint: Give random ailments to ANY three random pets. Double the effect on enemies."
+    },
+    {
+        "category": "Pet",
+        "name": "Leafy Sea Dragon",
+        "description": "Tier 4. Start of battle: Remove this and give adjacent friends plus 1 Experience and plus 4 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Leech",
+        "description": "Tier 3. End turn: Deal 1 damage to the nearest friend ahead and gain damage as health."
+    },
+    {
+        "category": "Pet",
+        "name": "Lemming",
+        "description": "Tier 1. Sell: Gain plus 1 Gold next turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Lemur",
+        "description": "Tier 2. Start of turn: Choose one level 1 Lemur toy."
+    },
+    {
+        "category": "Pet",
+        "name": "Leopard",
+        "description": "Tier 6. Start of battle: Deal 50 percent attack damage to one random enemy."
+    },
+    {
+        "category": "Pet",
+        "name": "Lionfish",
+        "description": "Tier 6. Faint: Deal 3 damage to one random enemy. Repeat for each 10 attack this has."
+    },
+    {
+        "category": "Pet",
+        "name": "Lizard",
+        "description": "Tier 2. Hurt: Summon one 3/1 Lizard Tail. Works 2 times per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Lizard Tail",
+        "description": "Token. The Lizard Tail is a token that spawns when a Lizard is hurt."
+    },
+    {
+        "category": "Pet",
+        "name": "Llama",
+        "description": "Tier 4. End turn: If there is an empty space, gain plus 1 attack and plus 2 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Lobster",
+        "description": "Tier 4. Friend summoned: If outside battle, give it plus 1 attack and plus 2 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Longcomb Sawfish",
+        "description": "Tier 4. Five enemy attacks: Gain plus 4 health and remove 4 health from all enemies."
+    },
+    {
+        "category": "Pet",
+        "name": "Loveland Frogman",
+        "description": "Tier 5. Before friend attacks: Give it plus 1 attack and plus 2 health once. Permanent if it jumped."
+    },
+    {
+        "category": "Pet",
+        "name": "Loyal Chinchilla",
+        "description": "Token. The Loyal Chinchilla is a token that is summoned when a Chinchilla is sold."
+    },
+    {
+        "category": "Pet",
+        "name": "Lucky Cat",
+        "description": "Tier 3. Level-up: Gain plus 2 attack and plus 2 health now and plus 2 gold next turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Macaque",
+        "description": "Tier 5. Start of battle: Summon one 12/12 Orangutan with the same Food Perk as this."
+    },
+    {
+        "category": "Pet",
+        "name": "Magpie",
+        "description": "Tier 1. End turn: Spend up to 1 Gold and gain it back next turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Malay Tapir",
+        "description": "Tier 1. Adjacent friend attacked: Gain plus 1 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Mammoth",
+        "description": "Tier 6. Faint: Give all friends plus 2 attack and plus 2 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Mana Hound",
+        "description": "Tier 3. Start of battle: Give the nearest friend ahead plus 1 mana for each roll this turn, up to 5 rolls."
+    },
+    {
+        "category": "Pet",
+        "name": "Manatee",
+        "description": "Tier 4. End turn: Take 5 damage and give the nearest friend ahead plus 2 attack and plus 1 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Mandarinfish",
+        "description": "Tier 2. Before attack: Replace own ailment with plus 2 attack and plus 2 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Mandrake",
+        "description": "Tier 3. Start of battle: Make one tier 2 or lower enemy Dazed and prioritize Faint pets."
+    },
+    {
+        "category": "Pet",
+        "name": "Mandrill",
+        "description": "Tier 2. Faint: Break friendly tier 2 or lower toy."
+    },
+    {
+        "category": "Pet",
+        "name": "Manta Ray",
+        "description": "Tier 4. End turn: If there is an empty space, gain plus 2 Gold next turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Manticore",
+        "description": "Tier 6. Enemy ailments are two times worse."
+    },
+    {
+        "category": "Pet",
+        "name": "Mantis Shrimp",
+        "description": "Tier 6. Start of Battle: Deal 10 damage to the first enemy."
+    },
+    {
+        "category": "Pet",
+        "name": "Marine Iguana",
+        "description": "Tier 5. Before friend attacks: Give it Melon. Works on one friend per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Marmoset",
+        "description": "Tier 1. Sell: Your next roll is free."
+    },
+    {
+        "category": "Pet",
+        "name": "Meerkat",
+        "description": "Tier 2. Start of battle: Give adjacent friends plus 1 attack for every 4 gold spent this turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Microbe",
+        "description": "Tier 4. Faint: Make all pets within 3 spaces Weak."
+    },
+    {
+        "category": "Pet",
+        "name": "Mimic Octopus",
+        "description": "Tier 6. After attack: Deal 4 damage to the least healthy enemy."
+    },
+    {
+        "category": "Pet",
+        "name": "Minotaur",
+        "description": "Tier 4. Friend ahead attacks: Gain plus 1 attack and plus 1 health for each of the friend's level."
+    },
+    {
+        "category": "Pet",
+        "name": "Mole",
+        "description": "Tier 3. Faint: Remove the two nearest friendly perks to summon one 6/6 Mole."
+    },
+    {
+        "category": "Pet",
+        "name": "Mongoose",
+        "description": "Tier 6. Start of turn: Choose one level 1 Mongoose toy."
+    },
+    {
+        "category": "Pet",
+        "name": "Monkey",
+        "description": "Tier 5. End turn: Give front-most friendly pet plus 2 attack and plus 2 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Monkey-Faced Bat",
+        "description": "Tier 3. Anyone behind hurt: Give two random friends plus 1 attack and plus 1 health. Works 3 times per battle."
+    },
+    {
+        "category": "Pet",
+        "name": "Monty",
+        "description": "Tier 5. Attack for two times more damage."
+    },
+    {
+        "category": "Pet",
+        "name": "Mosasaurus",
+        "description": "Tier 5. Friendly toy broke: Give adjacent friends plus 2 attack and plus 3 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Mosquito",
+        "description": "Tier 1. Start of battle: Deal 1 damage to one random enemy."
+    },
+    {
+        "category": "Pet",
+        "name": "Moth",
+        "description": "Tier 1. Start of battle: Give front-most friendly pet plus 2 attack."
+    },
+    {
+        "category": "Pet",
+        "name": "Mothman",
+        "description": "Tier 2. Anyone gained ailment: Gain plus 1 attack and plus 1 health until next turn. Works 5 times per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Mouse",
+        "description": "Tier 1. Sell: Replace shop food with one free Apple."
+    },
+    {
+        "category": "Pet",
+        "name": "Murmel",
+        "description": "Tier 1. Friend gained experience: Gain plus 1 attack until next turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Musk Ox",
+        "description": "Tier 3. Friend ahead faints: Gain plus 1 attack and plus 2 health until end of battle."
+    },
+    {
+        "category": "Pet",
+        "name": "Nessie",
+        "description": "Tier 5. Faint: Summon one 3/3 Boat. If it's your first Boat this battle, give it plus 1 attack and plus 1 health for each roll."
+    },
+    {
+        "category": "Pet",
+        "name": "Nest",
+        "description": "Tier 1. Egg perk has regular effect."
+    },
+    {
+        "category": "Pet",
+        "name": "Nudibranch",
+        "description": "Tier 1. Start of battle: If there are no friendly duplicates gain, plus 3 attack and plus 1 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Nurse Shark",
+        "description": "Tier 5. Faint: Spend up to 6 trumpets and deal triple as damage to one random enemy."
+    },
+    {
+        "category": "Pet",
+        "name": "Nyala",
+        "description": "Tier 5. Faint: Gain plus 8 Trumpets."
+    },
+    {
+        "category": "Pet",
+        "name": "Octopus",
+        "description": "Tier 6. After attack: Deal 6 damage to one random enemy."
+    },
+    {
+        "category": "Pet",
+        "name": "Ogopogo",
+        "description": "Tier 2. Start of battle: Give the front-most friend plus 1 experience."
+    },
+    {
+        "category": "Pet",
+        "name": "Okapi",
+        "description": "Tier 3. Roll: Gain plus 1 damage and plus 1 health until end of battle. Works 5 times per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Olm",
+        "description": "Tier 2. Faint: Make one random enemy Spooked and multiply the effect once for each roll this turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Opossum",
+        "description": "Tier 1. Sell: Give one random Faint pet in the shop plus 1 attack and plus 1 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Orangutan",
+        "description": "Tier 3. End turn: Give the lowest Health friendly pet plus 3 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Orca",
+        "description": "Tier 6. Faint: Summon one random Faint pet from ANY pack as 6/6."
+    },
+    {
+        "category": "Pet",
+        "name": "Orchid Mantis",
+        "description": "Tier 5. Start of battle: Summon one Mantis with 40 percent attack and health of this."
+    },
+    {
+        "category": "Pet",
+        "name": "Osprey",
+        "description": "Tier 3. Faint: Summon one 2/1 Groundhog."
+    },
+    {
+        "category": "Pet",
+        "name": "Ostrich",
+        "description": "Tier 6. Roll: If 4 shop pets are the same tier, re-roll and give friends plus 2 health. Works 4 times per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Otter",
+        "description": "Tier 1. Buy: Give one random friend plus 1 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Ouroboros",
+        "description": "Tier 3. Roll: Give new shop pets plus 1 attack and plus 1 health until next turn for each roll, up to 5 rolls."
+    },
+    {
+        "category": "Pet",
+        "name": "Owl",
+        "description": "Tier 3. Start of turn: Summon one level 1 Mouse."
+    },
+    {
+        "category": "Pet",
+        "name": "Ox",
+        "description": "Tier 3. Friend ahead faints: Gain Melon perk and plus 1 attack. Works 1 time per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Oyster",
+        "description": "Tier 6. Sell: Gain plus 3 gold."
+    },
+    {
+        "category": "Pet",
+        "name": "Pacific Fanfish",
+        "description": "Tier 5. Start of battle: Gain plus 4 attack and plus 4 health for each friend that sells for at least 3 gold."
+    },
+    {
+        "category": "Pet",
+        "name": "Painted Terrapin",
+        "description": "Tier 5. Faint: Give White Okra perk to the nearest friend behind."
+    },
+    {
+        "category": "Pet",
+        "name": "Panda",
+        "description": "Tier 2. Start of battle: Faint to give 50 percent Attack and Health to the nearest friend ahead."
+    },
+    {
+        "category": "Pet",
+        "name": "Pangasius",
+        "description": "Tier 3. Start of battle: Copy ailment (or Spooked) to the first enemy."
+    },
+    {
+        "category": "Pet",
+        "name": "Pangolin",
+        "description": "Tier 3. Faint: If you have a toy, give the nearest friend behind plus 4 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Panther",
+        "description": "Tier 5. Perks are two times stronger on this."
+    },
+    {
+        "category": "Pet",
+        "name": "Parrot",
+        "description": "Tier 4. End turn: Copy ability from the nearest pet ahead as level 1 until next turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Peacock",
+        "description": "Tier 2. Hurt: Gain plus 3 attack."
+    },
+    {
+        "category": "Pet",
+        "name": "Peacock Spider",
+        "description": "Tier 1. Faint: Make adjacent perk-less pets Spooked."
+    },
+    {
+        "category": "Pet",
+        "name": "Pelican",
+        "description": "Tier 5. Start of battle: Swallow one Strawberry friend ahead and turn it into a Salmon on faint."
+    },
+    {
+        "category": "Pet",
+        "name": "Pengobble",
+        "description": "Tier 1. Gains mana: Gain 2 bonus mana. Works 2 times per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Penguin",
+        "description": "Tier 4. Start of turn: Give two level 2 and level 3 friends plus 1 attack and plus 1 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Pheasant",
+        "description": "Tier 1. Friend Summoned: Give it the Strawberry perk until end of battle. Works 1 time per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Philippine Eagle",
+        "description": "Tier 6. Anyone jumped: Give one random friend plus 4 attack and plus 4 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Phoenix",
+        "description": "Tier 6. Faint: Make ANY three random pets Crisp, then summon one 4/4 Young Phoenix."
+    },
+    {
+        "category": "Pet",
+        "name": "Pied Tamarin",
+        "description": "Tier 1. Faint: Spend 1 Trumpet to deal 3 damage to one random enemy."
+    },
+    {
+        "category": "Pet",
+        "name": "Pig",
+        "description": "Tier 1. Sell: Gain plus 1 Gold."
+    },
+    {
+        "category": "Pet",
+        "name": "Pigeon",
+        "description": "Tier 1. Sell: Stock one free Bread Crumbs."
+    },
+    {
+        "category": "Pet",
+        "name": "Pillbug",
+        "description": "Tier 1. Sell: Stock one free Sleeping Pill."
+    },
+    {
+        "category": "Pet",
+        "name": "Pink Robin",
+        "description": "Tier 1. Faint: Activate End Turn on one random tier 2 or lower friend."
+    },
+    {
+        "category": "Pet",
+        "name": "Piranha",
+        "description": "Tier 6. Hurt: Give friends plus 3 attack."
+    },
+    {
+        "category": "Pet",
+        "name": "Pixiu",
+        "description": "Tier 5. Faint: Spend 4 mana to gain 3 gold next turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Platypus",
+        "description": "Tier 4. Faint and Sell: Summon one 3/2 level 1 Duck and Beaver."
+    },
+    {
+        "category": "Pet",
+        "name": "Poison Dart Frog",
+        "description": "Tier 4. Friend ahead faints: Deal 4 damage to the highest health enemy."
+    },
+    {
+        "category": "Pet",
+        "name": "Poodle",
+        "description": "Tier 6. End turn: Give plus 1 attack and plus 1 health to one friend of each tier."
+    },
+    {
+        "category": "Pet",
+        "name": "Praying Mantis",
+        "description": "Tier 4. Start of turn: Deal 50 damage to adjacent friends and gain plus 2 attack and plus 2 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Proboscis Monkey",
+        "description": "Tier 2. Start of turn: Transform the nearest friend ahead into another pet from the same tier."
+    },
+    {
+        "category": "Pet",
+        "name": "Pteranodon",
+        "description": "Tier 6. Friend faints: Re-summon it behind this as a 1/1. Works 1 time per battle."
+    },
+    {
+        "category": "Pet",
+        "name": "Pug",
+        "description": "Tier 3. Start of battle: Give the nearest friend ahead plus 1 Experience."
+    },
+    {
+        "category": "Pet",
+        "name": "Puma",
+        "description": "Tier 6. Friendly toy repeats its ability as level 1."
+    },
+    {
+        "category": "Pet",
+        "name": "Puppy",
+        "description": "Tier 4. Start of turn: Choose one level 1 Puppy toy."
+    },
+    {
+        "category": "Pet",
+        "name": "Purple Frog",
+        "description": "Tier 3. Friend summoned: Activate and disable its Start of turn ability until next turn. Works 1 time per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Pygmy Hippo",
+        "description": "Tier 3. Five enemy attacks: Deal 33 percent of health as damage to the least healthy enemy."
+    },
+    {
+        "category": "Pet",
+        "name": "Pygmy Hog",
+        "description": "Tier 2. Five enemy attacks: Transform into a 5/5 Angry Pygmy Hog with Garlic perk."
+    },
+    {
+        "category": "Pet",
+        "name": "Pygmy Seahorse",
+        "description": "Tier 1. Start of battle: Give three random friends plus 1 Attack and plus 1 Health and remove this."
+    },
+    {
+        "category": "Pet",
+        "name": "Queen Bee",
+        "description": "Tier 3. Bee summoned: Give it plus 3 Attack and plus 3 health and remove ALL other Queen Bees."
+    },
+    {
+        "category": "Pet",
+        "name": "Quetzalcoatl",
+        "description": "Tier 6. End turn: Give one random tier 3 or lower friend plus 2 Experience."
+    },
+    {
+        "category": "Pet",
+        "name": "Quoll",
+        "description": "Tier 1. Sell: Choose one tier 1 food to stock at 1 gold."
+    },
+    {
+        "category": "Pet",
+        "name": "Rabbit",
+        "description": "Tier 3. Friendly ate food: Give them plus 1 health. Works 3 times per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Ram",
+        "description": "Token. The Ram is a Token Pet with no abilities."
+    },
+    {
+        "category": "Pet",
+        "name": "Rat",
+        "description": "Tier 2. Faint: Summon one 1/1 Dirty Rat up front for the opponent."
+    },
+    {
+        "category": "Pet",
+        "name": "Real Velociraptor",
+        "description": "Tier 6. Friend lost perk: Return its perk. Works on one friend per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Red Dragon",
+        "description": "Tier 5. Start of battle: Make the last enemy Crisp."
+    },
+    {
+        "category": "Pet",
+        "name": "Red Lipped Batfish",
+        "description": "Tier 4. Start of battle: Transform the opposite enemy into ANY random Faint pet from one tier below."
+    },
+    {
+        "category": "Pet",
+        "name": "Red Panda",
+        "description": "Tier 5. Buy: Choose and transform into a pet from the next shop tier from ANY pack."
+    },
+    {
+        "category": "Pet",
+        "name": "Reindeer",
+        "description": "Tier 6. Before Attack: Gain Melon. Works 1 time per battle."
+    },
+    {
+        "category": "Pet",
+        "name": "Rhino",
+        "description": "Tier 5. Knock out: Deal 4 damage to the first enemy. Double against Tier 1 Pets."
+    },
+    {
+        "category": "Pet",
+        "name": "Robin",
+        "description": "Tier 2. Start of battle: Summon one 2/3 Nest with Egg perk."
+    },
+    {
+        "category": "Pet",
+        "name": "Roc",
+        "description": "Tier 4. Start of battle: Give one friend ahead plus 2 mana. Repeat 3 times and spread evenly."
+    },
+    {
+        "category": "Pet",
+        "name": "Rock",
+        "description": "Token. The Rock is a Token that is created from the nearest pet ahead of a Basilisk or the back-most enemy of a Cockatrice at the start of battle."
+    },
+    {
+        "category": "Pet",
+        "name": "Roloway Monkey",
+        "description": "Tier 3. Start of battle: Transform two friends ahead into ANY useful level 1 Hurt pets from tier 3 or lower."
+    },
+    {
+        "category": "Pet",
+        "name": "Rooster",
+        "description": "Tier 5. Faint: Summon one Chick with 1 health and 50 percent attack of this."
+    },
+    {
+        "category": "Pet",
+        "name": "Royal Flycatcher",
+        "description": "Tier 3. Three enemies faint: Deal 4 damage to one random enemy."
+    },
+    {
+        "category": "Pet",
+        "name": "Sabertooth Tiger",
+        "description": "Tier 6. Faint: Summon one Mammoth with plus 2 attack and plus 3 health for each time this was hurt."
+    },
+    {
+        "category": "Pet",
+        "name": "Saiga Antelope",
+        "description": "Tier 4. 2 friends faint: Gain plus 3 trumpet."
+    },
+    {
+        "category": "Pet",
+        "name": "Saker Falcon",
+        "description": "Tier 2. Before Attack: If outnumbered, gain plus 2 attack and plus 2 health. Works 3 times per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Salamander",
+        "description": "Tier 2. Start of battle: Gain plus 1 attack and plus 1 health for each level of each Sell friend."
+    },
+    {
+        "category": "Pet",
+        "name": "Salmon",
+        "description": "Tier 5. Summoned: Deal 5 damage to one random enemy. Repeat for every 25 health this has."
+    },
+    {
+        "category": "Pet",
+        "name": "Salmon of Knowledge",
+        "description": "Tier 5. Start of battle: Give the two front-most friends AND enemies plus 2 experience."
+    },
+    {
+        "category": "Pet",
+        "name": "Saola",
+        "description": "Tier 2. End turn: Give the highest attack friend minus 1 attack and plus 2 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Sauropod",
+        "description": "Tier 6. Friendly gained perk: Gain plus 1 gold next turn. Works 3 times per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Scorpion",
+        "description": "Tier 5. Summoned: Gain Peanut perk."
+    },
+    {
+        "category": "Pet",
+        "name": "Sea Cucumber",
+        "description": "Tier 5. Start of battle: Make one random enemy Tasty."
+    },
+    {
+        "category": "Pet",
+        "name": "Sea Serpent",
+        "description": "Tier 6. This pet's Mana damage hits the most healthy enemy and one extra enemy."
+    },
+    {
+        "category": "Pet",
+        "name": "Sea Turtle",
+        "description": "Tier 2. Friend summoned: Give it plus 2 health until next turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Sea Urchin",
+        "description": "Tier 2. Faint: Remove 5 health from the first enemy."
+    },
+    {
+        "category": "Pet",
+        "name": "Seahorse",
+        "description": "Tier 2. Start of Battle: Push the last enemy one space forward."
+    },
+    {
+        "category": "Pet",
+        "name": "Seal",
+        "description": "Tier 5. Eats food: Give three random friends plus 1 attack."
+    },
+    {
+        "category": "Pet",
+        "name": "Sealion",
+        "description": "Tier 4. End turn: Give friends behind plus 1 attack and friends ahead plus 1 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Secretary Bird",
+        "description": "Tier 5. Two friends faint: Give the nearest friend ahead plus 3 Attack and plus 4 Health."
+    },
+    {
+        "category": "Pet",
+        "name": "Shark",
+        "description": "Tier 5. Friend faints: Gain plus 2 attack and plus 2 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Sheep",
+        "description": "Tier 3. Faint: Summon two 2/2 Rams."
+    },
+    {
+        "category": "Pet",
+        "name": "Shima Enaga",
+        "description": "Tier 2. Friend Faints: If it had a Strawberry, summon one 2/2 friend in its place. Works 2 times per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Shoebill",
+        "description": "Tier 5. Start of turn: Replace the nearest Strawberry ahead with plus 4 attack and plus 4 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Shrimp",
+        "description": "Friend sold: Give one random friend plus 1 health. Works 3 times per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Siamese",
+        "description": "Tier 4. End turn: Give adjacent pets plus 1 attack. Also plus 1 health if the shop has discounted food."
+    },
+    {
+        "category": "Pet",
+        "name": "Silkmoth",
+        "description": "Tier 1. Friend ahead hurt: Give it plus 1 health. Works 2 times per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Silky Sifaka",
+        "description": "Tier 6. Start of battle: Transform the two friends behind into ANY useful level 1 Faint pets from tier 6."
+    },
+    {
+        "category": "Pet",
+        "name": "Silverfish",
+        "description": "Tier 2. Sell: Sells for plus 2 Gold extra, but lose 1 next turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Skeleton Dog",
+        "description": "Tier 3. Faint: Give one random friend permanent plus 1 attack and plus 1 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Skunk",
+        "description": "Tier 4. Start of battle: Reduce the highest health enemy by 33 percent health."
+    },
+    {
+        "category": "Pet",
+        "name": "Sleipnir",
+        "description": "Tier 6. Start of battle: Give the front-most friend plus 1 Mana for each 2 attack this has."
+    },
+    {
+        "category": "Pet",
+        "name": "Slime",
+        "description": "Tier 3. Faint: Summon one 2/2 Slime for each two battles fought."
+    },
+    {
+        "category": "Pet",
+        "name": "Sloth",
+        "description": "Token. The Sloth is a hidden Tier 1 Pet that can be found in Any pack."
+    },
+    {
+        "category": "Pet",
+        "name": "Slug",
+        "description": "Tier 4. Faint: Summon one 2/2 Smaller Slug that summons one 1/1 Smallest Slug."
+    },
+    {
+        "category": "Pet",
+        "name": "Smaller Slime",
+        "description": "Token. The Smaller Slime is a Token that is summoned when a Slime faints after having fought at least two battles."
+    },
+    {
+        "category": "Pet",
+        "name": "Smaller Slug",
+        "description": "Tier 1. Faint: Summon one 1/1 Smallest Slug."
+    },
+    {
+        "category": "Pet",
+        "name": "Smallest Slug",
+        "description": "Token. The Smallest Slug is a token that spawns when the Smaller Slug faints."
+    },
+    {
+        "category": "Pet",
+        "name": "Snail",
+        "description": "Tier 2. End turn: If you lost last battle, give the three nearest friends ahead plus 1 attack."
+    },
+    {
+        "category": "Pet",
+        "name": "Snake",
+        "description": "Tier 6. Friend ahead attacks: Deal 5 damage to one random enemy. Works 5 times per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Snapping Turtle",
+        "description": "Tier 5. Faint: Give Skewer perk to the nearest friend behind."
+    },
+    {
+        "category": "Pet",
+        "name": "Sneaky Egg",
+        "description": "Tier 1. Start of battle: Faint and summon one 4/2 Cracked Egg."
+    },
+    {
+        "category": "Pet",
+        "name": "Snow Leopard",
+        "description": "Tier 5. Start of battle: Gain plus 5 attack and plus 5 health and jump-attack one random enemy."
+    },
+    {
+        "category": "Pet",
+        "name": "Sparrow",
+        "description": "Tier 4. Friendly Strawberries block 5 damage twice, or ailments once."
+    },
+    {
+        "category": "Pet",
+        "name": "Spider",
+        "description": "Tier 2. Faint: Summon one level 1 tier 3 pet as a 2/2."
+    },
+    {
+        "category": "Pet",
+        "name": "Spider Crab",
+        "description": "Tier 2. Friend attacks: Give it plus 4 health and move it far back. Works on one friend per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Spinosaurus",
+        "description": "Tier 6. Friend faints: Give one random friend plus 2 attack and plus 3 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Spiny Bush Viper",
+        "description": "Tier 4. Faint: Deal 1 damage to two random enemies and multiply damage by the distance."
+    },
+    {
+        "category": "Pet",
+        "name": "Spoon-Billed Sandpiper",
+        "description": "Tier 3. Start of turn: Give the nearest friend behind plus 2 to their lowest stat."
+    },
+    {
+        "category": "Pet",
+        "name": "Spotted Handfish",
+        "description": "Tier 2. Start of turn: Stock one random canned ailment."
+    },
+    {
+        "category": "Pet",
+        "name": "Squid",
+        "description": "Tier 2. Faint: Spend 1 trumpet to give the first enemy Ink."
+    },
+    {
+        "category": "Pet",
+        "name": "Squirrel",
+        "description": "Tier 4. Start of turn: Discount all shop food by 1 gold."
+    },
+    {
+        "category": "Pet",
+        "name": "Starfish",
+        "description": "Tier 5. Level 3 friend sold: Give friends plus 1 attack and plus 1 health. Triple if sold pet had at least 10 attack."
+    },
+    {
+        "category": "Pet",
+        "name": "Sting Ray",
+        "description": "Tier 5. Start of turn: Choose one level 1 Sting Ray toy."
+    },
+    {
+        "category": "Pet",
+        "name": "Stoat",
+        "description": "Tier 2. Sell: Summon one level 1 pet from your current tier as a 1/1."
+    },
+    {
+        "category": "Pet",
+        "name": "Stonefish",
+        "description": "Tier 5. Faint: Deal attack damage directly back to whoever knocked this out."
+    },
+    {
+        "category": "Pet",
+        "name": "Stork",
+        "description": "Tier 2. Faint: Summon ANY one level 1 pet from the previous shop tier as a 2/2."
+    },
+    {
+        "category": "Pet",
+        "name": "Sumatran Tiger",
+        "description": "Tier 6. Start of battle: Jump-attack the opposite enemy."
+    },
+    {
+        "category": "Pet",
+        "name": "Sunfish",
+        "description": "Tier 6. Start of battle: If turn number is odd, deal 4 damage to ALL pets ahead."
+    },
+    {
+        "category": "Pet",
+        "name": "Surgeon Fish",
+        "description": "Tier 3. Faint: Spend 2 trumpets to give the two nearest friends behind plus 4 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Swan",
+        "description": "Tier 2. Start of turn: Gain plus 1 gold."
+    },
+    {
+        "category": "Pet",
+        "name": "Tabby Cat",
+        "description": "Tier 2. Friendly gained perk: Give two random friends plus 1 health until end of battle."
+    },
+    {
+        "category": "Pet",
+        "name": "Tadpole",
+        "description": "Tier 2. Start of battle: Transform into a level 1 Frog and gain plus 2 experience."
+    },
+    {
+        "category": "Pet",
+        "name": "Tahr",
+        "description": "Tier 4. Faint: Give Mild Chili perk to the nearest friend behind."
+    },
+    {
+        "category": "Pet",
+        "name": "Taita Shrew",
+        "description": "Tier 2. Start of battle: Transform into a level 1 Weasel."
+    },
+    {
+        "category": "Pet",
+        "name": "Taita Thrush",
+        "description": "Tier 5. Adjacent friend attacked: Give friends plus 1 attack and plus 1 health. Works 3 times per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Takhi",
+        "description": "Tier 2. Faint: Summon one 3/2 African Wild Dog that jump-attacks the second enemy."
+    },
+    {
+        "category": "Pet",
+        "name": "Takin",
+        "description": "Tier 3. Friend ahead hurt: Gain plus 1 attack and plus 2 health until next turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Tardigrade",
+        "description": "Tier 4. Faint: Summon one 3/3 level 1 Tardigrade and make it Dazed."
+    },
+    {
+        "category": "Pet",
+        "name": "Tasmanian Devil",
+        "description": "Tier 4. Start of battle: Make the lowest attack enemy 5x Spooked and jump-attack it."
+    },
+    {
+        "category": "Pet",
+        "name": "Tatzelwurm",
+        "description": "Tier 3. Friend ahead faints: Deal 2 damage to the first enemy. Double if the friend was level 3."
+    },
+    {
+        "category": "Pet",
+        "name": "Team Spirit",
+        "description": "Tier 6. Friend level-up: Give friends plus 1attack and plus 1 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Termite",
+        "description": "Tier 1. Start of turn: Set attack to current shop tier plus 1."
+    },
+    {
+        "category": "Pet",
+        "name": "Thorny Dragon",
+        "description": "Tier 2. Faint: Deal 3 damage to one random enemy and prioritize those with ailments."
+    },
+    {
+        "category": "Pet",
+        "name": "Thunderbird",
+        "description": "Tier 2. Start of battle: Give the second nearest friend ahead plus 3 mana."
+    },
+    {
+        "category": "Pet",
+        "name": "Tiger",
+        "description": "Tier 6. The friend ahead repeats their ability in battle as if they were level 1."
+    },
+    {
+        "category": "Pet",
+        "name": "Tiger Bug",
+        "description": "Tier 4. Empty front space: Jump to the front and deal 3 damage to the first two enemies."
+    },
+    {
+        "category": "Pet",
+        "name": "Toad",
+        "description": "Tier 3. Enemy hurt: Make it Weak. Works 2 times per battle."
+    },
+    {
+        "category": "Pet",
+        "name": "Togian Babirusa",
+        "description": "Tier 1. Faint: Give one random enemy plus 1 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Tooth Billed Pigeon",
+        "description": "Tier 1. Sell: Stock one free Seed Pile."
+    },
+    {
+        "category": "Pet",
+        "name": "Toucan",
+        "description": "Tier 3. Before first attack: Copy tier 5 or lower perk (or Egg) to the nearest friend behind."
+    },
+    {
+        "category": "Pet",
+        "name": "Tree Kangaroo",
+        "description": "Tier 3. Start of battle: Make the last perk-less enemy Silly and activate it."
+    },
+    {
+        "category": "Pet",
+        "name": "Triceratops",
+        "description": "Tier 5. Hurt: Give one random friend plus 3 attack and plus 3 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Tropical Fish",
+        "description": "Tier 3. Start of turn: Give adjacent friends plus 1 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Tsuchinoko",
+        "description": "Tier 1. Start of battle: Jump to the front space and gain plus 1 experience."
+    },
+    {
+        "category": "Pet",
+        "name": "Tucuxi",
+        "description": "Tier 3. Faint: Push the back-most friend to the front and give it plus 3 attack and plus 3 health in battle."
+    },
+    {
+        "category": "Pet",
+        "name": "Tuna",
+        "description": "Tier 3. Faint: Give one random friend plus 1 attack and plus 1 health for each time this was hurt."
+    },
+    {
+        "category": "Pet",
+        "name": "Turkey",
+        "description": "Tier 5. Friend summoned: Give it plus 3 attack and plus 1 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Turtle",
+        "description": "Tier 4. Faint: Give Melon perk to the nearest friend behind."
+    },
+    {
+        "category": "Pet",
+        "name": "Tyrannosaurus",
+        "description": "Tier 6. Start of turn: Give two tier 5 friends or higher plus 2 attack and plus 2 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Umbrella Bird",
+        "description": "Tier 1. End turn: Make the nearest friend ahead Dazed."
+    },
+    {
+        "category": "Pet",
+        "name": "Unicorn",
+        "description": "Tier 4. Friend gained ailment: Replace it with permanent plus 2attack and plus 2health. Works 1 time per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Vampire Bat",
+        "description": "Tier 5. Enemy gained ailment: Deal 4 damage to it and gain damage as health. Works 2 times per battle."
+    },
+    {
+        "category": "Pet",
+        "name": "Vampire Parrot",
+        "description": "Tier 3. Start of battle: Gain plus 1 attack and plus 2 health for each friendly pet with a different ailment."
+    },
+    {
+        "category": "Pet",
+        "name": "Vampire Squid",
+        "description": "Tier 6. End turn: Give 1 attack and 2 health to each friend with a different ailment."
+    },
+    {
+        "category": "Pet",
+        "name": "Vaquita",
+        "description": "Tier 4. Faint: Gain plus 50 percent trumpets, and minimum plus 4 trumpets."
+    },
+    {
+        "category": "Pet",
+        "name": "Velociraptor",
+        "description": "Tier 6. Friend attacks: Steal friendly Strawberry ahead to give friends plus 2 attack and plus 3 health."
+    },
+    {
+        "category": "Pet",
+        "name": "Visitor",
+        "description": "Tier 4. Faint: Make ALL pets within one space Icky."
+    },
+    {
+        "category": "Pet",
+        "name": "Volcano Snail",
+        "description": "Tier 1. Faint: Make one random perkless enemy Toasty."
+    },
+    {
+        "category": "Pet",
+        "name": "Vulture",
+        "description": "Tier 5. Two friends faint: Deal 4 damage to one random enemy."
+    },
+    {
+        "category": "Pet",
+        "name": "Warthog",
+        "description": "Tier 6. Faint: Give random friends plus 1 attack and plus 1 health for every 3 attack this has."
+    },
+    {
+        "category": "Pet",
+        "name": "Weasel",
+        "description": "Tier 3. Faint: Gain plus 1 gold on next turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Weevil",
+        "description": "Tier 1. Friendly ate food: Give them plus 1 Attack until next turn. Works 3 times per turn."
+    },
+    {
+        "category": "Pet",
+        "name": "Werewolf",
+        "description": "Tier 5. Start of battle: If turn number is even, gain plus 50 percent attack and health. Otherwise gain 6 mana."
+    },
+    {
+        "category": "Pet",
+        "name": "Whale",
+        "description": "Tier 4. Start of battle: Swallow the nearest friend ahead and release it as level 1 on faint."
+    },
+    {
+        "category": "Pet",
+        "name": "Whale Shark",
+        "description": "Tier 4. Gain perk or ailment: Remove it and gain plus 1 attack and plus 1 health. Triple in battle."
+    },
+    {
+        "category": "Pet",
+        "name": "White-Bellied Heron",
+        "description": "Tier 2. Start of battle: Give Meat Bone to the friend ahead."
+    },
+    {
+        "category": "Pet",
+        "name": "Wildebeest",
+        "description": "Tier 6. Before attack: Spend 2 Trumpet to gain Coconut perk. Works 1 time per battle."
+    },
+    {
+        "category": "Pet",
+        "name": "Wolf",
+        "description": "Tier 5. Faint: Summon three 3/2 Pigs."
+    },
+    {
+        "category": "Pet",
+        "name": "Wolverine",
+        "description": "Tier 6. Four friends hurt: Remove 3 health health from all enemies."
+    },
+    {
+        "category": "Pet",
+        "name": "Wombat",
+        "description": "Tier 2. Before attack: Transform into the first Faint enemy at level 1."
+    },
+    {
+        "category": "Pet",
+        "name": "Woodpecker",
+        "description": "Tier 5. Start of battle: Deal 2 damage to the nearest two pets ahead. Triggers 2 times."
+    },
+    {
+        "category": "Pet",
+        "name": "Woolly Rhino",
+        "description": "Tier 5. Start of battle: Deal 4 damage for each different friendly ailment to the first enemy."
+    },
+    {
+        "category": "Pet",
+        "name": "Worm",
+        "description": "Tier 2. Start of turn: Stock one 2-gold Apple."
+    },
+    {
+        "category": "Pet",
+        "name": "Worm of Sand",
+        "description": "Tier 4. End turn: Give adjacent friends plus 1 attack and plus 1 health for every 4 roll, up to 8 rolls."
+    },
+    {
+        "category": "Pet",
+        "name": "Wyvern",
+        "description": "Tier 2. Friendly level-up: Gain 1 extra shop reward."
+    },
+    {
+        "category": "Pet",
+        "name": "Yak",
+        "description": "Tier 2. End turn: Deal 1 damage to itself and gain plus 2 attack attack."
+    },
+    {
+        "category": "Pet",
+        "name": "Yellow Boxfish",
+        "description": "Tier 6. Faint: Set Attack and Health of the most healthy pet from ANY team to 20."
+    },
+    {
+        "category": "Pet",
+        "name": "Yeti",
+        "description": "Tier 6. Start of turn: Roll four times while freezing pet copies and tier 6 food."
+    },
+    {
+        "category": "Pet",
+        "name": "Young Phoenix",
+        "description": "Token. The Young Phoenix is a token which is summoned when a Phoenix faints."
+    },
+    {
+        "category": "Pet",
+        "name": "Zombie Cricket",
+        "description": "Token. The Zombie Cricket is a token which is summoned when a Cricket faints."
+    },
+    {
+        "category": "Pet",
+        "name": "Zombie Fly",
+        "description": "Token. The Zombie Fly is a token that is summoned by the Fly when one of its friends faints."
+    },
+    {
+        "category": "Food",
+        "name": "Ambrosia",
+        "description": "Tier 4 food. Give one pet the Ambrosia perk. Block ailment or 8 damage, once."
+    },
+    {
+        "category": "Food",
+        "name": "Antarctic Krill",
+        "description": "Tier 2 food. Stock ANY free useful perk food from the current tier."
+    },
+    {
+        "category": "Food",
+        "name": "Apple",
+        "description": "Tier 1 food. Give one pet plus 1 attack and plus 1 health."
+    },
+    {
+        "category": "Food",
+        "name": "Asparagus",
+        "description": "Tier 1 food. Increase the sell value of one pet by 1 gold."
+    },
+    {
+        "category": "Food",
+        "name": "Avocado",
+        "description": "Tier 3 food. Gain plus 3 gold on next turn."
+    },
+    {
+        "category": "Food",
+        "name": "Bacon",
+        "description": "Tier 1 food. Give one pet plus 2 attack."
+    },
+    {
+        "category": "Food",
+        "name": "Baguette",
+        "description": "Tier 4 food. Give one pet the Baguette perk. Before attack: Remove the front-most enemy perk, once."
+    },
+    {
+        "category": "Food",
+        "name": "Banana",
+        "description": "Tier 4 food. Give one pet the Banana perk. Summon one 4/4 Monkey on faint."
+    },
+    {
+        "category": "Food",
+        "name": "Big Mana Potion",
+        "description": "Tier 5 food. Give one pet plus 6 mana."
+    },
+    {
+        "category": "Food",
+        "name": "Blackberry",
+        "description": "Tier 3 food. Give one pet the Blackberry perk. When gained, give pet plus 1 attack and plus 2 health."
+    },
+    {
+        "category": "Food",
+        "name": "Blueberry",
+        "description": "Tier 1 food. Give one pet the Blueberry perk. Prioritize this for enemy random abilities."
+    },
+    {
+        "category": "Food",
+        "name": "Bok Choy",
+        "description": "Tier 2 food. Give one pet the Bok Choy perk. Gain plus 4 health when this would faint, once."
+    },
+    {
+        "category": "Food",
+        "name": "Bread",
+        "description": "Tier 4 food. Give one pet the Bread perk. End turn: Gain plus 7 health until next turn."
+    },
+    {
+        "category": "Food",
+        "name": "Bread Crumbs",
+        "description": "Tier 1 food. Give one pet plus 1 attack."
+    },
+    {
+        "category": "Food",
+        "name": "Broccoli",
+        "description": "Tier 2 food. Give one pet minus 1 attack and plus 3 health."
+    },
+    {
+        "category": "Food",
+        "name": "Brussels Sprout",
+        "description": "Tier 3 food. Block being pushed or 5 damage, once."
+    },
+    {
+        "category": "Food",
+        "name": "Bubble Tea",
+        "description": "Tier 3 food. Give future shop pets from the next tier permanent plus 1 attack and plus 1 health."
+    },
+    {
+        "category": "Food",
+        "name": "Cake",
+        "description": "Tier 3 food. Give one pet the Cake perk. End turn: Increase sell value by 1 gold."
+    },
+    {
+        "category": "Food",
+        "name": "Canned Ailment",
+        "description": "Tier 1 food. Choose one tier 1 to 3 ailment to stock. Always on sale!."
+    },
+    {
+        "category": "Food",
+        "name": "Canned Bloat",
+        "description": "Tier 5 food. Make one pet Bloated withought triggering abilities. Can't gain perk, once."
+    },
+    {
+        "category": "Food",
+        "name": "Canned Burn",
+        "description": "Tier 4 food. Make one pet Crisp withought triggering abilities. Anyone attacks: Take 6 damage, once."
+    },
+    {
+        "category": "Food",
+        "name": "Canned Cold",
+        "description": "Tier 2 food. Make one pet Cold withought triggering abilities. Take plus 5 damage, Once."
+    },
+    {
+        "category": "Food",
+        "name": "Canned Confusion",
+        "description": "Tier 3 food. Make one pet Confused withought triggering abilities. Before Attack: Transform into a pet from one tier below, once."
+    },
+    {
+        "category": "Food",
+        "name": "Canned Curse",
+        "description": "Tier 6 food. Make one pet Cursed withought triggering abilities. Friend: Make one random friend Cursed."
+    },
+    {
+        "category": "Food",
+        "name": "Canned Dazed",
+        "description": "Tier 5 food. Make one pet Dazed withought triggering abilities. Prevent ability from activating."
+    },
+    {
+        "category": "Food",
+        "name": "Canned Food",
+        "description": "Tier 4 food. Give all current and future shop pets plus 1 attack and plus 1 health."
+    },
+    {
+        "category": "Food",
+        "name": "Canned Icky",
+        "description": "Tier 6 food. Make one pet Icky withought triggering abilities. Take double damage, twice."
+    },
+    {
+        "category": "Food",
+        "name": "Canned Ink",
+        "description": "Tier 2 food. Make one pet Inked withought triggering abilities. Attack and ability deal 3 less damage."
+    },
+    {
+        "category": "Food",
+        "name": "Canned Silly",
+        "description": "Tier 3 food. Make one pet Silly withought triggering abilities. Ability has random targets in battle."
+    },
+    {
+        "category": "Food",
+        "name": "Canned Sleepy",
+        "description": "Tier 5 food. Make one pet Sleepy withought triggering abilities. Attack with half damage, once."
+    },
+    {
+        "category": "Food",
+        "name": "Canned Toasty",
+        "description": "Tier 1 food. Make one pet Toasty withought triggering abilities. Anyone Attacks: Take one damage, Once."
+    },
+    {
+        "category": "Food",
+        "name": "Canned Weak",
+        "description": "Tier 2 food. Make one pet Weak withought triggering abilities. Take plus 3 damage."
+    },
+    {
+        "category": "Food",
+        "name": "Canned Web",
+        "description": "Tier 3 food. Make one pet Webbed withought triggering abilities. Faint: Summon one 2/2 Spider up front for the oponent."
+    },
+    {
+        "category": "Food",
+        "name": "Caramel",
+        "description": "Tier 2 food. Give one pet the Caramel perk. Before attack: Combine friendly Caramels to deal 3 damage each to the most healthy enemy, once."
+    },
+    {
+        "category": "Food",
+        "name": "Carrot",
+        "description": "Tier 5 food. Give one pet the Carrot perk. Gain plus 1 attack and plus 1 health at end of turn."
+    },
+    {
+        "category": "Food",
+        "name": "Carrot Parisier",
+        "description": "Tier 3 food. Give one pet plus 3 attack."
+    },
+    {
+        "category": "Food",
+        "name": "Cashew Nut",
+        "description": "Tier 1 food. Give one pet the Cashew Nut perk. Before battle: Deal 1 damage to the second nearest pet ahead. Double against enemies."
+    },
+    {
+        "category": "Food",
+        "name": "Cauliflower",
+        "description": "Tier 4 food. Give one pet the Cauliflower perk. Knock Out: If still standing, gain permanent plus 1 attack and plus 1 health, once."
+    },
+    {
+        "category": "Food",
+        "name": "Celery",
+        "description": "Tier 6 food. Give one pet plus 6health."
+    },
+    {
+        "category": "Food",
+        "name": "Cheese",
+        "description": "Tier 4 food. Give one pet the Cheese perk. Attack with at least 15damage, once."
+    },
+    {
+        "category": "Food",
+        "name": "Cherry",
+        "description": "Tier 2 food. Give one pet the Cherry perk. Before battle: Gain 2 trumpets and remove perk."
+    },
+    {
+        "category": "Food",
+        "name": "Chicken Leg",
+        "description": "Tier 6 food. Give one pet plus 3 attack and plus 3 health."
+    },
+    {
+        "category": "Food",
+        "name": "Chickpea",
+        "description": "Tier 4 food. Transform one pet into another of the same tier and give two other plus 1 attack and plus 1 health."
+    },
+    {
+        "category": "Food",
+        "name": "Chili",
+        "description": "Tier 5 food. Give one pet the Chili perk. Attack second enemy for 5 damage."
+    },
+    {
+        "category": "Food",
+        "name": "Chocolate",
+        "description": "Tier 5 food. Give one pet plus 1 experience."
+    },
+    {
+        "category": "Food",
+        "name": "Chocolate Cake",
+        "description": "Tier 2 food. Give one pet the Chocolate Cake perk. Gain plus 3 Experience and faint before attacking."
+    },
+    {
+        "category": "Food",
+        "name": "Chocolate Milk",
+        "description": "Tier 1 food. Give one pet plus 1 attack."
+    },
+    {
+        "category": "Food",
+        "name": "Churros",
+        "description": "Tier 2 food. Activate ability before other pets with the same trigger."
+    },
+    {
+        "category": "Food",
+        "name": "Cloudberry",
+        "description": "Tier 2 food. Give one pet plus 1 attack and plus 1 health. Triple on every third Cloudberry."
+    },
+    {
+        "category": "Food",
+        "name": "Cocoa Bean",
+        "description": "Tier 5 food. Give one pet the Cocoa Bean perk. Before attack: Transform into an exact copy of a random enemy, once."
+    },
+    {
+        "category": "Food",
+        "name": "Coconut",
+        "description": "Tier 7 food. Block damage, once."
+    },
+    {
+        "category": "Food",
+        "name": "Cod Roe",
+        "description": "Tier 2 food. Give one pet the Cod Roe perk. Faint: Summon one 2/3 Fish."
+    },
+    {
+        "category": "Food",
+        "name": "Cookie",
+        "description": "Tier 1 food. Give one pet plus 2 attack and plus 2 health until end of battle."
+    },
+    {
+        "category": "Food",
+        "name": "Cornucopia",
+        "description": "Tier 6 food. Choose one free tier 6 food to stock from ALL packs."
+    },
+    {
+        "category": "Food",
+        "name": "Cotton Candy",
+        "description": "Tier 5 food. Give one pet plus 3 attack and plus 2 health."
+    },
+    {
+        "category": "Food",
+        "name": "Croissant",
+        "description": "Tier 3 food. Give one pet the Croissant perk. Gain plus 1 attack at end of turn."
+    },
+    {
+        "category": "Food",
+        "name": "Cucumber",
+        "description": "Tier 3 food. Give one pet the Cucumber perk. Gain plus 1 health at end of turn."
+    },
+    {
+        "category": "Food",
+        "name": "Cupcake",
+        "description": "Tier 2 food. Give one pet plus 3 attack and plus 3 health until end of battle."
+    },
+    {
+        "category": "Food",
+        "name": "Donut",
+        "description": "Tier 4 food. Give pet the Donut perk. Prioritize this for friendly random abilities."
+    },
+    {
+        "category": "Food",
+        "name": "Drink-Me Liquid",
+        "description": "Tier 4 food. Give one pet plus 3 health. Also convert 2 attack into health."
+    },
+    {
+        "category": "Food",
+        "name": "Durian",
+        "description": "Tier 5 food. Give one pet the Durian perk. Reduce the most healthy enemy by 33 percent health before attacking, once."
+    },
+    {
+        "category": "Food",
+        "name": "Easter Egg",
+        "description": "Tier 5 food. Give one pet the Easter Egg perk. Faint: Summon one 3/3 Bunny that attacks for double damage."
+    },
+    {
+        "category": "Food",
+        "name": "Eat-Me Cake",
+        "description": "Tier 4 food. Give one pet plus 3 attack. Also convert 2 health into attack."
+    },
+    {
+        "category": "Food",
+        "name": "Egg",
+        "description": "Tier 1 food. Give one pet the Egg perk. Before attack: Deal 2 damage to target, once."
+    },
+    {
+        "category": "Food",
+        "name": "Eggplant",
+        "description": "Tier 5 food. Give one pet the Eggplant perk. Before battle: Push opposite enemy 1 space forward."
+    },
+    {
+        "category": "Food",
+        "name": "Eucalyptus",
+        "description": "Tier 2 food. Takes 4 less enemy damage, once."
+    },
+    {
+        "category": "Food",
+        "name": "Faint Bread",
+        "description": "Tier 2 food. Give one pet the Faint Bread perk. Faint: Summon ANY tier 1 Faint pet."
+    },
+    {
+        "category": "Food",
+        "name": "Fairy Dust",
+        "description": "Tier 2 food. Give one pet the Fairy Dust perk. Empty front space: Jump to the front and gain plus 2 mana, once."
+    },
+    {
+        "category": "Food",
+        "name": "Fig",
+        "description": "Tier 3 food. Give one pet the Fig perk. Before attack: Deal 4 damage to the lowest health enemy, once."
+    },
+    {
+        "category": "Food",
+        "name": "Flodebolle",
+        "description": "Tier 5 food. Replace each shop item with something from 1 tier higher than it."
+    },
+    {
+        "category": "Food",
+        "name": "Fortune Cookie",
+        "description": "Tier 4 food. Give one pet the Fortune Cookie perk. Attack has 50 percent chance to deal double damage."
+    },
+    {
+        "category": "Food",
+        "name": "Fresh Water",
+        "description": "Tier 1 food. Give one pet plus 2 to their lowest stat."
+    },
+    {
+        "category": "Food",
+        "name": "Fried Shrimp",
+        "description": "Tier 2 food. Give one pet plus 3 attack and minus 1 health."
+    },
+    {
+        "category": "Food",
+        "name": "Garlic",
+        "description": "Tier 3 food. Give one pet the Garlic perk. Take 2 less damage. It can't be reduced to less than 2."
+    },
+    {
+        "category": "Food",
+        "name": "Geechee Red Pea",
+        "description": "Tier 3 food. Give one pet plus 3 health."
+    },
+    {
+        "category": "Food",
+        "name": "Gingerbread Man",
+        "description": "Tier 3 food. Give one pet the Gingerbread Man perk. Before battle: Gain plus 1 experience."
+    },
+    {
+        "category": "Food",
+        "name": "Golden Egg",
+        "description": "Tier 1 food. Give one pet the Golden Egg perk. Before attack: Deal 6 damage to target, once."
+    },
+    {
+        "category": "Food",
+        "name": "Grapes",
+        "description": "Tier 4 food. Give one pet the Grapes perk. Gain plus 1 gold at the start of every turn."
+    },
+    {
+        "category": "Food",
+        "name": "Gros Michel Banana",
+        "description": "Tier 1 food. Give one pet the Gros Michel Banana perk. Before attack: Transform into an Ant."
+    },
+    {
+        "category": "Food",
+        "name": "Guava",
+        "description": "Tier 3 food. Give one pet the Guava perk. Block 3 damage and attack for plus 3 damage, once."
+    },
+    {
+        "category": "Food",
+        "name": "Health Potion",
+        "description": "Tier 1 food. Give one pet the Health Potion perk. Before battle: Give the front-most friendly pet plus 2 health."
+    },
+    {
+        "category": "Food",
+        "name": "Holy Water",
+        "description": "Tier 1 food. Transform one Bad Dog into Good Dog, or give plus 4 attack and plus 4 health."
+    },
+    {
+        "category": "Food",
+        "name": "Honey",
+        "description": "Tier 1 food. Give one pet the Honey perk. Summon one 1/1 Bee after fainting."
+    },
+    {
+        "category": "Food",
+        "name": "Honeydew Melon",
+        "description": "Tier 5 food. Give one pet the Honeydew Melon perk. Block 10 damage, and attack for plus 5 damage, once."
+    },
+    {
+        "category": "Food",
+        "name": "Hot Dog",
+        "description": "Tier 6 food. Give two random pets plus 4 attack."
+    },
+    {
+        "category": "Food",
+        "name": "Judean Date",
+        "description": "Tier 6 food. Stock one 2-gold Melon and one 2-gold Steak."
+    },
+    {
+        "category": "Food",
+        "name": "Just-Right Porridge",
+        "description": "Tier 3 food. Give one pet plus 3 to their lowest stat."
+    },
+    {
+        "category": "Food",
+        "name": "Kiwano",
+        "description": "Tier 5 food. Give one pet the Kiwano perk. Ability deals plus 8 damage, once."
+    },
+    {
+        "category": "Food",
+        "name": "Kiwifruit",
+        "description": "Tier 2 food. Gain 2 free rolls next turn."
+    },
+    {
+        "category": "Food",
+        "name": "Konpeito",
+        "description": "Tier 6 food. Transform one pet into another from one higher tier."
+    },
+    {
+        "category": "Food",
+        "name": "Lasagna",
+        "description": "Tier 5 food. Give one pet plus 2 attack and plus 3 health."
+    },
+    {
+        "category": "Food",
+        "name": "Lemon",
+        "description": "Tier 5 food. Give one pet the Lemon perk. Take 7 less damage, twice."
+    },
+    {
+        "category": "Food",
+        "name": "Lettuce",
+        "description": "Tier 3 food. Give three pets from the current shop tier or higher plus 1 attack and plus 1 health."
+    },
+    {
+        "category": "Food",
+        "name": "Lime",
+        "description": "Tier 2 food. Give one pet the Lime perk. Take 1 less damage."
+    },
+    {
+        "category": "Food",
+        "name": "Lollipop",
+        "description": "Tier 3 food. Swap Attack and Health of a pet. Always on sale!."
+    },
+    {
+        "category": "Food",
+        "name": "Love Potion",
+        "description": "Tier 5 food. Give one pet the Love Potion perk. Before battle: Summon one 5/5 pet like this."
+    },
+    {
+        "category": "Food",
+        "name": "Macaron",
+        "description": "Tier 1 food. Give one pet the Macaron perk. Activate ability after other pets with the same trigger."
+    },
+    {
+        "category": "Food",
+        "name": "Magic Beans",
+        "description": "Tier 5 food. Give one pet the Magic Beans perk. Start of turn: Gain the Golden Egg perk and increase sell value by 4 gold."
+    },
+    {
+        "category": "Food",
+        "name": "Mana Potion",
+        "description": "Tier 1 food. Give one pet plus 3 mana."
+    },
+    {
+        "category": "Food",
+        "name": "Maple Syrup",
+        "description": "Tier 4 food. Give one pet the Maple Syrup perk. Attack for 50 percent damage and block 50 percent damage, thrice."
+    },
+    {
+        "category": "Food",
+        "name": "Meat Bone",
+        "description": "Tier 2 food. Give one pet the Meat Bone perk. Attack with plus 3 damage."
+    },
+    {
+        "category": "Food",
+        "name": "Melon",
+        "description": "Tier 6 food. Give one pet the Melon perk. Take 20 less damage, once."
+    },
+    {
+        "category": "Food",
+        "name": "Melon Slice",
+        "description": "Tier 4 food. Take 10 less damage, once."
+    },
+    {
+        "category": "Food",
+        "name": "Mild Chili",
+        "description": "Tier 4 food. Give one pet the Mild Chili perk. Attack second enemy for 4 damage."
+    },
+    {
+        "category": "Food",
+        "name": "Milk",
+        "description": "Tier 1 food. Give one pet plus 1 attack and plus 2 health."
+    },
+    {
+        "category": "Food",
+        "name": "Mushroom",
+        "description": "Tier 6 food. Give one pet the Mushroom perk. Come back as a 1/1 after fainting."
+    },
+    {
+        "category": "Food",
+        "name": "Nachos",
+        "description": "Tier 1 food. Give one pet the Nachos perk. Before attack: Convert up to 3 health into attack."
+    },
+    {
+        "category": "Food",
+        "name": "Oblonot",
+        "description": "Tier 5 food. Give one pet plus 5 to its lowest stat."
+    },
+    {
+        "category": "Food",
+        "name": "Onion",
+        "description": "Tier 4 food. Give one pet the Onion perk. Move to the back when in the front, once."
+    },
+    {
+        "category": "Food",
+        "name": "Orange",
+        "description": "Tier 6 food. Give two random pets plus 4 health."
+    },
+    {
+        "category": "Food",
+        "name": "Oyster Mushroom",
+        "description": "Tier 4 food. Give one pet the Oyster Mushroom perk. Before attack: Set attack and health to at least 9, once."
+    },
+    {
+        "category": "Food",
+        "name": "Pancakes",
+        "description": "Tier 6 food. Give one pet the Pancakes perk. Give friends plus 2 attack and plus 2 health before start of battle."
+    },
+    {
+        "category": "Food",
+        "name": "Peach",
+        "description": "Tier 1 food. Give one pet plus 2 health."
+    },
+    {
+        "category": "Food",
+        "name": "Peach of Immortality",
+        "description": "Tier 6 food. Give one pet plus 1 attack and plus 1 health for each Peach of Immortality bought this game."
+    },
+    {
+        "category": "Food",
+        "name": "Peanut",
+        "description": "Tier 7 food. Knock out any pet attacked and hurt by this."
+    },
+    {
+        "category": "Food",
+        "name": "Peanut Butter",
+        "description": "Tier 7 food. Knock out any pet attacked and hurt by this, once."
+    },
+    {
+        "category": "Food",
+        "name": "Pear",
+        "description": "Tier 4 food. Give one pet plus 2 attack and plus 2 health."
+    },
+    {
+        "category": "Food",
+        "name": "Peg Leg",
+        "description": "Tier 1 food. Set trophy goal to 12 and summon the achievement hunter's bane."
+    },
+    {
+        "category": "Food",
+        "name": "Pepper",
+        "description": "Tier 5 food. Give one pet the Pepper perk. Health does not go under 1. Removed after taking damage."
+    },
+    {
+        "category": "Food",
+        "name": "Pie",
+        "description": "Tier 4 food. Give one pet the Pie perk. Gain plus 4 attack and plus 3 health before start of battle."
+    },
+    {
+        "category": "Food",
+        "name": "Pineapple",
+        "description": "Tier 3 food. Give one pet the Pineapple perk. Ability deals plus 2 damage."
+    },
+    {
+        "category": "Food",
+        "name": "Pita Bread",
+        "description": "Tier 6 food. Give one pet the Pita Bread perk. Gain plus 15 health when hurt, once."
+    },
+    {
+        "category": "Food",
+        "name": "Pizza",
+        "description": "Tier 6 food. Give two random pets plus 2 attack and plus 2 health."
+    },
+    {
+        "category": "Food",
+        "name": "Popcorn",
+        "description": "Tier 6 food. Give one pet the Popcorn perk. Faint: Summon a random pet from the same tier."
+    },
+    {
+        "category": "Food",
+        "name": "Potato",
+        "description": "Tier 4 food. Give one pet the Potato perk. Take 10 less damage from abilities, twice."
+    },
+    {
+        "category": "Food",
+        "name": "Pretzel",
+        "description": "Tier 6 food. Give one pet plus 2 attack and plus 2 health. Double if all pets are tier 4 or higher."
+    },
+    {
+        "category": "Food",
+        "name": "Pumpkin",
+        "description": "Tier 1 food. Give one pet plus 2 attack on odd turns and plus 2 health on even turns."
+    },
+    {
+        "category": "Food",
+        "name": "Radish",
+        "description": "Tier 2 food. Give one pet the Radish perk. Before battle: Gain ANY usefull perk from the pet's tier."
+    },
+    {
+        "category": "Food",
+        "name": "Rainbow Jelly",
+        "description": "Tier 6 food. If pack has no pets/food from the Perks tab, give tier 5 and 6 perks to one pet and the friends ahead of it."
+    },
+    {
+        "category": "Food",
+        "name": "Rambutan",
+        "description": "Tier 3 food. Give one pet the Rambutan perk. Gain plus 3 mana before attack."
+    },
+    {
+        "category": "Food",
+        "name": "Ravioli",
+        "description": "Tier 3 food. Replace perk or ailment on one pet with plus 2 Attack and plus 2 Health."
+    },
+    {
+        "category": "Food",
+        "name": "Rice",
+        "description": "Tier 2 food. Give one pet the Rice perk. Sell for plus 2 Gold."
+    },
+    {
+        "category": "Food",
+        "name": "Salad Bowl",
+        "description": "Tier 3 food. Give two random pets plus 1 attack and plus 1 health."
+    },
+    {
+        "category": "Food",
+        "name": "Salt",
+        "description": "Tier 4 food. Give one pet the Salt perk. Attack for double damage, once."
+    },
+    {
+        "category": "Food",
+        "name": "Sandwich",
+        "description": "Tier 3 food. Balance out attack and health. Always on sale!."
+    },
+    {
+        "category": "Food",
+        "name": "Sardinian Currant",
+        "description": "Tier 6 food. Give one pet the Sardinian Currant perk. Start of turn: Gain plus 2 gold."
+    },
+    {
+        "category": "Food",
+        "name": "Sausage",
+        "description": "Tier 3 food. Give one pet the Sausage perk. Start of turn: Gain one free roll."
+    },
+    {
+        "category": "Food",
+        "name": "Seaweed",
+        "description": "Tier 3 food. Give one pet the Seaweed perk. Before attack: Transform into a Baby Urchin."
+    },
+    {
+        "category": "Food",
+        "name": "Seed Pile",
+        "description": "Tier 1 food. Give one pet plus 1 health."
+    },
+    {
+        "category": "Food",
+        "name": "Skewer",
+        "description": "Tier 5 food. Attack second and third enemy for 3 damage."
+    },
+    {
+        "category": "Food",
+        "name": "Sleeping Pill",
+        "description": "Tier 2 food. Make one pet faint. Always on sale!."
+    },
+    {
+        "category": "Food",
+        "name": "Soft Ice",
+        "description": "Tier 6 food. Give all pets plus 1 attack."
+    },
+    {
+        "category": "Food",
+        "name": "Soup",
+        "description": "Tier 4 food. Give one pet plus 1 attack and plus 1 health. Triple if you have 1 life left."
+    },
+    {
+        "category": "Food",
+        "name": "Squash",
+        "description": "Tier 3 food. Give one pet the Squash perk. Before attack: Remove 6 health from target, once."
+    },
+    {
+        "category": "Food",
+        "name": "Starfruit",
+        "description": "Tier 6 food. Chose one tier 5 to 6 perk food to stock for free from ANY pack."
+    },
+    {
+        "category": "Food",
+        "name": "Steak",
+        "description": "Tier 6 food. Give one pet the Steak perk. Attack with plus 20 damage, once."
+    },
+    {
+        "category": "Food",
+        "name": "Stew",
+        "description": "Tier 5 food. Give three random pets plus 2 health."
+    },
+    {
+        "category": "Food",
+        "name": "Strawberry",
+        "description": "Tier 1 food. Give one pet the Strawberry perk. Faint: Give the back-most friend plus 1 attack and plus 1 health."
+    },
+    {
+        "category": "Food",
+        "name": "Strawberry Jam",
+        "description": "Tier 5 food. Give one pet the Strawberry. Always on sale! Faint: Give the back-most friend plus 1 attack and plus 1 health."
+    },
+    {
+        "category": "Food",
+        "name": "Stronger Canned Ailment",
+        "description": "Tier 4 food. Choose one tier 4 to 6 ailment to stock. Always on sale!."
+    },
+    {
+        "category": "Food",
+        "name": "Sudduth Tomato",
+        "description": "Tier 2 food. Give one pet the Sudduth Tomato perk. Hurt: If still standing, gain permanent plus 1 health, once."
+    },
+    {
+        "category": "Food",
+        "name": "Sushi",
+        "description": "Tier 5 food. Give three random pets plus 1 attack and plus 1 health."
+    },
+    {
+        "category": "Food",
+        "name": "Taco",
+        "description": "Tier 5 food. Give three random pets plus 2 attack."
+    },
+    {
+        "category": "Food",
+        "name": "Tofu",
+        "description": "Tier 5 food. Stock one 2-gold copy of the last non-Tofu food bought this turn."
+    },
+    {
+        "category": "Food",
+        "name": "Tomato",
+        "description": "Tier 6 food. Give one pet the Tomato perk. Before attack: Deal 10 damage to the last enemy, once."
+    },
+    {
+        "category": "Food",
+        "name": "Unagi",
+        "description": "Tier 1 food. Give one pet the Unagi perk. Start of battle: Deal 2 damage to a random enemy."
+    },
+    {
+        "category": "Food",
+        "name": "Vanilla Bean",
+        "description": "Tier 4 food. Give the two left-most shop pets plus 2 attack and plus 3 health."
+    },
+    {
+        "category": "Food",
+        "name": "Waffle",
+        "description": "Tier 4 food. Activate buy ability or give plus 3 health."
+    },
+    {
+        "category": "Food",
+        "name": "Wall Chicken",
+        "description": "Tier 2 food. Give one pet plus 3 attack and Weak."
+    },
+    {
+        "category": "Food",
+        "name": "Walnut",
+        "description": "Tier 1 food. Give one pet the Walnut perk. Block 2 Damage."
+    },
+    {
+        "category": "Food",
+        "name": "Water of Youth",
+        "description": "Tier 3 food. Transform one pet into another from the same tier and with ANY tier 3 perk."
+    },
+    {
+        "category": "Food",
+        "name": "White Okra",
+        "description": "Tier 6 food. Give one pet the White Okra perk. Block 10 damage twice or ailment once."
+    },
+    {
+        "category": "Food",
+        "name": "White Truffle",
+        "description": "Tier 3 food. Give one pet the White Truffle perk. Friend faint: Jump-attack the highest attack enemy, once."
+    },
+    {
+        "category": "Food",
+        "name": "Yggdrasil Fruit",
+        "description": "Tier 6 food. Give one pet the Yggdrasil Fruit perk. Faint: Summon two 5/5 Nordic Goats."
+    },
+    {
+        "category": "Toy",
+        "name": "Air Palm Tree",
+        "description": "Tier 6 toy. Start of battle: Give Coconut perk to the highest attack friend."
+    },
+    {
+        "category": "Toy",
+        "name": "Balloon",
+        "description": "Tier 1 toy. Break: Give the front-most friend plus 1 attack and plus 1 health."
+    },
+    {
+        "category": "Toy",
+        "name": "Camera",
+        "description": "Tier 5 toy. Start of battle: Reduce 30 percent attack from the highest attack enemy."
+    },
+    {
+        "category": "Toy",
+        "name": "Candelabra",
+        "description": "Tier 4 toy. Three friends bought: Give all friends permanent plus 1 attack and plus 1 health."
+    },
+    {
+        "category": "Toy",
+        "name": "Cash Register",
+        "description": "Tier 3 toy. Break: Summon one 6/6 friend that sells for 3 gold."
+    },
+    {
+        "category": "Toy",
+        "name": "Crystal Ball",
+        "description": "Tier 1 toy. Start of battle: Give the front-most friend plus 2 mana."
+    },
+    {
+        "category": "Toy",
+        "name": "Evil Book",
+        "description": "Tier 5 toy. Empty front space: Summon one 6/6 Great One in battle that deals 5 damage to ALL other pets."
+    },
+    {
+        "category": "Toy",
+        "name": "Excalibur",
+        "description": "Tier 6 toy. End turn: Give the back-most friend plus 1 Attack and plus 1 Health."
+    },
+    {
+        "category": "Toy",
+        "name": "Flashlight",
+        "description": "Tier 5 toy. Break: Give the right-most friend plus 5 attack and plus 5 health."
+    },
+    {
+        "category": "Toy",
+        "name": "Foam Sword",
+        "description": "Tier 3 toy. Start of battle: Deal 5 damage to the lowest health enemy."
+    },
+    {
+        "category": "Toy",
+        "name": "Garlic Press",
+        "description": "Tier 2 toy. Start Of Battle: Give the right-most friend garlic."
+    },
+    {
+        "category": "Toy",
+        "name": "Glass Shoes",
+        "description": "Tier 4 toy. Three friends faint: Give all friends permanent plus 1 attack and plus 1 health."
+    },
+    {
+        "category": "Toy",
+        "name": "Golden Harp",
+        "description": "Tier 4 toy. Spend 14 gold: Break and give all friends permanent plus 1 attack and plus 1 health."
+    },
+    {
+        "category": "Toy",
+        "name": "Holy Grail",
+        "description": "Tier 6 toy. Break: Stock one free Holy Water."
+    },
+    {
+        "category": "Toy",
+        "name": "Lock of Hair",
+        "description": "Tier 4 toy. Three food bought: Give all friends permanent plus 1 attack and plus 1 health."
+    },
+    {
+        "category": "Toy",
+        "name": "Magic Carpet",
+        "description": "Tier 2 toy. Friend Summoned: Give it plus 1 attack."
+    },
+    {
+        "category": "Toy",
+        "name": "Magic Lamp",
+        "description": "Tier 2 toy. Friendly level-up: Give it plus 1 attack and plus 1 health."
+    },
+    {
+        "category": "Toy",
+        "name": "Magic Mirror",
+        "description": "Tier 4 toy. Two friends transformed: Break and give all friends permanent plus 1 attack and plus 1 health."
+    },
+    {
+        "category": "Toy",
+        "name": "Magic Wand",
+        "description": "Tier 1 toy. Start of battle: Give the back-most tier 2 or lower friend plus 1 experience."
+    },
+    {
+        "category": "Toy",
+        "name": "Melon Helmet",
+        "description": "Tier 3 toy. Break: Give the front-most friend Melon perk."
+    },
+    {
+        "category": "Toy",
+        "name": "Microwave Oven",
+        "description": "Tier 2 toy. Start Of Battle: Give Popcorn perk to the front-most perkless friend."
+    },
+    {
+        "category": "Toy",
+        "name": "Nutcracker",
+        "description": "Tier 4 toy. All friends fainted: Summon one 6/6 Salmon of Knowledge in battle once."
+    },
+    {
+        "category": "Toy",
+        "name": "Ocarina",
+        "description": "Tier 4 toy. Start of battle: Give the middle friendly pet plus 6 mana."
+    },
+    {
+        "category": "Toy",
+        "name": "Oven Mitts",
+        "description": "Tier 4 toy. Break: Stock one free Chicken Leg."
+    },
+    {
+        "category": "Toy",
+        "name": "Pandoras Box",
+        "description": "Tier 5 toy. Start of battle: Give ALL pets random perks and ailments."
+    },
+    {
+        "category": "Toy",
+        "name": "Peanut Jar",
+        "description": "Tier 6 toy. Start Of Battle: Give Peanut Butter perk to the lowest attack friend."
+    },
+    {
+        "category": "Toy",
+        "name": "Pickaxe",
+        "description": "Tier 4 toy. Roll 7 times: Give all friends permanent plus 1 attack and plus 1 health."
+    },
+    {
+        "category": "Toy",
+        "name": "Plastic Saw",
+        "description": "Tier 2 toy. Start Of Battle: Give Eucalyptus perk to the front-most friend."
+    },
+    {
+        "category": "Toy",
+        "name": "Radio",
+        "description": "Tier 2 toy. Break: Give all friends plus 1 health."
+    },
+    {
+        "category": "Toy",
+        "name": "Red Cape",
+        "description": "Tier 4 toy. Friend jumped: Give all friends permanent plus 1 attack and plus 1 health."
+    },
+    {
+        "category": "Toy",
+        "name": "Rosebud",
+        "description": "Tier 4 toy. Two friendly level-up: Give all friends permanent plus 1 attack and plus 1 health."
+    },
+    {
+        "category": "Toy",
+        "name": "Stick",
+        "description": "Tier 1 toy. Start of battle: Give Walnut perk to the friend on the middle space."
+    },
+    {
+        "category": "Toy",
+        "name": "Stinky Sock",
+        "description": "Tier 5 toy. Start of battle: Reduce 40 percent health from the highest health enemy."
+    },
+    {
+        "category": "Toy",
+        "name": "Television",
+        "description": "Tier 6 toy. Break: Give all friends plus 2 attack and plus 2 health."
+    },
+    {
+        "category": "Toy",
+        "name": "Tennis Ball",
+        "description": "Tier 1 toy. Start of battle: Deal 1 damage to two random enemies."
+    },
+    {
+        "category": "Toy",
+        "name": "Thunder Hammer",
+        "description": "Tier 4 toy. Start of battle: Give one random Tand and Tand plus 6 attack and plus 6 health."
+    },
+    {
+        "category": "Toy",
+        "name": "Tinder Box",
+        "description": "Tier 4 toy. Empty front space: Summon one 6/6 Giant Eyes Dog up front in battle once."
+    },
+    {
+        "category": "Toy",
+        "name": "Toilet Paper",
+        "description": "Tier 4 toy. Start Of Battle: Give the first enemy weak."
+    },
+    {
+        "category": "Toy",
+        "name": "Toy Gun",
+        "description": "Tier 3 toy. Start of battle: Deal 5 damage to the last enemy."
+    },
+    {
+        "category": "Toy",
+        "name": "Treasure Chest",
+        "description": "Tier 3 toy. Break: Stock one free from Tier 2 as a 4/4 level 3."
+    },
+    {
+        "category": "Toy",
+        "name": "Treasure Map",
+        "description": "Tier 3 toy. Break: Summon a level 1 Treasure Chest."
+    },
+    {
+        "category": "Toy",
+        "name": "Winged Sandals",
+        "description": "Tier 3 toy. End turn: Gain one free roll next turn."
+    },
+    {
+        "category": "Toy",
+        "name": "Witch Broom",
+        "description": "Tier 1 toy. Start of battle: Make 1 random perk-less enemy weak."
+    },
+    {
+        "category": "Ailment",
+        "name": "Bloated",
+        "description": "Ailment. Can't gain perk, once."
+    },
+    {
+        "category": "Ailment",
+        "name": "Cold",
+        "description": "Ailment. Take plus 5 damage, once."
+    },
+    {
+        "category": "Ailment",
+        "name": "Confused",
+        "description": "Ailment. Before attack: Transform into a pet from one tier below, once."
+    },
+    {
+        "category": "Ailment",
+        "name": "Crisp",
+        "description": "Ailment. Take 6 damage after ANY attack, once."
+    },
+    {
+        "category": "Ailment",
+        "name": "Cursed",
+        "description": "Ailment. Faint: Make one random friend Cursed."
+    },
+    {
+        "category": "Ailment",
+        "name": "Dazed",
+        "description": "Ailment. Prevent ability from activating."
+    },
+    {
+        "category": "Ailment",
+        "name": "Icky",
+        "description": "Ailment. Take double damage, twice."
+    },
+    {
+        "category": "Ailment",
+        "name": "Ink",
+        "description": "Ailment. Deal minus 3 damage."
+    },
+    {
+        "category": "Ailment",
+        "name": "Silly",
+        "description": "Ailment. Ability has random targets."
+    },
+    {
+        "category": "Ailment",
+        "name": "Sleepy",
+        "description": "Ailment. Halves damage dealt, once."
+    },
+    {
+        "category": "Ailment",
+        "name": "Spooked",
+        "description": "Ailment. Take plus 1 damage."
+    },
+    {
+        "category": "Ailment",
+        "name": "Tasty",
+        "description": "Ailment. Faint: Give one random enemy permanent plus 2 attack and plus 2 health."
+    },
+    {
+        "category": "Ailment",
+        "name": "Toasty",
+        "description": "Ailment. Take 1 damage after ANY attack, once."
+    },
+    {
+        "category": "Ailment",
+        "name": "Weak",
+        "description": "Ailment. Take plus 3 damage."
+    },
+    {
+        "category": "Ailment",
+        "name": "Webbed",
+        "description": "Ailment. Faint: Summon one 2/2 Spider up front for the opponent."
+    },
+    {
+        "category": "Trigger",
+        "name": "Before Attack",
+        "description": "Trigger. Activates right before the pet swings its attack at an enemy."
+    },
+    {
+        "category": "Trigger",
+        "name": "Before Battle",
+        "description": "Trigger. Activates right before battle starts, similar to start of battle."
+    },
+    {
+        "category": "Trigger",
+        "name": "Buy",
+        "description": "Trigger. Activates when the pet is bought from the shop."
+    },
+    {
+        "category": "Trigger",
+        "name": "Eats Food",
+        "description": "Trigger. Activates when the pet eats any food item."
+    },
+    {
+        "category": "Trigger",
+        "name": "Empty Front Space",
+        "description": "Trigger. Activates when the front position of the team becomes empty in battle."
+    },
+    {
+        "category": "Trigger",
+        "name": "End Turn",
+        "description": "Trigger. Activates when the shop turn ends, just before entering battle."
+    },
+    {
+        "category": "Trigger",
+        "name": "Faint",
+        "description": "Trigger. Activates when the pet loses all health and is removed from battle."
+    },
+    {
+        "category": "Trigger",
+        "name": "Friend Ahead Attacks",
+        "description": "Trigger. Activates when the friend directly in front of this pet attacks."
+    },
+    {
+        "category": "Trigger",
+        "name": "Friend Ahead Faints",
+        "description": "Trigger. Activates when the friend directly in front of this pet faints."
+    },
+    {
+        "category": "Trigger",
+        "name": "Friend Bought",
+        "description": "Trigger. Activates when another friendly pet is bought from the shop."
+    },
+    {
+        "category": "Trigger",
+        "name": "Friend Eats Food",
+        "description": "Trigger. Activates when another friendly pet eats food."
+    },
+    {
+        "category": "Trigger",
+        "name": "Friend Faints",
+        "description": "Trigger. Activates when any allied pet faints during battle."
+    },
+    {
+        "category": "Trigger",
+        "name": "Friend Hurt",
+        "description": "Trigger. Activates when another friendly pet takes damage but survives."
+    },
+    {
+        "category": "Trigger",
+        "name": "Friend Levels Up",
+        "description": "Trigger. Activates when another friendly pet levels up."
+    },
+    {
+        "category": "Trigger",
+        "name": "Friend Sold",
+        "description": "Trigger. Activates when another friendly pet is sold."
+    },
+    {
+        "category": "Trigger",
+        "name": "Friend Summoned",
+        "description": "Trigger. Activates when a new friend is summoned to the team."
+    },
+    {
+        "category": "Trigger",
+        "name": "Hurt",
+        "description": "Trigger. Activates when the pet takes damage but survives."
+    },
+    {
+        "category": "Trigger",
+        "name": "Knock Out",
+        "description": "Trigger. Activates when the pet defeats an enemy with its attack."
+    },
+    {
+        "category": "Trigger",
+        "name": "Level-up",
+        "description": "Trigger. Activates when the pet levels up to level 2 or level 3."
+    },
+    {
+        "category": "Trigger",
+        "name": "Roll",
+        "description": "Trigger. Activates when the shop is rolled for new pets and food."
+    },
+    {
+        "category": "Trigger",
+        "name": "Sell",
+        "description": "Trigger. Activates when the pet is sold from the team."
+    },
+    {
+        "category": "Trigger",
+        "name": "Start of Battle",
+        "description": "Trigger. Activates once at the start of battle before any attacks."
+    },
+    {
+        "category": "Trigger",
+        "name": "Start of Turn",
+        "description": "Trigger. Activates when a new shop turn begins."
+    },
+    {
+        "category": "Mechanic",
+        "name": "Attack",
+        "description": "Mechanic. The damage a pet deals in battle. Pets in front attack simultaneously each round of battle."
+    },
+    {
+        "category": "Mechanic",
+        "name": "Battle",
+        "description": "Mechanic. The combat phase against another player. Pets in front fight first until one team has no pets left."
+    },
+    {
+        "category": "Mechanic",
+        "name": "Combine",
+        "description": "Mechanic. Merge two of the same pet into one. The combined pet keeps the best stats plus a small bonus and gains experience."
+    },
+    {
+        "category": "Mechanic",
+        "name": "Experience",
+        "description": "Mechanic. Pets earn experience by combining duplicates. Two points reach level 2 and a total of five reaches level 3."
+    },
+    {
+        "category": "Mechanic",
+        "name": "Food",
+        "description": "Mechanic. Consumables purchased in the shop that grant stats or perks to your pets."
+    },
+    {
+        "category": "Mechanic",
+        "name": "Freeze",
+        "description": "Mechanic. Lock a pet or food in the shop so it stays available next turn."
+    },
+    {
+        "category": "Mechanic",
+        "name": "Gold",
+        "description": "Mechanic. The currency used to buy pets, roll the shop, and feed pets food. You start each turn with ten gold."
+    },
+    {
+        "category": "Mechanic",
+        "name": "Health",
+        "description": "Mechanic. A pet's hit points. When health reaches zero, the pet faints and is removed from battle."
+    },
+    {
+        "category": "Mechanic",
+        "name": "Hearts",
+        "description": "Mechanic. Your life total. You lose hearts when you lose a battle. When hearts reach zero you are eliminated."
+    },
+    {
+        "category": "Mechanic",
+        "name": "Level",
+        "description": "Mechanic. Combine three of the same pet to reach level 2, then 3. Higher level strengthens the pet's ability and grants a shop reward."
+    },
+    {
+        "category": "Mechanic",
+        "name": "Mana",
+        "description": "Mechanic. A pet-specific resource. Pets gain mana from abilities and spend it on effects like healing, summoning, or buffing. Mana halves at the end of each turn."
+    },
+    {
+        "category": "Mechanic",
+        "name": "Pack",
+        "description": "Mechanic. A collection of pets that share a theme. Packs include Standard, Expansion, Golden, Star, Puppy, Unicorn, Danger, Weekly, and custom mini packs."
+    },
+    {
+        "category": "Mechanic",
+        "name": "Perk",
+        "description": "Mechanic. A persistent effect granted by certain foods such as Honey, Garlic, Melon, Steak, Coconut, or Peanut. A pet can only hold one perk at a time."
+    },
+    {
+        "category": "Mechanic",
+        "name": "Pet",
+        "description": "Mechanic. The units you collect and battle with. Each has attack, health, a tier, and an ability."
+    },
+    {
+        "category": "Mechanic",
+        "name": "Roll",
+        "description": "Mechanic. Spend one gold to refresh the shop with new pets and food choices."
+    },
+    {
+        "category": "Mechanic",
+        "name": "Shop",
+        "description": "Mechanic. The buying phase between battles where you purchase pets, food, and toys."
+    },
+    {
+        "category": "Mechanic",
+        "name": "Tier",
+        "description": "Mechanic. Pets and food are grouped into tiers 1 through 6. Higher tiers unlock as you reach higher turn levels in the shop."
+    },
+    {
+        "category": "Mechanic",
+        "name": "Toy",
+        "description": "Mechanic. Items that appear at higher turns. Each toy has a timer that counts down, then breaks to trigger an effect."
+    },
+    {
+        "category": "Mechanic",
+        "name": "Trumpet",
+        "description": "Mechanic. A team resource gained from certain abilities. When one or zero friends remain, trumpets are spent to summon a Golden Retriever with attack and health equal to the trumpet count."
+    }
+]

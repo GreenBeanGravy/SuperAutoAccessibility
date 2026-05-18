@@ -151,6 +151,13 @@
       <LogicalName>SuperAutoAccessibility.SAAPI64.dll</LogicalName>
     </EmbeddedResource>
 
+    <!-- Embed the wiki-scraped keyword dictionary. DictionaryMenu loads this on first
+         open; an optional override file at <SAP>/Mods/SAPAccess.dictionary.json takes
+         precedence if present (for testing / community-edited dictionaries). -->
+    <EmbeddedResource Include="Generated\WikiDictionary.json">
+      <LogicalName>SuperAutoAccessibility.Generated.WikiDictionary.json</LogicalName>
+    </EmbeddedResource>
+
     <!-- Embed sound effects -->
     <EmbeddedResource Include="..\Sounds\SAP_IsFrozen.ogg">
       <LogicalName>SuperAutoAccessibility.Sounds.SAP_IsFrozen.ogg</LogicalName>
