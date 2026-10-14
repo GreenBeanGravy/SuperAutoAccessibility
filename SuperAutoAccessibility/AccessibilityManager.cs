@@ -727,7 +727,7 @@ namespace SuperAutoAccessibility
             StringBuilder sb = new StringBuilder();
 
             // Extract text content (with label override for context or fallback)
-            string elementText = TextExtractor.GetElementText(go);
+            string elementText = Tree.SapUiSource.PackSpeechText(go) ?? TextExtractor.GetElementText(go);
             string labelOverride = SectionManager.GetLabelOverride(go);
             if (!string.IsNullOrEmpty(labelOverride))
             {

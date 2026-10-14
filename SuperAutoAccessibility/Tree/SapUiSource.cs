@@ -371,6 +371,8 @@ namespace SuperAutoAccessibility.Tree
                 return;
             }
 
+            if (TryPopulatePack(go, node)) return;
+
             // Option buttons (settings) show their name on the left and the current choice on the
             // right ("Window mode ... Off"). Publish those as name and value, so the choice is
             // spoken as a value and a change to it is reported as one.
@@ -407,7 +409,88 @@ namespace SuperAutoAccessibility.Tree
                 else if (!text.Contains(over)) text = over + ", " + text;
             }
             text = UGuiSource.Clean(text);
+            text = WithoutTooltip(text, TooltipOf(go));
             return string.IsNullOrEmpty(text) ? Patches.PageManagerPatches.SplitCamelCase(go.name) : text;
+        }
+
+        /// <summary>
+        /// A button's tooltip is a child of it, so once it shows (the mod hovers the focused
+        /// control) its text joined the label: "Arena, Play against teams created by other
+        /// players..." as the name and the same sentence again as the description.
+        /// </summary>
+        private static string WithoutTooltip(string text, string tip)
+        {
+            if (string.IsNullOrEmpty(text) || string.IsNullOrEmpty(tip) || text == tip) return text;
+            if (text.EndsWith(", " + tip, StringComparison.Ordinal)) return text.Substring(0, text.Length - tip.Length - 2);
+            if (text.StartsWith(tip + ", ", StringComparison.Ordinal)) return text.Substring(tip.Length + 2);
+            return text.Replace(", " + tip + ", ", ", ");
+        }
+
+        /// <summary>
+        /// Pack shop entries hold several texts (price, "New", pack name, pet count, days left)
+        /// that read in layout order as "$10.00, New, Danger pack, 62, New pets". The name is the
+        /// label, owned or the price is the value, the rest is the description.
+        /// </summary>
+        private static bool TryPopulatePack(GameObject go, AccessNode node)
+        {
+            var name = Find(go, "Tween/Name/Label");
+            if (name == null || go.GetComponent<ButtonBase>() == null) return false;
+            string label = Text(name);
+            if (label == null) return false;
+
+            node.Role = AccessRole.Button;
+            node.Label = label;
+            string state = AccessibilityManager.GetControlValue(go);
+            string price = Text(Find(go, "Tween/PriceLabel/Background/Text"));
+            node.Value = !string.IsNullOrEmpty(state) ? state : price;
+
+            var details = PackDetails(go);
+            if (price != null && node.Value != price) details.Add(price);
+            string tip = TooltipOf(go);
+            if (tip != null) details.Add(tip);
+            node.Description = details.Count > 0 ? string.Join(", ", details) : null;
+            node.AddAction(AccessAction.Click);
+            return true;
+        }
+
+        private static List<string> PackDetails(GameObject go)
+        {
+            var details = new List<string>();
+            if (Text(Find(go, "Tween/NewLabel/Background/Text")) != null) details.Add("New");
+            if (Text(Find(go, "Tween/Wild/Background/Text")) != null) details.Add("Wild");
+            string count = Text(Find(go, "Tween/Band/LabelTop"));
+            string countWhat = Text(Find(go, "Tween/Band/LabelBottom"));
+            if (count != null) details.Add(countWhat != null ? count + " " + countWhat.ToLowerInvariant() : count);
+            string preview = Text(Find(go, "Tween/Preview/Label"));
+            if (preview != null) details.Add(preview);
+            return details;
+        }
+
+        /// <summary>
+        /// The mod's own wording for a pack shop entry, name first ("Danger pack, $10.00, New,
+        /// 62 new pets"), or null when this is not one. The texts in layout order read
+        /// "$10.00, New, Danger pack, 62, New pets".
+        /// </summary>
+        internal static string PackSpeechText(GameObject go)
+        {
+            try
+            {
+                if (go == null || go.GetComponent<ButtonBase>() == null) return null;
+                string name = Text(Find(go, "Tween/Name/Label"));
+                if (name == null) return null;
+                var parts = new List<string> { name };
+                string price = Text(Find(go, "Tween/PriceLabel/Background/Text"));
+                if (price != null) parts.Add(price);
+                parts.AddRange(PackDetails(go));
+                return string.Join(", ", parts);
+            }
+            catch { return null; }
+        }
+
+        private static Il2CppTMPro.TMP_Text Find(GameObject go, string path)
+        {
+            var t = go.transform.Find(path);
+            return t != null ? t.GetComponent<Il2CppTMPro.TMP_Text>() : null;
         }
 
         internal static string TooltipOf(GameObject go)
@@ -519,16 +602,46 @@ namespace SuperAutoAccessibility.Tree
                 foreach (var pair in live)
                     foreach (var e in pair.Value) controls.Add(e.gameObject.transform.GetInstanceID());
 
+                // Text a section reads line by line itself (the news screen's patch notes) stays
+                // out: as the dialog's description the screen reader would read all of it every
+                // time focus entered the dialog.
+                var readElsewhere = new List<string>();
+                foreach (var pair in live)
+                {
+                    string tag = pair.Key.Tag;
+                    if (string.IsNullOrEmpty(tag)) continue;
+                    string first = UGuiSource.Clean(tag.Split('\n')[0]);
+                    if (!string.IsNullOrEmpty(first) && first.Length >= 12)
+                        readElsewhere.Add(first.Length > 40 ? first.Substring(0, 40) : first);
+                }
+
                 var texts = screenRoot.GetComponentsInChildren<Il2CppTMPro.TMP_Text>(false);
                 // The title is already the dialog's name.
                 var seen = new HashSet<string> { title ?? "" };
                 var sb = new StringBuilder();
+
+                // Stats tiles: label and number as one line, and for "most bought" tiles the pet
+                // or food, which is only an icon ("Most bought pet. 27" said nothing about which).
+                var statsItems = new HashSet<int>();
+                foreach (var item in screenRoot.GetComponentsInChildren<StatsSummaryItem>(false))
+                {
+                    string line = StatsLine(item);
+                    statsItems.Add(item.transform.GetInstanceID());
+                    if (string.IsNullOrEmpty(line) || sb.Length >= MaxDescription) continue;
+                    if (sb.Length > 0) sb.Append(". ");
+                    sb.Append(line);
+                }
                 for (int i = 0; i < texts.Length && sb.Length < MaxDescription; i++)
                 {
                     var t = texts[i];
                     if (t == null || InsideControl(t.transform, screenRoot.transform, controls)) continue;
+                    if (statsItems.Count > 0 && InsideAny(t.transform, screenRoot.transform, statsItems)) continue;
                     string s = UGuiSource.Clean(t.text);
                     if (string.IsNullOrEmpty(s) || !seen.Add(s)) continue;
+                    // The lobby's "28 / 50" counter says nothing on its own. The game calls these
+                    // snacks (Stats: "Snacks gained").
+                    if (UnderObjectNamed(t.transform, "Snacks", screenRoot.transform)) s = "Snacks: " + s;
+                    if (readElsewhere.Exists(f => s.Contains(f))) continue;
                     if (sb.Length > 0) sb.Append(". ");
                     sb.Append(s);
                 }
@@ -538,6 +651,45 @@ namespace SuperAutoAccessibility.Tree
             {
                 return null;
             }
+        }
+
+        private static string StatsLine(StatsSummaryItem item)
+        {
+            try
+            {
+                string label = Text(item.Label);
+                string value = Text(item.Value);
+                if (label == null) return value;
+                string metric = item.Metric.ToString();
+                string what = null;
+                if (metric == "MinionBought" || metric == "SpellBought")
+                {
+                    var sprite = item.Image != null ? item.Image.sprite : null;
+                    if (sprite != null) what = Patches.PageManagerPatches.SplitCamelCase(sprite.name);
+                }
+                var parts = new List<string>();
+                if (!string.IsNullOrEmpty(what)) parts.Add(what);
+                if (value != null) parts.Add(value);
+                return parts.Count > 0 ? label + ": " + string.Join(", ", parts) : label;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private static bool InsideAny(Transform t, Transform stop, HashSet<int> ids)
+        {
+            for (; t != null && t != stop; t = t.parent)
+                if (ids.Contains(t.GetInstanceID())) return true;
+            return false;
+        }
+
+        private static bool UnderObjectNamed(Transform t, string name, Transform stop)
+        {
+            for (; t != null && t != stop; t = t.parent)
+                if (t.name == name) return true;
+            return false;
         }
 
         private static bool InsideControl(Transform t, Transform stop, HashSet<int> controls)
