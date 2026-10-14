@@ -120,7 +120,15 @@ namespace SuperAutoAccessibility.Tree
             {
                 _usingScan = true;
                 _scan.BuildSnapshot(into);
+                if (!into.Contains(SelectedId())) into.FocusId = into.RootId;
             }
+        }
+
+        private static ulong SelectedId()
+        {
+            var es = EventSystem.current;
+            var go = es != null ? es.currentSelectedGameObject : null;
+            return go != null ? UGuiSource.StableId(go) : 0;
         }
 
         private static int CountElements(List<NavigationSection> sections)
@@ -262,8 +270,14 @@ namespace SuperAutoAccessibility.Tree
                 }
             }
 
+            // Nothing the game has selected is on this screen yet: the mod moves focus a frame or
+            // two after a screen opens. Focusing the first control meanwhile made the screen
+            // reader start on it ("简体中文" before the picker's current "English"), and the real
+            // focus then cancelled that speech, dialog title included, without saying the title
+            // again. The window root says nothing worth cancelling and keeps the title for the
+            // real focus.
             if (into.FocusId == 0 || !into.Contains(into.FocusId))
-                into.FocusId = _ring.Count > 0 ? _ring[0] : RootId;
+                into.FocusId = RootId;
         }
 
         // ---- one control ---------------------------------------------------------------------
