@@ -710,10 +710,7 @@ namespace SuperAutoAccessibility.Tree
                 if (!Gameplay.GameplayPhaseDetector.IsShopPhase() && !Gameplay.GameplayPhaseDetector.IsBattlePhase())
                     return false;
                 if (AccessibilityManager.GetActiveModal() != null) return false;
-                var menu = UnityEngine.Object.FindObjectOfType<Menu>();
-                if (menu != null && menu.SideBar != null && menu.SideBar.Container != null &&
-                    menu.SideBar.Container.gameObject.activeInHierarchy)
-                    return false;
+                if (SectionManager.MenuOverlayOpen()) return false;
                 return true;
             }
             catch

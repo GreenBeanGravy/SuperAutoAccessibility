@@ -762,6 +762,32 @@ namespace SuperAutoAccessibility
                     return;
                 }
 
+                // 2b. Settings opened from the pause menu during a run is no page, so Page.Back
+                // never reached it and Escape opened the pause menu on top of it instead. Press
+                // its own Back, as a sighted player would.
+                if ((Gameplay.GameplayPhaseDetector.IsShopPhase() || Gameplay.GameplayPhaseDetector.IsBattlePhase()) &&
+                    SectionManager.IsSettingsMenuVisible())
+                {
+                    try
+                    {
+                        var settingsMenu = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.MonoBehaviours.Build.SettingsMenu>();
+                        if (settingsMenu?.ExitButton != null)
+                        {
+                            ExecuteEvents.Execute(settingsMenu.ExitButton.gameObject,
+                                new BaseEventData(EventSystem.current), ExecuteEvents.submitHandler);
+                            SectionManager.InvalidateCache();
+                            if (!Tree.SapA11y.OwnsSpeech)
+                                AccessibilityManager.Announce("Settings closed");
+                            LoggerInstance.Msg("Escape: Closed settings during a run");
+                            return;
+                        }
+                    }
+                    catch (System.Exception ex)
+                    {
+                        LoggerInstance.Warning($"Escape settings close error: {ex.Message}");
+                    }
+                }
+
                 // 3. Close sidebar if open
                 if (IsSidebarOpen())
                 {
@@ -1720,7 +1746,11 @@ namespace SuperAutoAccessibility
             // This prevents Unity's native Submit handler (Enter/Space) from clicking
             // whatever button the game happens to have focused. Our mod handles all
             // input through its own keybinds and SectionManager navigation.
-            if (Gameplay.GameplayPhaseDetector.IsShopPhase() && EventSystem.current != null)
+            // Not while a menu is open over the run (Settings from the pause menu): those are
+            // navigated like any menu, and clearing every frame left them with no focus at all,
+            // so nothing was spoken and the screen reader had nothing to read.
+            if (Gameplay.GameplayPhaseDetector.IsShopPhase() && EventSystem.current != null &&
+                !SectionManager.MenuOverlayOpen())
             {
                 var selected = EventSystem.current.currentSelectedGameObject;
                 if (selected != null)
@@ -3689,6 +3719,8 @@ namespace SuperAutoAccessibility
                         _sidebarActive = false;
                         _sidebarItems.Clear();
                         SectionManager.InvalidateCache();
+                        if (Gameplay.GameplayPhaseDetector.IsShopPhase() || Gameplay.GameplayPhaseDetector.IsBattlePhase())
+                            AccessibilityManager.RequestFocusFirstForMenu();
                     }
                 }
                 catch (System.Exception ex)

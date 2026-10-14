@@ -49,8 +49,23 @@ namespace SuperAutoAccessibility
         // Deferred FocusFirst â€” set by PageManager patch, executed next frame when elements are ready
         private static bool _pendingFocusFirst = false;
 
+        /// <summary>
+        /// Focus the first control of a menu opened over a run (Settings from the pause menu).
+        /// Unlike a page, it gets no PageManager.Open, so nothing was selected and nothing said.
+        /// If no menu is up by then (Resume closed the pause menu), the run's own controls are
+        /// left alone.
+        /// </summary>
+        public static void RequestFocusFirstForMenu()
+        {
+            RequestFocusFirst();
+            _focusFirstNeedsMenu = true;
+        }
+
+        private static bool _focusFirstNeedsMenu;
+
         public static void RequestFocusFirst()
         {
+            _focusFirstNeedsMenu = false;
             _pendingFocusFirst = true;
             _focusFirstGiveUpAt = -1f;
             _focusFirstNextTry = 0f;
@@ -280,6 +295,23 @@ namespace SuperAutoAccessibility
         public static void FocusFirst()
         {
             if (EventSystem.current == null) return;
+            if (_focusFirstNeedsMenu && !SectionManager.MenuOverlayOpen() && GetActiveModal() == null)
+            {
+                // Keep trying while the menu opens; give up quietly if none does.
+                float t = Time.realtimeSinceStartup;
+                if (_focusFirstGiveUpAt < 0f) _focusFirstGiveUpAt = t + FocusFirstRetrySeconds;
+                if (t < _focusFirstGiveUpAt)
+                {
+                    _pendingFocusFirst = true;
+                    _focusFirstNextTry = t + FocusFirstRetryInterval;
+                }
+                else
+                {
+                    _focusFirstGiveUpAt = -1f;
+                    _focusFirstNeedsMenu = false;
+                }
+                return;
+            }
 
             bool landed = false;
             try

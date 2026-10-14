@@ -143,13 +143,7 @@ namespace SuperAutoAccessibility
             }
             catch { }
 
-            try
-            {
-                var menu = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.Menu>();
-                if (menu?.SideBar?.Container?.gameObject != null)
-                    sidebarOpen = menu.SideBar.Container.gameObject.activeInHierarchy;
-            }
-            catch { }
+            sidebarOpen = OpenSideBar() != null;
 
             // Check if Picker popup is open
             try
@@ -347,17 +341,10 @@ namespace SuperAutoAccessibility
                 var menu = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.Menu>();
 
                 // Check sidebar FIRST â€” if open, build sidebar sections
-                bool sidebarOpen = false;
-                try
+                var openSideBar = OpenSideBar();
+                if (openSideBar != null)
                 {
-                    if (menu?.SideBar?.Container?.gameObject != null)
-                        sidebarOpen = menu.SideBar.Container.gameObject.activeInHierarchy;
-                }
-                catch { }
-
-                if (sidebarOpen && menu?.SideBar != null)
-                {
-                    BuildSidebarSections(menu.SideBar);
+                    BuildSidebarSections(openSideBar);
                 }
                 else
                 {
@@ -586,7 +573,35 @@ namespace SuperAutoAccessibility
         /// Checks if the SettingsMenu is currently visible (has at least one active group container).
         /// Used to detect settings opened from the in-game sidebar, where the page name remains "Build".
         /// </summary>
-        private static bool IsSettingsMenuVisible()
+        /// <summary>
+        /// A menu is up over a run: the pause menu, Settings opened from it, or a picker. The
+        /// accessibility tree publishes these like any menu; the run's own overlays stay with the
+        /// mod's speech.
+        /// </summary>
+        public static bool MenuOverlayOpen()
+        {
+            // Asked every frame of the shop phase; four scene searches each time is too much.
+            float now = Time.realtimeSinceStartup;
+            if (now - _menuOverlayCheckedAt < 0.1f) return _menuOverlayOpen;
+            _menuOverlayCheckedAt = now;
+            _menuOverlayOpen = OpenSideBar() != null || IsSettingsMenuVisible() || PickerOpen();
+            return _menuOverlayOpen;
+        }
+
+        private static float _menuOverlayCheckedAt = -1f;
+        private static bool _menuOverlayOpen;
+
+        private static bool PickerOpen()
+        {
+            try
+            {
+                var picker = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.UI.Picker>();
+                return picker?.Container?.gameObject != null && picker.Container.gameObject.activeInHierarchy;
+            }
+            catch { return false; }
+        }
+
+        public static bool IsSettingsMenuVisible()
         {
             try
             {
@@ -2690,6 +2705,26 @@ namespace SuperAutoAccessibility
                 _modDrivenSelection = true;
                 EventSystem.current.SetSelectedGameObject(section.Elements[_currentElementIndex].gameObject);
             }
+        }
+
+        /// <summary>
+        /// The pause menu when it is open, else null. In the menus it hangs off Menu; during a run
+        /// there is no Menu and it lives at Build/SideBar, so a Menu-only lookup never saw it open
+        /// and the run's pause menu had no sections (and no accessibility tree).
+        /// </summary>
+        public static Il2CppSpacewood.Unity.SideBar OpenSideBar()
+        {
+            try
+            {
+                var menu = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.Menu>();
+                var sidebar = menu != null && menu.SideBar != null
+                    ? menu.SideBar
+                    : UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.SideBar>();
+                if (sidebar != null && sidebar.Container != null && sidebar.Container.gameObject.activeInHierarchy)
+                    return sidebar;
+            }
+            catch { }
+            return null;
         }
 
         /// <summary>Whether the EventSystem's selection is one of the current sections' controls.</summary>
