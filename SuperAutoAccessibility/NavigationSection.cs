@@ -2283,6 +2283,11 @@ namespace SuperAutoAccessibility
             catch { }
         }
 
+        private static string PatchNotesLabel(int count)
+        {
+            return $"Patch notes, {count} lines, left and right arrows to read";
+        }
+
         /// <summary>
         /// Builds sections for the News/Announcement overlay dialog.
         /// Creates labeled sections for pinboard items (Major/Minor/Free) and actions (Dismiss/Link).
@@ -2308,7 +2313,8 @@ namespace SuperAutoAccessibility
                     AddPinboardSection(pinboard, "FreeItems", "Free Items");
                 }
 
-                // Changes section: the changelog text at the bottom, split by line
+                bool dismissIsChangesEntry = false;
+
                 // Changes section: the changelog text at the bottom, split by individual items.
                 // Uses the scrollbar as anchor (a Selectable that won't trigger dialog actions).
                 try
@@ -2369,19 +2375,21 @@ namespace SuperAutoAccessibility
                                         if (announcement.DismissButton?.gameObject != null)
                                         {
                                             TryAddWithLabel(changesSection, announcement.DismissButton,
-                                                $"{changeLines.Count} patch notes. Use left and right arrows to read.");
+                                                PatchNotesLabel(changeLines.Count));
+                                            dismissIsChangesEntry = true;
                                         }
                                     }
                                     else
                                     {
                                         TryAddWithLabel(changesSection, selectableBase,
-                                            $"{changeLines.Count} patch notes. Use left and right arrows to read.");
+                                            PatchNotesLabel(changeLines.Count));
                                     }
                                 }
                                 else if (announcement.DismissButton?.gameObject != null)
                                 {
                                     TryAddWithLabel(changesSection, announcement.DismissButton,
-                                        $"{changeLines.Count} patch notes. Use left and right arrows to read.");
+                                        PatchNotesLabel(changeLines.Count));
+                                    dismissIsChangesEntry = true;
                                 }
 
                                 if (changesSection.Elements.Count > 0)
@@ -2401,7 +2409,12 @@ namespace SuperAutoAccessibility
                         TryAddWithLabel(actionsSection, announcement.LinkButton, "Link");
                 }
                 catch { }
-                TryAddWithLabel(actionsSection, announcement.DismissButton, "Dismiss");
+                // When Dismiss is already the patch notes' entry, a second entry for it had two
+                // effects: its label table entry replaced the patch notes' label (both keyed by the
+                // button), so the notes were announced as "Dismiss", and Tab from the notes to it
+                // landed on the same button again.
+                if (!dismissIsChangesEntry)
+                    TryAddWithLabel(actionsSection, announcement.DismissButton, "Dismiss");
                 if (actionsSection.Elements.Count > 0)
                     _sections.Add(actionsSection);
 
