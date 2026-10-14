@@ -229,6 +229,8 @@ namespace SuperAutoAccessibility.Tree
                     }
                 }
 
+                WriteNotices(asm, dir);
+
                 IntPtr handle = System.Runtime.InteropServices.NativeLibrary.Load(path);
 
                 // UnityA11y's P/Invokes name "accesskit". Point them at this exact copy, so a stray
@@ -243,6 +245,34 @@ namespace SuperAutoAccessibility.Tree
             {
                 MelonLogger.Error("[tree] Could not load accesskit.dll; menus stay on the mod's own speech: " + ex.Message);
                 return IntPtr.Zero;
+            }
+        }
+
+        private const string NoticePrefix = "SuperAutoAccessibility.notice.";
+
+        /// <summary>
+        /// AccessKit's license asks for its notice to travel with every copy, and the release is
+        /// a single DLL, so the notices ride inside it and land next to accesskit.dll.
+        /// </summary>
+        private static void WriteNotices(Assembly asm, string dir)
+        {
+            foreach (string name in asm.GetManifestResourceNames())
+            {
+                if (!name.StartsWith(NoticePrefix, StringComparison.Ordinal)) continue;
+                try
+                {
+                    string text;
+                    using (var res = asm.GetManifestResourceStream(name))
+                    using (var reader = new StreamReader(res))
+                        text = reader.ReadToEnd();
+                    string path = Path.Combine(dir, name.Substring(NoticePrefix.Length));
+                    if (!File.Exists(path) || File.ReadAllText(path) != text)
+                        File.WriteAllText(path, text);
+                }
+                catch (Exception ex)
+                {
+                    MelonLogger.Warning("[tree] Could not write " + name + ": " + ex.Message);
+                }
             }
         }
 

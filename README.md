@@ -45,7 +45,7 @@ The build finds your Super Auto Pets installation through the Steam registry. If
 dotnet build -c Release /p:SAPPath="C:\path\to\Super Auto Pets"
 ```
 
-The built DLL is at `SuperAutoAccessibility/bin/Release/net6.0/SuperAutoAccessibility.dll`. Copy it into your `Super Auto Pets/Mods/` folder. It carries AccessKit's native `accesskit.dll` inside and extracts it to `Mods/AccessKitLibs/` on first start, so the release is still that one file.
+The built DLL is at `SuperAutoAccessibility/bin/Release/net6.0/SuperAutoAccessibility.dll`. Copy it into your `Super Auto Pets/Mods/` folder. It carries AccessKit's native `accesskit.dll` inside and extracts it, with its license notices, to `Mods/AccessKitLibs/` on first start, so the release is still that one file.
 
 To keep a development build from offering to update itself to the latest release, put an empty file named `SAPAccess.dev` next to it in `Mods/`.
 

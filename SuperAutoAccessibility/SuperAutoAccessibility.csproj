@@ -171,6 +171,16 @@
     <EmbeddedResource Include="..\UnityA11y\native\accesskit.dll">
       <LogicalName>SuperAutoAccessibility.accesskit.dll</LogicalName>
     </EmbeddedResource>
+    <!-- AccessKit's license notices, written next to accesskit.dll. -->
+    <EmbeddedResource Include="..\THIRD-PARTY-NOTICES.txt">
+      <LogicalName>SuperAutoAccessibility.notice.THIRD-PARTY-NOTICES.txt</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\UnityA11y\licenses\AccessKit-MIT.txt">
+      <LogicalName>SuperAutoAccessibility.notice.AccessKit-MIT.txt</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\UnityA11y\licenses\AccessKit-Chromium-BSD.txt">
+      <LogicalName>SuperAutoAccessibility.notice.AccessKit-Chromium-BSD.txt</LogicalName>
+    </EmbeddedResource>
 
     <!-- Embed the wiki-scraped keyword dictionary. DictionaryMenu loads this on first
          open; an optional override file at <SAP>/Mods/SAPAccess.dictionary.json takes
