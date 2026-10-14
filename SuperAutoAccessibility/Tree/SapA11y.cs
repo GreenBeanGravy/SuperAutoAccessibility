@@ -41,6 +41,12 @@ namespace SuperAutoAccessibility.Tree
         private static bool _readerPresent;
 
         public static A11yRuntime Runtime => _runtime;
+
+        /// <summary>
+        /// Development only: behave as if a screen reader were running, so the hand-over of speech
+        /// to the tree can be tested without starting one. Set from a debugger or eval.
+        /// </summary>
+        public static bool AssumeScreenReaderForTesting;
         internal static SapUiSource Source => _source;
 
         public static void Initialize()
@@ -104,8 +110,9 @@ namespace SuperAutoAccessibility.Tree
                 {
                     _nextReaderCheck = now + ReaderCheckSeconds;
                     string reader = TolkSpeech.DetectScreenReader();
-                    _readerPresent = !string.IsNullOrEmpty(reader) &&
-                                     !string.Equals(reader, "SAPI", StringComparison.OrdinalIgnoreCase);
+                    _readerPresent = AssumeScreenReaderForTesting ||
+                                     (!string.IsNullOrEmpty(reader) &&
+                                      !string.Equals(reader, "SAPI", StringComparison.OrdinalIgnoreCase));
                 }
                 return _readerPresent;
             }

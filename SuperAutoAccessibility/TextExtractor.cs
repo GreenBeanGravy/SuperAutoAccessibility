@@ -91,6 +91,11 @@ namespace SuperAutoAccessibility
             // Remove rich text tags first (they may contain newlines)
             text = System.Text.RegularExpressions.Regex.Replace(text, @"<[^>]+>", "");
 
+            // Zero-width characters: TextMeshPro input fields append U+200B to their text, so an
+            // empty password field was announced as "Password, Enter password..., <ZWSP>, edit box",
+            // and some symbol levels read the character out.
+            text = System.Text.RegularExpressions.Regex.Replace(text, "[​‌‍⁠﻿]", "");
+
             // Collapse all whitespace (newlines, tabs, multiple spaces) into single space
             text = System.Text.RegularExpressions.Regex.Replace(text, @"\s+", " ");
 

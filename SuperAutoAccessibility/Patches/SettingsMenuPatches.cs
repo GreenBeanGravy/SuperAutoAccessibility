@@ -95,7 +95,10 @@ namespace SuperAutoAccessibility.Patches
                 // Announce the tab change
                 AccessibilityManager.Announce($"{activeTabName} tab");
 
-                // Request focus on first content element of the new tab
+                // Request focus on first content element of the new tab. Without naming the
+                // section, FocusFirst landed on the first TAB (General), so choosing Audio said
+                // "General" and a second Enter switched back to General.
+                SectionManager.RequestInitialSection("Content");
                 AccessibilityManager.RequestFocusFirst();
 
                 // Queue a UI dump for debugging

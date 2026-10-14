@@ -26,6 +26,9 @@ namespace SuperAutoAccessibility
         // Bootstrap language picker
         private static bool _lastLanguagePickerOpen = false;
 
+        // The button whose Picker popup is open, to return focus to when it closes.
+        private static GameObject _pickerOpener;
+
         public override void OnInitializeMelon()
         {
             LoggerInstance.Msg("Super Auto Pets Accessibility Mod initializing... (update test build)");
@@ -845,7 +848,9 @@ namespace SuperAutoAccessibility
                     try
                     {
                         string newValue = AccessibilityManager.GetControlValue(_pendingSliderAnnounce);
-                        if (!string.IsNullOrEmpty(newValue))
+                        // The tree publishes the new value and the screen reader reports the
+                        // change on the focused slider itself.
+                        if (!string.IsNullOrEmpty(newValue) && !Tree.SapA11y.SpeaksFor(_pendingSliderAnnounce))
                         {
                             AccessibilityManager.Announce(newValue);
                         }
@@ -937,7 +942,8 @@ namespace SuperAutoAccessibility
                     try
                     {
                         string newValue = AccessibilityManager.GetControlValue(_pendingValueCheck) ?? "";
-                        if (newValue != _preClickValue && !string.IsNullOrEmpty(newValue))
+                        if (newValue != _preClickValue && !string.IsNullOrEmpty(newValue) &&
+                            !Tree.SapA11y.SpeaksFor(_pendingValueCheck))
                         {
                             AccessibilityManager.Announce(newValue);
                         }
@@ -965,20 +971,27 @@ namespace SuperAutoAccessibility
                 {
                     // Picker just opened â€” announce title and focus first option
                     SectionManager.InvalidateCache();
-                    string title = "";
-                    try
-                    {
-                        if (picker.Title != null && !string.IsNullOrWhiteSpace(picker.Title.text))
-                            title = picker.Title.text.Trim();
-                    }
-                    catch { }
-                    string announcement = string.IsNullOrEmpty(title) ? "Picker" : title;
-                    AccessibilityManager.Announce(announcement);
+                    string announcement = PickerInfo.Title(picker);
+                    // The tree names the picker as a dialog when focus lands inside it.
+                    if (!Tree.SapA11y.SpeaksScreen(picker.Container.gameObject))
+                        AccessibilityManager.Announce(announcement);
                     AccessibilityManager.RequestFocusFirst();
                     LoggerInstance.Msg($"Picker opened: {announcement}");
+                    try { _pickerOpener = picker.ButtonTarget != null ? picker.ButtonTarget.gameObject : null; }
+                    catch { _pickerOpener = null; }
                 }
                 else if (!pickerOpen && _lastPickerOpen)
                 {
+                    // Back to the button that opened the picker (closed by Escape or by picking),
+                    // which now shows the new choice. Without this, focus fell to the first control
+                    // of the screen.
+                    var opener = _pickerOpener;
+                    _pickerOpener = null;
+                    if (opener != null && opener.activeInHierarchy)
+                    {
+                        AccessibilityManager.CancelPendingFocusFirst();
+                        SectionManager.FocusObject(opener);
+                    }
                     // Picker just closed â€” invalidate cache
                     SectionManager.InvalidateCache();
                 }

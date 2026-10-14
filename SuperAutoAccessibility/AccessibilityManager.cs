@@ -932,6 +932,15 @@ namespace SuperAutoAccessibility
                 return null;
             }
 
+            // Picker option: the current choice is marked only by a checked icon, so say it.
+            try
+            {
+                var picker = PickerInfo.OwnerOf(go);
+                if (picker != null)
+                    return PickerInfo.IsPicked(picker, go.GetComponent<ButtonBase>()) ? "checked" : null;
+            }
+            catch { }
+
             // PackProduct: show owned/locked/selected status (check before ButtonBase since BuyButton is a ButtonBase)
             try
             {

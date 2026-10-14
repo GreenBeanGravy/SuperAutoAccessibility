@@ -278,6 +278,10 @@ namespace SuperAutoAccessibility
         {
             _sections.Clear();
             _labelOverrides.Clear();
+            // A requested initial focus belongs to the build that set it. FocusFirstSection always
+            // rebuilds before reading it, so clearing here only drops stale requests (a closed
+            // picker's index applied to whatever screen came next).
+            _pendingInitialFocus = null;
 
             try
             {
@@ -1134,16 +1138,10 @@ namespace SuperAutoAccessibility
 
             try
             {
-                // Get title for context
-                string title = "";
-                try
-                {
-                    if (picker.Title != null && !string.IsNullOrWhiteSpace(picker.Title.text))
-                        title = picker.Title.text.Trim();
-                }
-                catch { }
-                if (!string.IsNullOrEmpty(title))
-                    section.Name = title;
+                // Title for context; falls back to the label of the button that opened the
+                // picker, since many pickers (Language) leave their own title empty.
+                section.Name = PickerInfo.Title(picker);
+                int pickedIndex = -1;
 
                 // Collect all Primary buttons from the PickerButton items in the ItemContainer
                 var itemContainer = picker.ItemContainer;
@@ -1159,11 +1157,17 @@ namespace SuperAutoAccessibility
                             if (pb.Primary.gameObject == null) continue;
                             if (!pb.Primary.gameObject.activeInHierarchy) continue;
                             if (!pb.Primary.GetInteractable()) continue;
+                            if (pickedIndex < 0 && PickerInfo.IsPicked(picker, pb.Primary))
+                                pickedIndex = section.Elements.Count;
                             section.Elements.Add(pb.Primary);
                         }
                         catch { }
                     }
                 }
+
+                // Open on the current choice rather than the first option, so the user hears
+                // what is selected and does not have to search the list for it.
+                if (pickedIndex >= 0) _pendingInitialFocus = (_sections.Count, pickedIndex);
             }
             catch (Exception ex)
             {
@@ -2720,18 +2724,75 @@ namespace SuperAutoAccessibility
             _currentSectionIndex = 0;
             _currentElementIndex = 0;
 
+            // A caller that asked for a named section (a settings tab asking for its content)
+            // starts there instead of at the top.
+            string wanted = _pendingInitialSectionName;
+            _pendingInitialSectionName = null;
+            if (wanted != null)
+            {
+                for (int i = 0; i < sections.Count; i++)
+                {
+                    if (sections[i].Name == wanted && sections[i].Elements.Count > 0)
+                    {
+                        _currentSectionIndex = i;
+                        break;
+                    }
+                }
+            }
+
             if (!ValidateSection()) return;
 
             if (sections.Count > 1)
             {
-                AccessibilityManager.SetCurrentSectionName(sections[0].Name);
+                AccessibilityManager.SetCurrentSectionName(sections[_currentSectionIndex].Name);
             }
 
             if (EventSystem.current != null)
             {
                 _modDrivenSelection = true;
-                EventSystem.current.SetSelectedGameObject(sections[0].Elements[0].gameObject);
+                EventSystem.current.SetSelectedGameObject(
+                    sections[_currentSectionIndex].Elements[_currentElementIndex].gameObject);
             }
+        }
+
+        private static string _pendingInitialSectionName;
+
+        /// <summary>
+        /// Focus a specific control (announced like keyboard navigation) and point the section
+        /// cursor at it. Returns false when it is gone or not part of any section.
+        /// </summary>
+        public static bool FocusObject(GameObject target)
+        {
+            if (target == null || !target.activeInHierarchy || EventSystem.current == null) return false;
+            InvalidateCache();
+            var sections = GetSections();
+            for (int s = 0; s < sections.Count; s++)
+            {
+                var elements = sections[s].Elements;
+                for (int e = 0; e < elements.Count; e++)
+                {
+                    try
+                    {
+                        if (elements[e] == null || elements[e].gameObject != target) continue;
+                    }
+                    catch { continue; }
+                    _currentSectionIndex = s;
+                    _currentElementIndex = e;
+                    _modDrivenSelection = true;
+                    EventSystem.current.SetSelectedGameObject(target);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Make the next FocusFirstSection start in the section with this name, if the rebuilt
+        /// sections have one with elements; otherwise it starts at the top as usual.
+        /// </summary>
+        public static void RequestInitialSection(string name)
+        {
+            _pendingInitialSectionName = name;
         }
     }
 }

@@ -184,12 +184,21 @@ namespace SuperAutoAccessibility.Tree
                 if (elements.Count > 0) live.Add(new KeyValuePair<NavigationSection, List<SelectableBase>>(section, elements));
             }
 
+            if (live.Count == 0)
+            {
+                // Every cached element is gone: the game rebuilt the screen without changing the
+                // mod's context key (a picker reopened over itself). Make the mod rebuild its
+                // sections and try again next frame rather than publish an empty screen.
+                SectionManager.InvalidateCache();
+                _dirty = true;
+            }
+
             GameObject screenRoot;
             string title = ScreenTitle(first, out screenRoot);
             var screen = new AccessNode(ScreenId, AccessRole.Dialog)
             {
                 Label = title,
-                Description = ScreenDescription(screenRoot, live),
+                Description = ScreenDescription(screenRoot, live, title),
                 Focusable = false,
             };
             into.Add(screen);
@@ -304,6 +313,37 @@ namespace SuperAutoAccessibility.Tree
                 return;
             }
 
+            // Picker options: one of them is the current choice, shown only by a checked icon.
+            var picker = PickerInfo.OwnerOf(go);
+            if (picker != null)
+            {
+                bool picked = PickerInfo.IsPicked(picker, go.GetComponent<ButtonBase>());
+                node.Role = AccessRole.RadioButton;
+                node.Label = LabelFor(go);
+                node.Toggled = picked ? Toggled.True : Toggled.False;
+                node.Selected = picked;
+                node.Description = TooltipOf(go);
+                node.AddAction(AccessAction.Click);
+                return;
+            }
+
+            // Option buttons (settings) show their name on the left and the current choice on the
+            // right ("Window mode ... Off"). Publish those as name and value, so the choice is
+            // spoken as a value and a change to it is reported as one.
+            var button = go.GetComponent<ButtonBase>();
+            string left = button != null ? Text(button.Label) : null;
+            string right = button != null ? Text(button.LabelRight) : null;
+            if (left != null && right != null)
+            {
+                node.Role = AccessRole.Button;
+                string over = SectionManager.GetLabelOverride(go);
+                node.Label = !string.IsNullOrEmpty(over) && !left.Contains(over) ? over + ", " + left : left;
+                node.Value = right;
+                node.Description = TooltipOf(go);
+                node.AddAction(AccessAction.Click);
+                return;
+            }
+
             node.Role = go.GetComponent<Scrollbar>() != null ? AccessRole.ScrollBar : AccessRole.Button;
             node.Label = LabelFor(go);
             string value = AccessibilityManager.GetControlValue(go);
@@ -382,20 +422,42 @@ namespace SuperAutoAccessibility.Tree
                 if (t.GetComponent<SideBar>() != null)
                 {
                     screenRoot = t.gameObject;
-                    return "Menu";
+                    return "Pause menu";
+                }
+                if (t.GetComponent<Il2CppSpacewood.Unity.MonoBehaviours.Build.SettingsMenu>() != null)
+                {
+                    screenRoot = t.gameObject;
+                    return "Settings";
                 }
                 if (t.GetComponent<Page>() != null)
                 {
                     screenRoot = t.gameObject;
                     return Patches.PageManagerPatches.SplitCamelCase(t.gameObject.name);
                 }
-                if (t.GetComponent<Il2CppSpacewood.Unity.UI.Modal>() != null || t.GetComponent<Picker>() != null)
+                var picker = t.GetComponent<Picker>();
+                if (picker != null)
+                {
+                    screenRoot = t.gameObject;
+                    return PickerInfo.Title(picker);
+                }
+                if (t.GetComponent<Il2CppSpacewood.Unity.UI.Modal>() != null)
                 {
                     screenRoot = t.gameObject;
                     return Patches.PageManagerPatches.SplitCamelCase(t.gameObject.name);
                 }
             }
 
+            // Nothing recognised: name the screen after the object holding the controls' canvas
+            // ("UserSettings" -> "User Settings"), which is how the game itself names its screens.
+            var canvas = first != null ? first.GetComponentInParent<Canvas>() : null;
+            if (canvas != null)
+            {
+                var holder = canvas.rootCanvas.transform.parent != null
+                    ? canvas.rootCanvas.transform.parent
+                    : canvas.rootCanvas.transform;
+                screenRoot = holder.gameObject;
+                return Patches.PageManagerPatches.SplitCamelCase(holder.name);
+            }
             screenRoot = first != null ? first.transform.root.gameObject : null;
             return Application.productName;
         }
@@ -404,7 +466,7 @@ namespace SuperAutoAccessibility.Tree
         /// The screen's own text, without the text of its controls (those are their names). The
         /// screen reader reads it once, when focus first lands inside the screen.
         /// </summary>
-        private static string ScreenDescription(GameObject screenRoot, List<KeyValuePair<NavigationSection, List<SelectableBase>>> live)
+        private static string ScreenDescription(GameObject screenRoot, List<KeyValuePair<NavigationSection, List<SelectableBase>>> live, string title)
         {
             if (screenRoot == null) return null;
             try
@@ -414,7 +476,8 @@ namespace SuperAutoAccessibility.Tree
                     foreach (var e in pair.Value) controls.Add(e.gameObject.transform.GetInstanceID());
 
                 var texts = screenRoot.GetComponentsInChildren<Il2CppTMPro.TMP_Text>(false);
-                var seen = new HashSet<string>();
+                // The title is already the dialog's name.
+                var seen = new HashSet<string> { title ?? "" };
                 var sb = new StringBuilder();
                 for (int i = 0; i < texts.Length && sb.Length < MaxDescription; i++)
                 {
@@ -643,7 +706,7 @@ namespace SuperAutoAccessibility.Tree
             {
                 var go = Compat.As<GameObject>(key);
                 if (go != null)
-                    return go.GetComponent<SideBar>() != null ? "Menu" : Patches.PageManagerPatches.SplitCamelCase(go.name);
+                    return go.GetComponent<SideBar>() != null ? "Pause menu" : Patches.PageManagerPatches.SplitCamelCase(go.name);
                 return base.GroupLabelFor(key);
             }
 
