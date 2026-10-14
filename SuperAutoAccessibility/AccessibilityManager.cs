@@ -18,6 +18,7 @@ namespace SuperAutoAccessibility
         private static string _lastAnnouncedText = "";
         private static float _lastAnnouncementTime = 0f;
         private const float ANNOUNCEMENT_THROTTLE = 0.1f;
+        private const float HOVER_REPEAT_WINDOW = 1.0f;
 
         // Tooltip delay tracking
         private static GameObject _currentSelectedObject = null;
@@ -366,6 +367,15 @@ namespace SuperAutoAccessibility
                     return;
                 }
 
+                // A new page can open with its first control under the resting mouse pointer, and
+                // the game then reports a hover on the control the keyboard focus just announced.
+                // That said it twice, a tenth of a second apart.
+                if (fromHover && selected == _lastAnnouncedObject &&
+                    Time.time - _lastAnnouncementTime < HOVER_REPEAT_WINDOW)
+                {
+                    return;
+                }
+
                 // Force PointerEnter for keyboard navigation to update tooltips
                 if (!fromHover)
                 {
@@ -403,7 +413,11 @@ namespace SuperAutoAccessibility
                             // The screen reader reads this control from the accessibility tree
                             // (name, role, value, position, tooltip as description). Speaking it
                             // here as well would say everything twice.
-                            bool treeSpeaks = Tree.SapA11y.SpeaksFor(selected);
+                            // A hover moves no focus; the screen reader's own mouse tracking reads
+                            // the control under the pointer from the tree's bounds instead.
+                            bool treeSpeaks = fromHover
+                                ? Tree.SapA11y.SpeaksFor(selected)
+                                : Tree.SapA11y.SpeaksFocusChange(selected);
                             if (!treeSpeaks)
                                 TolkSpeech.Speak(announcement, true);
 

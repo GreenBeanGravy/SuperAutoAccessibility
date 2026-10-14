@@ -124,6 +124,24 @@ namespace SuperAutoAccessibility.Tree
             return go != null && _source != null && OwnsSpeech && _source.Publishes(go);
         }
 
+        private static ulong _lastFocusId;
+        private static float _lastFocusAt = -100f;
+        private const float RecentFocusSeconds = 0.5f;
+
+        /// <summary>
+        /// For a focus announcement: true when the screen reader will hear focus arrive on this
+        /// control. A screen reader speaks on a focus CHANGE, so when the mod selects the control
+        /// that already had focus (Tab into a section whose only entry is the button you were on),
+        /// nothing reaches it and the mod has to speak. Focus that moved here a moment ago (the
+        /// game selected it and the mod selected it again) is still being read, so stay quiet.
+        /// </summary>
+        public static bool SpeaksFocusChange(GameObject go)
+        {
+            if (!SpeaksFor(go)) return false;
+            if (UGuiSource.StableId(go) != _lastFocusId) return true;
+            return Time.realtimeSinceStartup - _lastFocusAt < RecentFocusSeconds;
+        }
+
         /// <summary>
         /// True when the screen reader will introduce this screen itself: the tree publishes it
         /// as a dialog with its text as the description, and the mod is about to focus one of
@@ -146,7 +164,13 @@ namespace SuperAutoAccessibility.Tree
         {
             _started = true;
             _source = new SapUiSource();
-            _runtime = A11yRuntime.Create(new EventSystemFocusOwner(_source.ResolveGameObject), null, registerUGuiSource: false);
+            var owner = new EventSystemFocusOwner(_source.ResolveGameObject);
+            owner.FocusChanged += id =>
+            {
+                _lastFocusId = id;
+                _lastFocusAt = Time.realtimeSinceStartup;
+            };
+            _runtime = A11yRuntime.Create(owner, null, registerUGuiSource: false);
             _runtime.Log = msg => MelonLogger.Msg("[tree] " + msg);
             _runtime.Register(_source);
             _attachDeadline = Time.unscaledTime + AttachTimeoutSeconds;
