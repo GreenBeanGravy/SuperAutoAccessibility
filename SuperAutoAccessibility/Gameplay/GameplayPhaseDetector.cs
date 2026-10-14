@@ -67,10 +67,27 @@ namespace SuperAutoAccessibility.Gameplay
 
             if (_currentPhase != _lastAnnouncedPhase)
             {
+                _shopAnnounceFrom = _lastAnnouncedPhase;
+                _shopAnnouncePending = false;
+                _shopAnnounceWaits = 0;
                 AnnouncePhaseChange();
                 _lastAnnouncedPhase = _currentPhase;
             }
+            else if (_shopAnnouncePending && _currentPhase == GamePhase.ShopBuild)
+            {
+                AnnounceShopPhase();
+            }
         }
+
+        // The shop appears before the game has filled in the new turn: the first shop of a run
+        // was announced as "Turn 0", and after a battle the previous turn's turn and gold with no
+        // battle result ("Turn 1, 4 gold" when it was turn 2 with 10 gold). The announcement waits
+        // (up to ~2 s) for the turn number to move past the last one announced.
+        private static int _lastShopTurn;
+        private static bool _shopAnnouncePending;
+        private static int _shopAnnounceWaits;
+        private const int ShopAnnounceMaxWaits = 8;
+        private static GamePhase _shopAnnounceFrom = GamePhase.Unknown;
 
         private static void DetectPhase()
         {
@@ -148,6 +165,7 @@ namespace SuperAutoAccessibility.Gameplay
                         AnnounceBattleStart();
                         break;
                     case GamePhase.Menu:
+                        _lastShopTurn = 0;
                         ShopNavigationManager.Reset();
                         SuperAutoAccessibility.Patches.GameplayPatches.ResetBattleSubscription();
                         // Don't announce menu phase â€” PageManagerPatches handles menu page names
@@ -176,6 +194,19 @@ namespace SuperAutoAccessibility.Gameplay
                     return;
                 }
 
+                int turn = 0;
+                try { turn = boardModel.Turn; } catch { }
+                bool stale = turn <= 0 || (_shopAnnounceFrom == GamePhase.Battle && turn <= _lastShopTurn);
+                if (stale && _shopAnnounceWaits < ShopAnnounceMaxWaits)
+                {
+                    _shopAnnounceWaits++;
+                    _shopAnnouncePending = true;
+                    return;
+                }
+                _shopAnnouncePending = false;
+                _shopAnnounceWaits = 0;
+                _lastShopTurn = turn;
+
                 string summary = PetStatsReader.ReadBoardStatus(boardModel);
 
                 // Check for battle outcome from previous round
@@ -184,7 +215,7 @@ namespace SuperAutoAccessibility.Gameplay
                 {
                     var outcome = boardModel.PreviousOutcome;
                     if (outcome != null && outcome.HasValue &&
-                        (_lastAnnouncedPhase == GamePhase.Battle || _lastAnnouncedPhase == GamePhase.Unknown))
+                        (_shopAnnounceFrom == GamePhase.Battle || _shopAnnounceFrom == GamePhase.Unknown))
                     {
                         string outcomeStr = outcome.Value.ToString();
                         if (outcomeStr == "PlayerWon")
