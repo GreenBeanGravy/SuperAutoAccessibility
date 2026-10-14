@@ -215,6 +215,20 @@ namespace SuperAutoAccessibility.Tree
             into.Add(screen);
             root.Children.Add(ScreenId);
 
+            // A control listed in two sections belongs to the first. A section left with nothing
+            // (the news screen's Actions, whose Dismiss is also the patch notes' entry) would be
+            // an empty group, so it is dropped.
+            var claimed = new HashSet<ulong>();
+            var deduped = new List<KeyValuePair<NavigationSection, List<SelectableBase>>>();
+            foreach (var pair in live)
+            {
+                var fresh = new List<SelectableBase>();
+                foreach (var e in pair.Value)
+                    if (claimed.Add(UGuiSource.StableId(e.gameObject))) fresh.Add(e);
+                if (fresh.Count > 0) deduped.Add(new KeyValuePair<NavigationSection, List<SelectableBase>>(pair.Key, fresh));
+            }
+            live = deduped;
+
             // One section adds a group with nothing to say, so its controls sit in the dialog,
             // which then carries the set size: AccessKit answers UIA SizeOfSet from the item's
             // container, so without it every control reads as "n of 0".
