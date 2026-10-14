@@ -28,6 +28,9 @@ namespace SuperAutoAccessibility
         /// <summary>The tab that is open, for a tab list.</summary>
         public UnityEngine.GameObject SelectedElement { get; set; }
 
+        /// <summary>The name said on entering the section: DisplayName when set, else Name.</summary>
+        public string SpokenName => string.IsNullOrWhiteSpace(DisplayName) ? Name : DisplayName;
+
         public NavigationSection(string name)
         {
             Name = name;
@@ -2684,7 +2687,7 @@ namespace SuperAutoAccessibility
 
             if (sections.Count > 1)
             {
-                AccessibilityManager.SetCurrentSectionName(section.Name);
+                AccessibilityManager.SetCurrentSectionName(section.SpokenName);
             }
 
             if (EventSystem.current != null)
@@ -2736,8 +2739,16 @@ namespace SuperAutoAccessibility
         /// </summary>
         public static bool TryGetSectionPosition(GameObject go, out int index, out int count)
         {
-            index = count = 0;
-            if (go == null) return false;
+            var section = SectionOf(go, out index);
+            count = section != null ? section.Elements.Count : 0;
+            return section != null;
+        }
+
+        /// <summary>The first current section that lists a control, or null.</summary>
+        public static NavigationSection SectionOf(GameObject go, out int index)
+        {
+            index = 0;
+            if (go == null) return null;
             var sections = GetSections();
             for (int s = 0; s < sections.Count; s++)
             {
@@ -2749,14 +2760,13 @@ namespace SuperAutoAccessibility
                         if (elements[e] != null && elements[e].gameObject == go)
                         {
                             index = e;
-                            count = elements.Count;
-                            return true;
+                            return sections[s];
                         }
                     }
                     catch { }
                 }
             }
-            return false;
+            return null;
         }
 
         /// <summary>Whether the EventSystem's selection is one of the current sections' controls.</summary>
@@ -2830,7 +2840,7 @@ namespace SuperAutoAccessibility
 
                     if (sections.Count > 1)
                     {
-                        AccessibilityManager.SetCurrentSectionName(sections[_currentSectionIndex].Name);
+                        AccessibilityManager.SetCurrentSectionName(sections[_currentSectionIndex].SpokenName);
                     }
 
                     if (EventSystem.current != null)
@@ -2866,7 +2876,7 @@ namespace SuperAutoAccessibility
 
             if (sections.Count > 1)
             {
-                AccessibilityManager.SetCurrentSectionName(sections[_currentSectionIndex].Name);
+                AccessibilityManager.SetCurrentSectionName(sections[_currentSectionIndex].SpokenName);
             }
 
             if (EventSystem.current != null)

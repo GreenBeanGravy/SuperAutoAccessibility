@@ -814,6 +814,10 @@ namespace SuperAutoAccessibility
 
             // Add role based on component type
             string role = GetRole(go);
+            // Settings tabs: the tree calls them tabs and marks the open one; say the same.
+            var tabList = SectionManager.SectionOf(go, out _);
+            if (role == "button" && tabList != null && tabList.IsTabList)
+                role = tabList.SelectedElement == go ? "tab, selected" : "tab";
             if (!string.IsNullOrEmpty(role))
             {
                 if (sb.Length > 0) sb.Append(", ");
