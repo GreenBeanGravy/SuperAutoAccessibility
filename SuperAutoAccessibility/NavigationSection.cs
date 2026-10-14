@@ -2679,6 +2679,27 @@ namespace SuperAutoAccessibility
             }
         }
 
+        /// <summary>Whether the EventSystem's selection is one of the current sections' controls.</summary>
+        public static bool SelectionInSections()
+        {
+            var current = EventSystem.current?.currentSelectedGameObject;
+            if (current == null) return false;
+            var sections = GetSections();
+            for (int s = 0; s < sections.Count; s++)
+            {
+                var elements = sections[s].Elements;
+                for (int e = 0; e < elements.Count; e++)
+                {
+                    try
+                    {
+                        if (elements[e] != null && elements[e].gameObject == current) return true;
+                    }
+                    catch { }
+                }
+            }
+            return false;
+        }
+
         /// <summary>
         /// Sync internal indices from current EventSystem selection (mouse clicks, game-driven focus)
         /// </summary>

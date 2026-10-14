@@ -51,7 +51,18 @@ namespace SuperAutoAccessibility
         public static void RequestFocusFirst()
         {
             _pendingFocusFirst = true;
+            _focusFirstGiveUpAt = -1f;
+            _focusFirstNextTry = 0f;
         }
+
+        // A page's controls can appear some frames after PageManager.Open: the first page after
+        // launch had none yet, so nothing was ever selected. The player heard the page name and
+        // nothing else, and a screen reader on the tree had no focus at all. FocusFirst now keeps
+        // trying for a short while before it settles for the page name alone.
+        private const float FocusFirstRetrySeconds = 3f;
+        private const float FocusFirstRetryInterval = 0.1f;
+        private static float _focusFirstGiveUpAt = -1f;
+        private static float _focusFirstNextTry;
 
         public static void CancelPendingFocusFirst()
         {
@@ -155,7 +166,7 @@ namespace SuperAutoAccessibility
         public static void ProcessPending()
         {
             // Flush deferred FocusFirst from PageManager.Open (elements not ready in patch itself)
-            if (_pendingFocusFirst)
+            if (_pendingFocusFirst && Time.realtimeSinceStartup >= _focusFirstNextTry)
             {
                 _pendingFocusFirst = false;
                 FocusFirst();
@@ -269,14 +280,39 @@ namespace SuperAutoAccessibility
         {
             if (EventSystem.current == null) return;
 
+            bool landed = false;
             try
             {
-                SectionManager.FocusFirstSection();
+                // On a retry, a selection already on the screen came from the player or the game
+                // in the meantime; keep it rather than pull focus back to the top.
+                if (_focusFirstGiveUpAt >= 0f && SectionManager.SelectionInSections())
+                {
+                    landed = true;
+                }
+                else
+                {
+                    SectionManager.FocusFirstSection();
+                    landed = SectionManager.SelectionInSections();
+                }
             }
             catch (Exception ex)
             {
                 MelonLogger.Warning($"FocusFirst error: {ex.Message}");
             }
+
+            DebugLog.Msg($"[Focus Debug] FocusFirst landed={landed} retrying={_focusFirstGiveUpAt >= 0f} selected={EventSystem.current?.currentSelectedGameObject?.name ?? "none"} sections={SectionManager.GetSections().Count}");
+            if (!landed)
+            {
+                float now = Time.realtimeSinceStartup;
+                if (_focusFirstGiveUpAt < 0f) _focusFirstGiveUpAt = now + FocusFirstRetrySeconds;
+                if (now < _focusFirstGiveUpAt)
+                {
+                    _pendingFocusFirst = true;
+                    _focusFirstNextTry = now + FocusFirstRetryInterval;
+                    return;
+                }
+            }
+            _focusFirstGiveUpAt = -1f;
 
             // If page prefix is still pending (no element was focused to consume it), announce it standalone
             if (_pendingPagePrefix != null)
