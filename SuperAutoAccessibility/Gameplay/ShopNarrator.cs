@@ -442,7 +442,14 @@ namespace SuperAutoAccessibility.Gameplay
                 }
                 catch { }
 
-                if (!string.IsNullOrEmpty(abilityName))
+                // Ability enums are mostly the pet's name ("Horse Ability", "Blowfish"); naming
+                // it after the pet again said "Horse's Horse Ability activated". Same rule as the
+                // battle narration.
+                string petFromAbility = System.Text.RegularExpressions.Regex.Replace(
+                    abilityName ?? "", @"\s*Ability$", "").Trim();
+                if (!string.IsNullOrEmpty(abilityName) &&
+                    !string.Equals(petFromAbility, minionName, StringComparison.OrdinalIgnoreCase) &&
+                    !string.Equals(abilityName, minionName, StringComparison.OrdinalIgnoreCase))
                     return $"{minionName}'s {abilityName} activated";
                 return $"{minionName}'s ability activated";
             }
