@@ -4771,6 +4771,14 @@ namespace SuperAutoAccessibility
                     Il2CppSpacewood.Unity.TallyBullyScore>();
                 bool isOpen = tbs != null && tbs.gameObject.activeInHierarchy;
 
+                // The battle screen turns this panel on briefly while it loads in every mode, with
+                // its placeholder text, so an Arena battle opened with "Final Moustache Score. 100.
+                // New personal best!". It only means something in Daily (BullyRush).
+                bool isBullyRush = false;
+                try { isBullyRush = Il2CppSpacewood.Unity.Memory.Mode == Il2CppSpacewood.Core.Enums.Mode.BullyRush; }
+                catch { }
+                if (!isBullyRush) isOpen = false;
+
                 if (isOpen && !_lastTallyBullyScoreOpen)
                 {
                     var parts = new System.Collections.Generic.List<string>();
