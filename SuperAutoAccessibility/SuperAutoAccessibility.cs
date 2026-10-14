@@ -2389,7 +2389,7 @@ namespace SuperAutoAccessibility
 
                     string pageText = ReadTipsPage(tips);
                     string announcement = !string.IsNullOrEmpty(pageText)
-                        ? $"Tips. {pageText}. Left and Right to navigate pages. Escape to close."
+                        ? JoinSentences(new[] { "Tips", pageText, "Left and Right to navigate pages. Escape to close." })
                         : "Tips opened. Left and Right to navigate pages. Escape to close.";
                     AccessibilityManager.Announce(announcement);
                     MelonLogger.Msg($"Tips opened at page {pageIndex}");
@@ -2439,15 +2439,17 @@ namespace SuperAutoAccessibility
                 try
                 {
                     if (tips.Label != null && !string.IsNullOrWhiteSpace(tips.Label.text))
-                        parts.Add($"Page {tips.Label.text.Trim()}");
+                        parts.Add($"Page {TextExtractor.CleanTextPublic(tips.Label.text)}");
                 }
                 catch { }
 
-                // Main page text from Tips.Text property
+                // Tips.Text is the text of one page (AbilityOrder); off on the others, where it
+                // was read anyway, so every page began with the same sentence.
                 try
                 {
-                    if (tips.Text != null && !string.IsNullOrWhiteSpace(tips.Text.text))
-                        parts.Add(tips.Text.text.Trim());
+                    if (tips.Text != null && tips.Text.gameObject.activeInHierarchy &&
+                        !string.IsNullOrWhiteSpace(tips.Text.text))
+                        parts.Add(TextExtractor.CleanTextPublic(tips.Text.text));
                 }
                 catch { }
 
@@ -2475,7 +2477,10 @@ namespace SuperAutoAccessibility
                                         if (string.IsNullOrWhiteSpace(t)) continue;
                                         // Skip the main text (already added above)
                                         if (t == mainText) continue;
-                                        parts.Add(t);
+                                        // Numbers on the page's pictures (costs, attack and
+                                        // health) read as "3. 3. 3" without them.
+                                        if (!HasLetter(t)) continue;
+                                        parts.Add(TextExtractor.CleanTextPublic(t));
                                     }
                                     catch { }
                                 }
@@ -2485,9 +2490,37 @@ namespace SuperAutoAccessibility
                 }
                 catch { }
 
-                return parts.Count > 0 ? string.Join(". ", parts) : null;
+                return parts.Count > 0 ? JoinSentences(parts) : null;
             }
             catch { return null; }
+        }
+
+        /// <summary>
+        /// Joins texts with ". ", unless one already ends a sentence: tip texts end in a full
+        /// stop, and a plain join read "trigger type.. Hey!".
+        /// </summary>
+        private static bool HasLetter(string s)
+        {
+            foreach (char c in s)
+                if (char.IsLetter(c)) return true;
+            return false;
+        }
+
+        private static string JoinSentences(System.Collections.Generic.IEnumerable<string> parts)
+        {
+            var sb = new System.Text.StringBuilder();
+            foreach (var raw in parts)
+            {
+                string p = raw?.Trim();
+                if (string.IsNullOrEmpty(p)) continue;
+                if (sb.Length > 0)
+                {
+                    char end = sb[sb.Length - 1];
+                    sb.Append(end == '.' || end == '!' || end == '?' || end == ':' ? " " : ". ");
+                }
+                sb.Append(p);
+            }
+            return sb.ToString();
         }
 
         /// <summary>
