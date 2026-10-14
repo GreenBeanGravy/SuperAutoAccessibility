@@ -3805,7 +3805,7 @@ namespace SuperAutoAccessibility
                         _sidebarItems.Clear();
                         SectionManager.InvalidateCache();
                         if (Gameplay.GameplayPhaseDetector.IsShopPhase() || Gameplay.GameplayPhaseDetector.IsBattlePhase())
-                            AccessibilityManager.RequestFocusFirstForMenu();
+                            AccessibilityManager.RequestFocusFirstForMenu(label);
                     }
                 }
                 catch (System.Exception ex)

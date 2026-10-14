@@ -53,19 +53,22 @@ namespace SuperAutoAccessibility
         /// Focus the first control of a menu opened over a run (Settings from the pause menu).
         /// Unlike a page, it gets no PageManager.Open, so nothing was selected and nothing said.
         /// If no menu is up by then (Resume closed the pause menu), the run's own controls are
-        /// left alone.
+        /// left alone. The title is said before the first control, as a page's name is.
         /// </summary>
-        public static void RequestFocusFirstForMenu()
+        public static void RequestFocusFirstForMenu(string title = null)
         {
             RequestFocusFirst();
             _focusFirstNeedsMenu = true;
+            _focusFirstMenuTitle = title;
         }
 
         private static bool _focusFirstNeedsMenu;
+        private static string _focusFirstMenuTitle;
 
         public static void RequestFocusFirst()
         {
             _focusFirstNeedsMenu = false;
+            _focusFirstMenuTitle = null;
             _pendingFocusFirst = true;
             _focusFirstGiveUpAt = -1f;
             _focusFirstNextTry = 0f;
@@ -309,8 +312,14 @@ namespace SuperAutoAccessibility
                 {
                     _focusFirstGiveUpAt = -1f;
                     _focusFirstNeedsMenu = false;
+                    _focusFirstMenuTitle = null;
                 }
                 return;
+            }
+            if (_focusFirstMenuTitle != null)
+            {
+                SetPendingPagePrefix(_focusFirstMenuTitle);
+                _focusFirstMenuTitle = null;
             }
 
             bool landed = false;
