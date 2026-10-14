@@ -1789,6 +1789,8 @@ namespace SuperAutoAccessibility
                     // Look for the nearest parent with a ButtonBase or SelectableBase
                     var go = result.gameObject;
                     var btn = go.GetComponentInParent<ButtonBase>();
+                    // A menu's invisible full-screen backdrop sits over everything; look past it.
+                    if (btn != null && Hover.HoverIntegration.CoversScreen(btn.gameObject)) continue;
                     if (btn != null)
                     {
                         hitObject = btn.gameObject;
