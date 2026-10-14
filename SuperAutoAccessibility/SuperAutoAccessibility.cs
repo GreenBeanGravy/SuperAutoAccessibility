@@ -29,6 +29,43 @@ namespace SuperAutoAccessibility
         // The button whose Picker popup is open, to return focus to when it closes.
         private static GameObject _pickerOpener;
 
+        private static readonly string[] PageCancelButtonNames = { "Cancel", "Back", "Close" };
+
+        /// <summary>
+        /// Presses the current page's own visible Cancel, Back or Close button, if it has one.
+        /// Only the page's content is searched, never the app bar or side menu.
+        /// </summary>
+        private static bool TryPressPageCancelButton()
+        {
+            try
+            {
+                var pageManager = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.PageManager>();
+                var page = pageManager != null ? pageManager.CurrentPage : null;
+                if (page == null) return false;
+
+                var buttons = page.GetComponentsInChildren<ButtonBase>(false);
+                foreach (var name in PageCancelButtonNames)
+                {
+                    for (int i = 0; i < buttons.Length; i++)
+                    {
+                        var b = buttons[i];
+                        if (b == null || !string.Equals(b.gameObject.name, name, System.StringComparison.OrdinalIgnoreCase)) continue;
+                        if (!b.gameObject.activeInHierarchy || !b.GetInteractable()) continue;
+                        var es = EventSystem.current;
+                        if (es == null) return false;
+                        ExecuteEvents.Execute(b.gameObject, new BaseEventData(es), ExecuteEvents.submitHandler);
+                        MelonLogger.Msg($"Escape: Pressed page's {b.gameObject.name} button ({page.gameObject.name})");
+                        return true;
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                MelonLogger.Warning($"Escape page cancel error: {ex.Message}");
+            }
+            return false;
+        }
+
         public override void OnInitializeMelon()
         {
             LoggerInstance.Msg("Super Auto Pets Accessibility Mod initializing... (update test build)");
@@ -777,6 +814,12 @@ namespace SuperAutoAccessibility
                 {
                     LoggerInstance.Warning($"Escape back error: {ex.Message}");
                 }
+
+                // 6b. Pages that cannot Back() but have their own Cancel/Back/Close button
+                // (Forgot Password): press it, as a sighted player would. Without this, Escape
+                // opened the pause menu and the only way out was finding Cancel.
+                if (TryPressPageCancelButton())
+                    return;
 
                 // 7. Nothing to close/back â€” toggle sidebar (fallback)
                 if (IsSidebarOpen())
