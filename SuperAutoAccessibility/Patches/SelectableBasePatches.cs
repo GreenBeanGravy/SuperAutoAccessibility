@@ -16,11 +16,22 @@ namespace SuperAutoAccessibility.Patches
             {
                 MelonLogger.Msg("Applying SelectableBase patches...");
 
-                // Try to patch the IPointerEnterHandler interface implementation instead
+                // The interop generator names explicit interface implementations with
+                // underscores (Il2CppInterop 1.5, MelonLoader 0.7.3); older generators used dots.
+                // After the game moved to Unity 6 only the underscore name exists, and hover
+                // announcements were silently off.
                 var originalMethod = AccessTools.Method(
                     typeof(Il2CppSpacewood.Unity.UI.SelectableBase),
-                    "UnityEngine.EventSystems.IPointerEnterHandler.OnPointerEnter"
+                    "UnityEngine_EventSystems_IPointerEnterHandler_OnPointerEnter"
                 );
+
+                if (originalMethod == null)
+                {
+                    originalMethod = AccessTools.Method(
+                        typeof(Il2CppSpacewood.Unity.UI.SelectableBase),
+                        "UnityEngine.EventSystems.IPointerEnterHandler.OnPointerEnter"
+                    );
+                }
 
                 // If that doesn't work, try the public OnPointerEnter from the interface
                 if (originalMethod == null)

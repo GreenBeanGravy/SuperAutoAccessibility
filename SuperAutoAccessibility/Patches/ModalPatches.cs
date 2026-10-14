@@ -32,16 +32,8 @@ namespace SuperAutoAccessibility.Patches
                     MelonLogger.Warning("Failed to find Modal.Awake");
                 }
 
-                // Patch OnEnable for announcement when modal becomes visible
-                // OnEnable is called when the GameObject is activated - content should be ready
-                var onEnableOriginal = AccessTools.Method(
-                    typeof(MonoBehaviour),
-                    "OnEnable"
-                );
-
-                // Since Modal doesn't override OnEnable, we use a different approach:
-                // We'll register for announcement in Awake and use a coroutine or
-                // check in the next frame via ProcessPending with a very short delay
+                // Modal does not override OnEnable, so announcement is registered in Awake and
+                // run a few frames later from ProcessPending, once the text is populated.
                 MelonLogger.Msg("Modal patches initialized - using deferred announcement");
             }
             catch (Exception ex)

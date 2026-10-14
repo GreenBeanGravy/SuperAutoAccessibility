@@ -229,7 +229,9 @@ namespace SuperAutoAccessibility.Patches
             PatchMethod(harmony,
                 typeof(Il2CppSpacewood.Unity.MonoBehaviours.Build.HangarTurns),
                 "Set",
-                new[] { typeof(int) },
+                // By name: the game changed it to Set(int turn, int? max = null), and the old
+                // Set(int) lookup found nothing, so turns were never announced.
+                null,
                 nameof(SetTurn_Postfix),
                 isPostfix: true,
                 label: "HangarTurns.Set");

@@ -118,7 +118,19 @@ namespace SuperAutoAccessibility
 
         public static Il2CppSpacewood.Unity.UI.Modal GetActiveModal()
         {
-            return _modalStack.Count > 0 ? _modalStack.Peek() : null;
+            // Only Escape popped the stack, so a modal the game closed itself (a button inside
+            // it, a timeout) stayed "active" forever and R read its text back. Drop closed or
+            // destroyed modals before answering.
+            while (_modalStack.Count > 0)
+            {
+                var top = _modalStack.Peek();
+                bool open;
+                try { open = top != null && top.gameObject != null && top.gameObject.activeInHierarchy; }
+                catch { open = false; }
+                if (open) return top;
+                _modalStack.Pop();
+            }
+            return null;
         }
 
         /// <summary>
