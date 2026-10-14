@@ -296,6 +296,9 @@ namespace SuperAutoAccessibility.Gameplay
         /// </summary>
         private static string LookupCachedName(int unique, int sideHint = 0)
         {
+            string fromView = LookupBattleViewName(unique, sideHint);
+            if (!string.IsNullOrEmpty(fromView)) return fromView;
+
             if (sideHint > 0)
             {
                 if (_minionNameCache.TryGetValue((sideHint, unique), out var sideName))
@@ -314,6 +317,58 @@ namespace SuperAutoAccessibility.Gameplay
                 return playerName;
             if (_minionNameCache.TryGetValue((2, unique), out var opponentName))
                 return opponentName;
+            return null;
+        }
+
+        private static readonly Dictionary<(int, int), string> _battleViewNames = new Dictionary<(int, int), string>();
+        private static int _battleViewFrame = -1;
+
+        /// <summary>
+        /// Name of the battle pet with this id, from the battle's own pet views, which carry the
+        /// ids the battle events use. The board list the cache is built from numbers pets from the
+        /// back while the battle numbers them from the front, so a cache hit named the wrong pet:
+        /// with Mosquito, Pig and Duck (Duck in front), "Enemy Mosquito fainted" for the Duck and
+        /// "Enemy Duck's Mosquito Ability triggers" for the Mosquito. Rebuilt at most once a frame;
+        /// pets summoned mid-battle get their view when they appear.
+        /// </summary>
+        private static string LookupBattleViewName(int unique, int sideHint)
+        {
+            if (_battleViewFrame != Time.frameCount)
+            {
+                _battleViewFrame = Time.frameCount;
+                _battleViewNames.Clear();
+                try
+                {
+                    // A pet summoned in place of one that fainted (Cricket's Zombie Cricket) gets
+                    // the fainted pet's id, and both views stay. Fainted pets first, so the living
+                    // one wins the id.
+                    var views = UnityEngine.Object.FindObjectsOfType<Il2CppSpacewood.Unity.Views.MinionView>(true);
+                    for (int pass = 0; pass < 2; pass++)
+                    {
+                        foreach (var view in views)
+                        {
+                            try
+                            {
+                                if (view == null || !view.Battle) continue;
+                                if (view.Dead != (pass == 0)) continue;
+                                var model = view.Minion;
+                                if (model == null) continue;
+                                string name = PetStatsReader.GetLocalizedName(model);
+                                if (!string.IsNullOrEmpty(name))
+                                    _battleViewNames[((int)model.Owner, view.MinionId.Unique)] = name;
+                            }
+                            catch { }
+                        }
+                    }
+                }
+                catch { }
+            }
+
+            string found;
+            if (sideHint > 0)
+                return _battleViewNames.TryGetValue((sideHint, unique), out found) ? found : null;
+            if (_battleViewNames.TryGetValue((1, unique), out found)) return found;
+            if (_battleViewNames.TryGetValue((2, unique), out found)) return found;
             return null;
         }
 
@@ -654,6 +709,11 @@ namespace SuperAutoAccessibility.Gameplay
                             int ownerSide = (int)wrapper.Owner;
                             _minionNameCache[(ownerSide, key)] = minionName;
                             _minionOwnerCache[key] = ownerSide;
+                            // Events arrive in batches within one frame, and the view-based
+                            // names were read at the start of that frame, before this pet
+                            // existed: the next hit on it was "Your Cricket takes 6 damage" for the
+                            // Zombie Cricket just summoned.
+                            _battleViewNames[(ownerSide, key)] = minionName;
                         }
                         catch { }
                     }
