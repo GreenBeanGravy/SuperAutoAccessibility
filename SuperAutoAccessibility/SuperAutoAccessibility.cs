@@ -506,13 +506,13 @@ namespace SuperAutoAccessibility
                 UpdateMouseTracking();
             }
 
-            // B key: Read bones counter
+            // B key: read the lobby's snacks counter (the game's word: Stats says "Snacks gained")
             if (Input.GetKeyDown(KeyCode.B))
             {
                 var selected = EventSystem.current?.currentSelectedGameObject;
                 if (selected?.GetComponent<InputFieldBase>() == null)
                 {
-                    ReadBonesCounter();
+                    ReadSnacksCounter();
                 }
             }
 
@@ -3068,7 +3068,7 @@ namespace SuperAutoAccessibility
         private static bool _lastTallyBullyScoreOpen = false;
         private static bool _tallyArenaActive = false;
 
-        // TallyArenaFinale (end-of-run EXP/bones summary) tracking
+        // TallyArenaFinale (end-of-run EXP/snacks summary) tracking
         private static bool _lastTallyFinaleOpen = false;
         private static bool _tallyFinaleActive = false;
 
@@ -3815,7 +3815,7 @@ namespace SuperAutoAccessibility
             }
         }
 
-        private static void ReadBonesCounter()
+        private static void ReadSnacksCounter()
         {
             try
             {
@@ -3826,18 +3826,18 @@ namespace SuperAutoAccessibility
                     string text = tmp.text;
                     if (string.IsNullOrEmpty(text)) continue;
 
-                    // Match bones format: digits / digits (e.g., "0 / 5" or "124 / 500")
+                    // Match the counter: digits / digits (e.g., "0 / 5" or "124 / 500")
                     if (Regex.IsMatch(text.Trim(), @"^\d+\s*/\s*\d+$"))
                     {
-                        AccessibilityManager.Announce($"Bones: {text.Trim()}");
+                        AccessibilityManager.Announce($"Snacks: {text.Trim()}");
                         return;
                     }
                 }
-                AccessibilityManager.Announce("Bones counter not found");
+                AccessibilityManager.Announce("Snacks counter not found");
             }
             catch (System.Exception ex)
             {
-                MelonLogger.Warning($"ReadBonesCounter error: {ex.Message}");
+                MelonLogger.Warning($"ReadSnacksCounter error: {ex.Message}");
             }
         }
 
@@ -4005,7 +4005,7 @@ namespace SuperAutoAccessibility
                     "W: Wins",
                     "C: Timer",
                     "R: Full board status",
-                    "B: Bones",
+                    "B: Snacks",
                     "O: Scoreboard"
                 }));
                 _helpCategories.Add(("General", new List<string>
@@ -4060,7 +4060,7 @@ namespace SuperAutoAccessibility
                 _helpCategories.Add(("Information", new List<string>
                 {
                     "R: Read current context",
-                    "B: Bones"
+                    "B: Snacks"
                 }));
                 _helpCategories.Add(("General", new List<string>
                 {
@@ -4829,7 +4829,7 @@ namespace SuperAutoAccessibility
         // =====================================================================
 
         /// <summary>
-        /// Polls for the TallyArenaFinale screen (end-of-run EXP/bones summary + "Claim reward").
+        /// Polls for the TallyArenaFinale screen (end-of-run EXP/snacks summary + "Claim reward").
         /// Shown after the final TallyArena result when an arena run ends.
         /// </summary>
         private static void PollTallyArenaFinale()
@@ -4897,7 +4897,7 @@ namespace SuperAutoAccessibility
                     if (victories > 0)
                         parts.Add($"{victories} wins");
                     if (points > 0)
-                        parts.Add($"{points} bones earned");
+                        parts.Add($"{points} snacks earned");
                 }
                 catch { }
 
