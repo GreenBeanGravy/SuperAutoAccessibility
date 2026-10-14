@@ -864,7 +864,6 @@ namespace SuperAutoAccessibility
             // Section 1: Standard Packs (named properties â€” stable references)
             var standardSection = new NavigationSection("Standard Packs");
             TryAddPackProduct(standardSection, packShop.TurtlePack);
-            TryAddPackProduct(standardSection, packShop.Bundle);
             // Scan RegularPackLayout for any additional standard packs not covered above
             try
             {
@@ -874,6 +873,9 @@ namespace SuperAutoAccessibility
                 }
             }
             catch { }
+            // The Bundle sits at the end of the row (Standard: Turtle, Packs, Bundle). Added second,
+            // arrows and "n of m" disagreed with the screen and with mouse tracking.
+            TryAddPackProduct(standardSection, packShop.Bundle);
             if (standardSection.Elements.Count > 0) _sections.Add(standardSection);
 
             // Section 2: DLC/Weekly Packs (dynamically scanned from containers)
@@ -1046,6 +1048,7 @@ namespace SuperAutoAccessibility
                 if (product.Button.gameObject == null) return;
                 if (!product.Button.gameObject.activeInHierarchy) return;
                 if (!product.Button.GetInteractable()) return;
+                if (section.Elements.Contains(product.Button)) return;
                 section.Elements.Add(product.Button);
             }
             catch { }
