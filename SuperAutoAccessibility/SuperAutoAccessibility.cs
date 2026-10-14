@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 using HarmonyLib;
 using Il2CppSpacewood.Unity.UI;
 
-[assembly: MelonInfo(typeof(SuperAutoAccessibility.SAPMod), "Super Auto Pets Accessibility Mod", "1.1.0", "GreenBean")]
+[assembly: MelonInfo(typeof(SuperAutoAccessibility.SAPMod), "Super Auto Pets Accessibility Mod", "1.2.0", "GreenBean")]
 [assembly: MelonGame("Team Wood", "Super Auto Pets")]
 
 namespace SuperAutoAccessibility
@@ -68,7 +68,7 @@ namespace SuperAutoAccessibility
 
         public override void OnInitializeMelon()
         {
-            LoggerInstance.Msg("Super Auto Pets Accessibility Mod initializing... (update test build)");
+            LoggerInstance.Msg("Super Auto Pets Accessibility Mod initializing...");
 
             // Check for updates in background (non-blocking).
             // Skip when a dev-mode marker file exists alongside the mod, so local

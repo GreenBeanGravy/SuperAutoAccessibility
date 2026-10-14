@@ -2,13 +2,26 @@
 
 This is the development repo for [SuperAutoAccessibility](https://github.com/GreenBeanGravy/SuperAutoAccessibility), a [MelonLoader](https://melonwiki.xyz/) mod that adds screen reader support to Super Auto Pets for blind and visually impaired players.
 
+## How it talks to your screen reader
+
+Menus (sign in, settings, pickers, the pause menu and the rest) are published to Windows as a UI Automation tree through [UnityA11y](https://github.com/GreenBeanGravy/UnityA11y). NVDA, JAWS and Narrator read them the way they read any other app: in your screen reader's own voice and wording, with braille, and with its review and object navigation. You move around the menus with the mod's keys as before.
+
+The shop, the board and battles are still spoken through Tolk.
+
+If no screen reader is running, or the tree cannot attach to the game window, the mod speaks the menus through Tolk as well, so nothing goes silent.
+
+Two settings in `UserData/MelonPreferences.cfg`, under `[SAPAccess]`:
+
+- `UseAccessibilityTree` (default `true`): set it to `false` to have every menu spoken through Tolk.
+- `DebugLogging` (default `false`): writes tooltip, modal and page tracing and UI dumps to the MelonLoader log. Only useful when reporting a bug.
+
 ## Installing the mod
 
 The easiest way to install the mod is to download `SAPAccess Installer.exe` from [Releases](https://github.com/GreenBeanGravy/SuperAutoAccessibility/releases) and run it. The installer finds your Super Auto Pets installation, installs the latest MelonLoader, and copies the mod DLL into the `Mods/` folder.
 
 To install it manually:
 
-1. Install [MelonLoader](https://melonloader.co/) and select your `Super Auto Pets.exe`. If you haven't used MelonLoader before, follow its [installation guide](https://melonwiki.xyz/#/?id=automated-installation).
+1. Install [MelonLoader](https://melonloader.co/) and select your `Super Auto Pets.exe`. If you haven't used MelonLoader before, follow its [installation guide](https://melonwiki.xyz/#/?id=automated-installation). The game moved to Unity 6, which needs MelonLoader 0.7.3 or later; older versions crash at startup.
 2. Run Super Auto Pets once so MelonLoader creates the `Mods/` folder.
 3. Download `SuperAutoAccessibility.dll` from [Releases](https://github.com/GreenBeanGravy/SuperAutoAccessibility/releases) and copy it into `Super Auto Pets/Mods/`.
 
@@ -19,10 +32,12 @@ The mod supports automatic updates with either installation method. Each time yo
 You'll need the [.NET 6 SDK](https://dotnet.microsoft.com/download/dotnet/6.0) and a Steam installation of Super Auto Pets with [MelonLoader](https://melonloader.co/) installed. Follow the [MelonLoader installation guide](https://melonwiki.xyz/#/?id=automated-installation) if you need to set it up.
 
 ```bash
-git clone https://github.com/GreenBeanGravy/SuperAutoAccessibility.git
+git clone --recurse-submodules https://github.com/GreenBeanGravy/SuperAutoAccessibility.git
 cd SuperAutoAccessibility/SuperAutoAccessibility
 dotnet build -c Release
 ```
+
+UnityA11y is a git submodule in `UnityA11y/`, and its sources are compiled into the mod's DLL. If you cloned without `--recurse-submodules`, run `git submodule update --init` before building.
 
 The build finds your Super Auto Pets installation through the Steam registry. If the game is outside the default Steam library, specify its path:
 
@@ -30,7 +45,9 @@ The build finds your Super Auto Pets installation through the Steam registry. If
 dotnet build -c Release /p:SAPPath="C:\path\to\Super Auto Pets"
 ```
 
-The built DLL is at `SuperAutoAccessibility/bin/Release/net6.0/SuperAutoAccessibility.dll`. Copy it into your `Super Auto Pets/Mods/` folder.
+The built DLL is at `SuperAutoAccessibility/bin/Release/net6.0/SuperAutoAccessibility.dll`. Copy it into your `Super Auto Pets/Mods/` folder. It carries AccessKit's native `accesskit.dll` inside and extracts it to `Mods/AccessKitLibs/` on first start, so the release is still that one file.
+
+To keep a development build from offering to update itself to the latest release, put an empty file named `SAPAccess.dev` next to it in `Mods/`.
 
 ## Building the installer from source
 
