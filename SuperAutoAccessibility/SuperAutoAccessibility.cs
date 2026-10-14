@@ -741,7 +741,9 @@ namespace SuperAutoAccessibility
                     {
                         picker.Close();
                         SectionManager.InvalidateCache();
-                        AccessibilityManager.Announce("Picker closed");
+                        // A screen reader on the tree hears focus go back to the picker's button.
+                        if (!Tree.SapA11y.OwnsSpeech)
+                            AccessibilityManager.Announce("Picker closed");
                         LoggerInstance.Msg("Escape: Closed picker popup");
                         return;
                     }
@@ -2538,7 +2540,9 @@ namespace SuperAutoAccessibility
             _cachedSideBar = null;
             _sidebarCacheFrame = -1;
             SectionManager.InvalidateCache();
-            AccessibilityManager.Announce("Pause menu closed");
+            // A screen reader on the tree hears focus leave the pause menu dialog.
+            if (!Tree.SapA11y.OwnsSpeech)
+                AccessibilityManager.Announce("Pause menu closed");
             MelonLogger.Msg($"Escape: Closed sidebar ({context})");
         }
 
@@ -3513,8 +3517,8 @@ namespace SuperAutoAccessibility
         private static int _sidebarCacheFrame = -1;
         private static bool _sidebarActive = false;
         private static int _sidebarFocusIndex = 0;
-        private static readonly List<(string label, System.Action<Il2CppSpacewood.Unity.SideBar> handler)> _sidebarItems =
-            new List<(string, System.Action<Il2CppSpacewood.Unity.SideBar>)>();
+        private static readonly List<(string label, GameObject button, System.Action<Il2CppSpacewood.Unity.SideBar> handler)> _sidebarItems =
+            new List<(string, GameObject, System.Action<Il2CppSpacewood.Unity.SideBar>)>();
 
         /// <summary>
         /// Builds the list of visible sidebar buttons for keyboard navigation.
@@ -3552,8 +3556,7 @@ namespace SuperAutoAccessibility
                 if (_sidebarItems.Count > 0)
                 {
                     _sidebarActive = true;
-                    AccessibilityManager.Announce(
-                        $"Pause menu, {_sidebarItems[0].label}, 1 of {_sidebarItems.Count}");
+                    FocusSidebarItem(0, "Pause menu, ");
                     MelonLogger.Msg($"Sidebar: Built {_sidebarItems.Count} items");
                 }
                 else
@@ -3577,9 +3580,10 @@ namespace SuperAutoAccessibility
         {
             try
             {
-                if (button?.gameObject != null && button.gameObject.activeInHierarchy)
+                if (button?.gameObject != null && button.gameObject.activeInHierarchy &&
+                    button.GetInteractable())
                 {
-                    _sidebarItems.Add((label, handler));
+                    _sidebarItems.Add((label, button.gameObject, handler));
                 }
             }
             catch { }
@@ -3606,6 +3610,30 @@ namespace SuperAutoAccessibility
             {
                 MelonLogger.Warning($"ClickSidebarButton error: {ex.Message}");
             }
+        }
+
+        /// <summary>
+        /// Moves the pause menu's keyboard focus to item <paramref name="index"/>. The game's
+        /// selection moves with it, so the accessibility tree (and the screen reader reading it)
+        /// follows; this list used to keep its own index only, and the tree stayed on whatever
+        /// the game had selected. Tolk speaks the item only when the screen reader will not.
+        /// </summary>
+        private static void FocusSidebarItem(int index, string intro)
+        {
+            if (index < 0 || index >= _sidebarItems.Count) return;
+            _sidebarFocusIndex = index;
+            var (label, button, _) = _sidebarItems[index];
+            try
+            {
+                if (button != null && EventSystem.current != null)
+                    EventSystem.current.SetSelectedGameObject(button);
+            }
+            catch { }
+
+            if (!Tree.SapA11y.SpeaksFor(button))
+                AccessibilityManager.Announce($"{intro}{label}, {index + 1} of {_sidebarItems.Count}");
+            else
+                DebugLog.Msg($"Pause menu focus (screen reader reads it from the tree): {label}");
         }
 
         /// <summary>
@@ -3641,27 +3669,13 @@ namespace SuperAutoAccessibility
             bool end = Input.GetKeyDown(KeyCode.End);
 
             if (up)
-            {
-                _sidebarFocusIndex--;
-                if (_sidebarFocusIndex < 0) _sidebarFocusIndex = _sidebarItems.Count - 1;
-                AccessibilityManager.Announce($"{_sidebarItems[_sidebarFocusIndex].label}. {_sidebarFocusIndex + 1} of {_sidebarItems.Count}");
-            }
+                FocusSidebarItem(_sidebarFocusIndex <= 0 ? _sidebarItems.Count - 1 : _sidebarFocusIndex - 1, null);
             else if (down)
-            {
-                _sidebarFocusIndex++;
-                if (_sidebarFocusIndex >= _sidebarItems.Count) _sidebarFocusIndex = 0;
-                AccessibilityManager.Announce($"{_sidebarItems[_sidebarFocusIndex].label}. {_sidebarFocusIndex + 1} of {_sidebarItems.Count}");
-            }
+                FocusSidebarItem(_sidebarFocusIndex >= _sidebarItems.Count - 1 ? 0 : _sidebarFocusIndex + 1, null);
             else if (home)
-            {
-                _sidebarFocusIndex = 0;
-                AccessibilityManager.Announce($"{_sidebarItems[_sidebarFocusIndex].label}. {_sidebarFocusIndex + 1} of {_sidebarItems.Count}");
-            }
+                FocusSidebarItem(0, null);
             else if (end)
-            {
-                _sidebarFocusIndex = _sidebarItems.Count - 1;
-                AccessibilityManager.Announce($"{_sidebarItems[_sidebarFocusIndex].label}. {_sidebarFocusIndex + 1} of {_sidebarItems.Count}");
-            }
+                FocusSidebarItem(_sidebarItems.Count - 1, null);
             else if (enter)
             {
                 try
@@ -3669,7 +3683,7 @@ namespace SuperAutoAccessibility
                     var sidebar = FindSideBar();
                     if (sidebar != null)
                     {
-                        var (label, handler) = _sidebarItems[_sidebarFocusIndex];
+                        var (label, _, handler) = _sidebarItems[_sidebarFocusIndex];
                         MelonLogger.Msg($"Sidebar: Activating '{label}'");
                         handler(sidebar);
                         _sidebarActive = false;

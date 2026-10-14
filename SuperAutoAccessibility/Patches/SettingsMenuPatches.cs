@@ -92,8 +92,10 @@ namespace SuperAutoAccessibility.Patches
                 // Invalidate cache so sections rebuild with new tab content
                 SectionManager.InvalidateCache();
 
-                // Announce the tab change
-                AccessibilityManager.Announce($"{activeTabName} tab");
+                // Announce the tab change. With a screen reader on the tree, focus lands in a
+                // group named after the tab, which says it; this line would talk over that.
+                if (!Tree.SapA11y.SpeaksScreen(__instance.gameObject))
+                    AccessibilityManager.Announce($"{activeTabName} tab");
 
                 // Request focus on first content element of the new tab. Without naming the
                 // section, FocusFirst landed on the first TAB (General), so choosing Audio said

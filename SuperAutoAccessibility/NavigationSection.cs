@@ -17,6 +17,16 @@ namespace SuperAutoAccessibility
         public List<SelectableBase> Elements { get; set; }
         /// <summary>Optional metadata string (e.g. changelog lines for news Changes section)</summary>
         public string Tag { get; set; }
+        /// <summary>
+        /// What the screen reader calls this section's group, when that differs from Name. Name
+        /// stays the key code finds the section by ("Content"); the settings content group is
+        /// named after the open tab instead, so landing in it says which tab it is.
+        /// </summary>
+        public string DisplayName { get; set; }
+        /// <summary>The section is a row of tabs; the tree publishes it as a tab list.</summary>
+        public bool IsTabList { get; set; }
+        /// <summary>The tab that is open, for a tab list.</summary>
+        public UnityEngine.GameObject SelectedElement { get; set; }
 
         public NavigationSection(string name)
         {
@@ -595,16 +605,18 @@ namespace SuperAutoAccessibility
 
         private static void BuildSidebarSections(Il2CppSpacewood.Unity.SideBar sidebar)
         {
+            // Same order and names as the pause menu's own keyboard list (SAPMod.BuildSidebarItems),
+            // so the screen reader's "n of m" matches what that list says without one.
             var section = new NavigationSection("Sidebar");
             TryAddWithLabel(section, sidebar.Resume, "Resume");
+            TryAddWithLabel(section, sidebar.List, "Versus games");
             TryAddWithLabel(section, sidebar.Settings, "Settings");
             TryAddWithLabel(section, sidebar.Account, "Account");
             TryAddWithLabel(section, sidebar.Premium, "Subscription");
             TryAddWithLabel(section, sidebar.Feedback, "Feedback");
             TryAddWithLabel(section, sidebar.Credits, "Credits");
-            TryAddWithLabel(section, sidebar.Tips, "Tips");
-            TryAddWithLabel(section, sidebar.List, "List");
-            TryAddWithLabel(section, sidebar.Return, "Return");
+            TryAddWithLabel(section, sidebar.Tips, "Game tips");
+            TryAddWithLabel(section, sidebar.Return, "Return to menu");
             TryAddWithLabel(section, sidebar.LogOut, "Log out");
             TryAddWithLabel(section, sidebar.Abandon, "Abandon");
             TryAddWithLabel(section, sidebar.Quit, "Quit to desktop");
@@ -656,7 +668,7 @@ namespace SuperAutoAccessibility
         private static void BuildSettingsMenuSections(Il2CppSpacewood.Unity.MonoBehaviours.Build.SettingsMenu settingsMenu)
         {
             // Section 1: Tabs â€” in correct left-to-right order
-            var tabSection = new NavigationSection("Tabs");
+            var tabSection = new NavigationSection("Tabs") { IsTabList = true };
             TryAdd(tabSection, settingsMenu.GeneralTab);
             TryAdd(tabSection, settingsMenu.GameplayTab);
             TryAdd(tabSection, settingsMenu.AudioTab);
@@ -717,6 +729,15 @@ namespace SuperAutoAccessibility
                             }
 
                             contentSection.Elements.AddRange(sorted);
+                            try
+                            {
+                                var tab = group.Button != null ? group.Button.gameObject : null;
+                                tabSection.SelectedElement = tab;
+                                string tabName = tab != null ? TextExtractor.GetElementText(tab) : null;
+                                if (string.IsNullOrWhiteSpace(tabName) && tab != null) tabName = tab.name;
+                                contentSection.DisplayName = tabName;
+                            }
+                            catch { }
                             break; // Only one container should be active
                         }
                     }

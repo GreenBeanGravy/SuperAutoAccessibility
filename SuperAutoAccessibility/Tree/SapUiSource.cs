@@ -216,9 +216,10 @@ namespace SuperAutoAccessibility.Tree
                 AccessNode parent = screen;
                 if (useGroups)
                 {
-                    var group = new AccessNode(FirstSectionId + (ulong)s, AccessRole.Group)
+                    var group = new AccessNode(FirstSectionId + (ulong)s,
+                        section.IsTabList ? AccessRole.TabList : AccessRole.Group)
                     {
-                        Label = section.Name,
+                        Label = string.IsNullOrWhiteSpace(section.DisplayName) ? section.Name : section.DisplayName,
                         Focusable = false,
                         SizeOfSet = elements.Count,
                     };
@@ -237,6 +238,11 @@ namespace SuperAutoAccessibility.Tree
                     {
                         node = new AccessNode(id, AccessRole.Button);
                         Populate(go, node, i + 1, elements.Count);
+                        if (section.IsTabList && node.Role == AccessRole.Button)
+                        {
+                            node.Role = AccessRole.Tab;
+                            node.Selected = go == section.SelectedElement;
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -561,13 +567,48 @@ namespace SuperAutoAccessibility.Tree
             // The EventSystem selection IS the focus; nothing to mirror back.
         }
 
-        /// <summary>Whether this control is published right now (so the screen reader speaks it).</summary>
+        /// <summary>
+        /// Whether the screen reader will speak this control: it is in the tree, or it is in the
+        /// mod's current sections, which the tree is built from. The second case is the first
+        /// focus on a new screen: the mod announces it in the same frame it builds the screen's
+        /// sections, before the tree has rebuilt, so "is it in the tree yet" said no and the
+        /// control was spoken twice. It also makes the tree rebuild at once.
+        /// </summary>
         public bool Publishes(GameObject go)
         {
             if (go == null) return false;
             ulong id = UGuiSource.StableId(go);
-            if (_usingScan) return _scan.Resolve(id) != null;
-            return _goById.ContainsKey(id);
+            if (!_usingScan && _goById.ContainsKey(id)) return true;
+            if (InSections(go))
+            {
+                _dirty = true;
+                return true;
+            }
+            return _usingScan && _scan.Resolve(id) != null;
+        }
+
+        private static bool InSections(GameObject go)
+        {
+            if (InRunWithoutMenu()) return false;
+            try
+            {
+                var sections = SectionManager.GetSections();
+                for (int s = 0; s < sections.Count; s++)
+                {
+                    var elements = sections[s]?.Elements;
+                    if (elements == null) continue;
+                    for (int e = 0; e < elements.Count; e++)
+                    {
+                        try
+                        {
+                            if (elements[e] != null && elements[e].gameObject == go) return true;
+                        }
+                        catch { }
+                    }
+                }
+            }
+            catch { }
+            return false;
         }
 
         public GameObject ResolveGameObject(ulong id)
