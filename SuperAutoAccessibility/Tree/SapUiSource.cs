@@ -34,6 +34,8 @@ namespace SuperAutoAccessibility.Tree
         private readonly Dictionary<ulong, GameObject> _goById = new Dictionary<ulong, GameObject>();
         private readonly Dictionary<ulong, int> _indexById = new Dictionary<ulong, int>();
         private readonly Dictionary<ulong, int> _sizeById = new Dictionary<ulong, int>();
+        /// <summary>Tab list each tab belongs to, so the focused-node refresh keeps it a tab.</summary>
+        private readonly Dictionary<ulong, NavigationSection> _tabListById = new Dictionary<ulong, NavigationSection>();
         private readonly ScanFallback _scan = new ScanFallback();
 
         private bool _usingScan;
@@ -136,6 +138,7 @@ namespace SuperAutoAccessibility.Tree
             _goById.Clear();
             _indexById.Clear();
             _sizeById.Clear();
+            _tabListById.Clear();
 
             into.Add(new AccessNode(RootId, AccessRole.Window) { Label = Application.productName, Focusable = false });
             into.RootId = RootId;
@@ -238,10 +241,10 @@ namespace SuperAutoAccessibility.Tree
                     {
                         node = new AccessNode(id, AccessRole.Button);
                         Populate(go, node, i + 1, elements.Count);
-                        if (section.IsTabList && node.Role == AccessRole.Button)
+                        if (section.IsTabList)
                         {
-                            node.Role = AccessRole.Tab;
-                            node.Selected = go == section.SelectedElement;
+                            _tabListById[id] = section;
+                            ApplyTab(go, node, section);
                         }
                     }
                     catch (Exception ex)
@@ -264,6 +267,13 @@ namespace SuperAutoAccessibility.Tree
         }
 
         // ---- one control ---------------------------------------------------------------------
+
+        private static void ApplyTab(GameObject go, AccessNode node, NavigationSection tabList)
+        {
+            if (node.Role != AccessRole.Button) return;
+            node.Role = AccessRole.Tab;
+            node.Selected = go == tabList.SelectedElement;
+        }
 
         private static void Populate(GameObject go, AccessNode node, int index, int total)
         {
@@ -546,6 +556,8 @@ namespace SuperAutoAccessibility.Tree
             _sizeById.TryGetValue(id, out size);
             into.Reset(id, AccessRole.Button);
             Populate(go, into, index, size);
+            NavigationSection tabList;
+            if (_tabListById.TryGetValue(id, out tabList)) ApplyTab(go, into, tabList);
             return true;
         }
 
