@@ -667,6 +667,9 @@ namespace SuperAutoAccessibility.Tree
                     var sprite = item.Image != null ? item.Image.sprite : null;
                     if (sprite != null) what = Patches.PageManagerPatches.SplitCamelCase(sprite.name);
                 }
+                // One "most bought" tile per tier, told apart on screen only by a tier icon.
+                if (item.Tier > 0 && item.TierContainer != null && item.TierContainer.gameObject.activeInHierarchy)
+                    label += ", tier " + item.Tier;
                 var parts = new List<string>();
                 if (!string.IsNullOrEmpty(what)) parts.Add(what);
                 if (value != null) parts.Add(value);
