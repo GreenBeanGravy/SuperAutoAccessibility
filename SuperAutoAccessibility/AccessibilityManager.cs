@@ -1184,6 +1184,12 @@ namespace SuperAutoAccessibility
                 var selectable = go.GetComponent<SelectableBase>();
                 if (selectable == null) return "";
 
+                // The section the arrows move through. Siblings alone gave every pack in the
+                // Pack Shop "1 of 2" (its buy and inspect buttons) and Sign In "1 of 4" where
+                // the screen reader, reading the tree, said "1 of 6".
+                if (SectionManager.TryGetSectionPosition(go, out int sectionIndex, out int sectionCount))
+                    return sectionCount > 1 ? $"{sectionIndex + 1} of {sectionCount}" : "";
+
                 Transform parent = go.transform.parent;
                 if (parent == null) return "";
 

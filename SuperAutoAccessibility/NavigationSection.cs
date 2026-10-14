@@ -2730,6 +2730,35 @@ namespace SuperAutoAccessibility
             return null;
         }
 
+        /// <summary>
+        /// Where a control sits in the first section that lists it: the list the arrows move
+        /// through, and the position the accessibility tree gives it.
+        /// </summary>
+        public static bool TryGetSectionPosition(GameObject go, out int index, out int count)
+        {
+            index = count = 0;
+            if (go == null) return false;
+            var sections = GetSections();
+            for (int s = 0; s < sections.Count; s++)
+            {
+                var elements = sections[s].Elements;
+                for (int e = 0; e < elements.Count; e++)
+                {
+                    try
+                    {
+                        if (elements[e] != null && elements[e].gameObject == go)
+                        {
+                            index = e;
+                            count = elements.Count;
+                            return true;
+                        }
+                    }
+                    catch { }
+                }
+            }
+            return false;
+        }
+
         /// <summary>Whether the EventSystem's selection is one of the current sections' controls.</summary>
         public static bool SelectionInSections()
         {
