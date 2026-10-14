@@ -188,7 +188,10 @@ namespace SuperAutoAccessibility
                     }
 
                     string announcement = string.IsNullOrEmpty(allText) ? "dialog" : allText;
-                    Announce(announcement);
+                    // With the tree, the screen reader introduces the modal itself (a dialog
+                    // named after it, its text as the description) as focus lands inside.
+                    if (!Tree.SapA11y.SpeaksScreen(modal.gameObject))
+                        Announce(announcement);
 
                     // Focus first interactive element in the modal so Tab starts from there
                     FocusFirst();
@@ -220,7 +223,11 @@ namespace SuperAutoAccessibility
                     string allText = TextExtractor.GetAllTextFromHierarchy(page.gameObject);
                     MelonLogger.Msg($"[Page Debug] Page text: '{allText}'");
 
-                    if (!string.IsNullOrEmpty(allText))
+                    if (Tree.SapA11y.SpeaksScreen(page.gameObject))
+                    {
+                        // The screen reader introduces the page from the tree as focus lands in it.
+                    }
+                    else if (!string.IsNullOrEmpty(allText))
                     {
                         Announce(allText);
                     }
@@ -345,7 +352,12 @@ namespace SuperAutoAccessibility
                         if (announcement != _lastAnnouncedText ||
                             Time.time - _lastAnnouncementTime > 2.0f)
                         {
-                            TolkSpeech.Speak(announcement, true);
+                            // The screen reader reads this control from the accessibility tree
+                            // (name, role, value, position, tooltip as description). Speaking it
+                            // here as well would say everything twice.
+                            bool treeSpeaks = Tree.SapA11y.SpeaksFor(selected);
+                            if (!treeSpeaks)
+                                TolkSpeech.Speak(announcement, true);
 
                             _lastAnnouncedObject = selected;
                             _lastAnnouncedText = announcement;
@@ -359,7 +371,9 @@ namespace SuperAutoAccessibility
                             // Capture current visible texts to detect new tooltip text later
                             CaptureTextStateAtSelection(selected);
 
-                            MelonLogger.Msg($"Announced: {announcement}");
+                            MelonLogger.Msg(treeSpeaks
+                                ? $"Focus (screen reader reads it from the tree): {announcement}"
+                                : $"Announced: {announcement}");
                         }
                     }
                 }
@@ -468,7 +482,12 @@ namespace SuperAutoAccessibility
                     MelonLogger.Msg($"[Tooltip Debug] tooltipText='{tooltipText}', elementText='{elementText}'");
                     MelonLogger.Msg($"[Tooltip Debug] elementText.Contains check: {elementText.Contains(tooltipText)}");
 
-                    if (!elementText.Contains(tooltipText))
+                    if (Tree.SapA11y.SpeaksFor(go) &&
+                        string.Equals(Tree.SapUiSource.TooltipOf(go), TextExtractor.CleanTextPublic(tooltipText), StringComparison.Ordinal))
+                    {
+                        // Published as the control's description; the screen reader reads it.
+                    }
+                    else if (!elementText.Contains(tooltipText))
                     {
                         MelonLogger.Msg($"[Tooltip Debug] Speaking tooltip now...");
                         TolkSpeech.Speak(tooltipText, false); // Don't interrupt â€” queue after current speech

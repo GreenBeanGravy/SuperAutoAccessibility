@@ -4,7 +4,18 @@
     <AssemblyName>SuperAutoAccessibility</AssemblyName>
     <LangVersion>latest</LangVersion>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <!-- UnityA11y (the accessibility tree, the ..\UnityA11y submodule) is compiled straight into
+         this assembly with its IL2CPP flavor, so the mod still ships as one DLL and the
+         installer and updater need no changes. -->
+    <DefineConstants>$(DefineConstants);IL2CPP</DefineConstants>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\UnityA11y\src\UnityA11y.Core\**\*.cs" LinkBase="UnityA11y\Core" />
+    <Compile Include="..\UnityA11y\src\UnityA11y.AccessKit\**\*.cs" LinkBase="UnityA11y\AccessKit" />
+    <Compile Include="..\UnityA11y\src\UnityA11y.Unity\**\*.cs" LinkBase="UnityA11y\Unity" />
+  </ItemGroup>
 
   <!-- Auto-detect Super Auto Pets install via Steam registry. Override with /p:SAPPath=... -->
   <PropertyGroup>
@@ -104,6 +115,10 @@
       <HintPath>$(SAPPath)\MelonLoader\Il2CppAssemblies\Unity.TextMeshPro.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>$(SAPPath)\MelonLoader\Il2CppAssemblies\UnityEngine.TextRenderingModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEngine.IMGUIModule">
       <HintPath>$(SAPPath)\MelonLoader\Il2CppAssemblies\UnityEngine.IMGUIModule.dll</HintPath>
       <Private>False</Private>
@@ -149,6 +164,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="..\lib\SAAPI64.dll">
       <LogicalName>SuperAutoAccessibility.SAAPI64.dll</LogicalName>
+    </EmbeddedResource>
+
+    <!-- AccessKit, the native half of the accessibility tree. Extracted to
+         Mods\AccessKitLibs\ at startup and replaced whenever its hash differs. -->
+    <EmbeddedResource Include="..\UnityA11y\native\accesskit.dll">
+      <LogicalName>SuperAutoAccessibility.accesskit.dll</LogicalName>
     </EmbeddedResource>
 
     <!-- Embed the wiki-scraped keyword dictionary. DictionaryMenu loads this on first

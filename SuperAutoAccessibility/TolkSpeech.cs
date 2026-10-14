@@ -147,6 +147,24 @@ namespace SuperAutoAccessibility
             MelonLogger.Msg($"Tolk initialized. Detected screen reader: {detectedReader}");
         }
 
+        /// <summary>
+        /// The screen reader Tolk would speak through right now ("NVDA", "JAWS", ...), or null
+        /// when there is none and speech falls back to SAPI or nowhere.
+        /// </summary>
+        public static string DetectScreenReader()
+        {
+            if (Tolk_DetectScreenReader == null) return null;
+            try
+            {
+                IntPtr p = Tolk_DetectScreenReader();
+                return p != IntPtr.Zero ? Marshal.PtrToStringUni(p) : null;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         public static void Speak(string text, bool interrupt = false)
         {
             if (string.IsNullOrEmpty(text)) return;

@@ -47,6 +47,7 @@ namespace SuperAutoAccessibility
 
             AccessibilityManager.Initialize();
             SoundManager.Initialize();
+            Tree.SapA11y.Initialize();
 
             try
             {
@@ -71,6 +72,10 @@ namespace SuperAutoAccessibility
 
         public override void OnUpdate()
         {
+            // Publishes the menus to the screen reader. Runs first so the tree reflects the
+            // selection the rest of this frame's code starts from.
+            Tree.SapA11y.Tick();
+
             // Poll Bootstrap loading screen text and announce changes
             PollBootstrapText();
 
@@ -5702,6 +5707,8 @@ namespace SuperAutoAccessibility
         public override void OnApplicationQuit()
         {
             LoggerInstance.Msg("Shutting down accessibility mod...");
+            // Before the window goes: the tree's window procedure points into this mod.
+            Tree.SapA11y.Shutdown();
             TolkSpeech.Shutdown();
         }
 
