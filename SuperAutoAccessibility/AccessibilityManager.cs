@@ -164,11 +164,11 @@ namespace SuperAutoAccessibility
                 else
                 {
                     // Ready to announce - get ALL text from modal hierarchy
-                    MelonLogger.Msg($"[Modal Debug] Modal GO name: {modal.gameObject.name}");
+                    DebugLog.Msg($"[Modal Debug] Modal GO name: {modal.gameObject.name}");
 
                     // Try the modal's own hierarchy first
                     string allText = TextExtractor.GetAllTextFromHierarchy(modal.gameObject);
-                    MelonLogger.Msg($"[Modal Debug] Direct hierarchy text: '{allText}'");
+                    DebugLog.Msg($"[Modal Debug] Direct hierarchy text: '{allText}'");
 
                     // If no text found, try searching up to find the full modal container
                     if (string.IsNullOrEmpty(allText))
@@ -177,11 +177,11 @@ namespace SuperAutoAccessibility
                         Transform parent = modal.transform.parent;
                         while (parent != null && string.IsNullOrEmpty(allText))
                         {
-                            MelonLogger.Msg($"[Modal Debug] Trying parent: {parent.name}");
+                            DebugLog.Msg($"[Modal Debug] Trying parent: {parent.name}");
                             allText = TextExtractor.GetAllTextFromHierarchy(parent.gameObject);
                             if (!string.IsNullOrEmpty(allText))
                             {
-                                MelonLogger.Msg($"[Modal Debug] Found text in parent: '{allText}'");
+                                DebugLog.Msg($"[Modal Debug] Found text in parent: '{allText}'");
                             }
                             parent = parent.parent;
                         }
@@ -218,10 +218,10 @@ namespace SuperAutoAccessibility
                 else
                 {
                     // Ready to announce - get ALL text from page hierarchy
-                    MelonLogger.Msg($"[Page Debug] Reading content for page: {page.gameObject.name}");
+                    DebugLog.Msg($"[Page Debug] Reading content for page: {page.gameObject.name}");
 
                     string allText = TextExtractor.GetAllTextFromHierarchy(page.gameObject);
-                    MelonLogger.Msg($"[Page Debug] Page text: '{allText}'");
+                    DebugLog.Msg($"[Page Debug] Page text: '{allText}'");
 
                     if (Tree.SapA11y.SpeaksScreen(page.gameObject))
                     {
@@ -410,12 +410,12 @@ namespace SuperAutoAccessibility
                     var tooltip = buttonBase.Tooltip;
                     if (tooltip != null)
                     {
-                        MelonLogger.Msg($"[Tooltip Debug] Found ButtonTooltip component");
+                        DebugLog.Msg($"[Tooltip Debug] Found ButtonTooltip component");
 
                         // Try TextMesh first
                         if (tooltip.TextMesh != null)
                         {
-                            MelonLogger.Msg($"[Tooltip Debug] TextMesh exists, text='{tooltip.TextMesh.text}'");
+                            DebugLog.Msg($"[Tooltip Debug] TextMesh exists, text='{tooltip.TextMesh.text}'");
                             if (!string.IsNullOrWhiteSpace(tooltip.TextMesh.text))
                             {
                                 tooltipText = tooltip.TextMesh.text.Trim();
@@ -425,7 +425,7 @@ namespace SuperAutoAccessibility
                         // Try LocalizeTextMesh if TextMesh didn't have text
                         if (string.IsNullOrEmpty(tooltipText) && tooltip.LocalizeTextMesh != null)
                         {
-                            MelonLogger.Msg($"[Tooltip Debug] Checking LocalizeTextMesh");
+                            DebugLog.Msg($"[Tooltip Debug] Checking LocalizeTextMesh");
                             // LocalizeTextMesh may have a different way to get text
                             var localizeGO = tooltip.LocalizeTextMesh.gameObject;
                             if (localizeGO != null)
@@ -433,7 +433,7 @@ namespace SuperAutoAccessibility
                                 var tmpText = localizeGO.GetComponent<Il2CppTMPro.TextMeshProUGUI>();
                                 if (tmpText != null && !string.IsNullOrWhiteSpace(tmpText.text))
                                 {
-                                    MelonLogger.Msg($"[Tooltip Debug] LocalizeTextMesh text='{tmpText.text}'");
+                                    DebugLog.Msg($"[Tooltip Debug] LocalizeTextMesh text='{tmpText.text}'");
                                     tooltipText = tmpText.text.Trim();
                                 }
                             }
@@ -443,7 +443,7 @@ namespace SuperAutoAccessibility
                         if (string.IsNullOrEmpty(tooltipText) && tooltip.gameObject != null)
                         {
                             string tooltipChildText = TextExtractor.GetElementText(tooltip.gameObject);
-                            MelonLogger.Msg($"[Tooltip Debug] Tooltip child text='{tooltipChildText}'");
+                            DebugLog.Msg($"[Tooltip Debug] Tooltip child text='{tooltipChildText}'");
                             if (!string.IsNullOrWhiteSpace(tooltipChildText))
                             {
                                 tooltipText = tooltipChildText;
@@ -452,7 +452,7 @@ namespace SuperAutoAccessibility
                     }
                     else
                     {
-                        MelonLogger.Msg($"[Tooltip Debug] ButtonBase found but Tooltip is null");
+                        DebugLog.Msg($"[Tooltip Debug] ButtonBase found but Tooltip is null");
                     }
                 }
 
@@ -462,7 +462,7 @@ namespace SuperAutoAccessibility
                     tooltipText = FindTooltipInHierarchy(go.transform);
                     if (!string.IsNullOrEmpty(tooltipText))
                     {
-                        MelonLogger.Msg($"[Tooltip Debug] Found via hierarchy search: '{tooltipText}'");
+                        DebugLog.Msg($"[Tooltip Debug] Found via hierarchy search: '{tooltipText}'");
                     }
                 }
 
@@ -472,15 +472,15 @@ namespace SuperAutoAccessibility
                     tooltipText = FindNewlyVisibleText(go);
                     if (!string.IsNullOrEmpty(tooltipText))
                     {
-                        MelonLogger.Msg($"[Tooltip Debug] Found newly visible text: '{tooltipText}'");
+                        DebugLog.Msg($"[Tooltip Debug] Found newly visible text: '{tooltipText}'");
                     }
                 }
 
                 // Announce if found and different from the element label
                 if (!string.IsNullOrEmpty(tooltipText))
                 {
-                    MelonLogger.Msg($"[Tooltip Debug] tooltipText='{tooltipText}', elementText='{elementText}'");
-                    MelonLogger.Msg($"[Tooltip Debug] elementText.Contains check: {elementText.Contains(tooltipText)}");
+                    DebugLog.Msg($"[Tooltip Debug] tooltipText='{tooltipText}', elementText='{elementText}'");
+                    DebugLog.Msg($"[Tooltip Debug] elementText.Contains check: {elementText.Contains(tooltipText)}");
 
                     if (Tree.SapA11y.SpeaksFor(go) &&
                         string.Equals(Tree.SapUiSource.TooltipOf(go), TextExtractor.CleanTextPublic(tooltipText), StringComparison.Ordinal))
@@ -489,18 +489,18 @@ namespace SuperAutoAccessibility
                     }
                     else if (!elementText.Contains(tooltipText))
                     {
-                        MelonLogger.Msg($"[Tooltip Debug] Speaking tooltip now...");
+                        DebugLog.Msg($"[Tooltip Debug] Speaking tooltip now...");
                         TolkSpeech.Speak(tooltipText, false); // Don't interrupt â€” queue after current speech
                         MelonLogger.Msg($"Announced Tooltip: {tooltipText}");
                     }
                     else
                     {
-                        MelonLogger.Msg($"[Tooltip Debug] Skipped - tooltip text is contained in element text");
+                        DebugLog.Msg($"[Tooltip Debug] Skipped - tooltip text is contained in element text");
                     }
                 }
                 else
                 {
-                    MelonLogger.Msg($"[Tooltip Debug] No tooltip text found for element");
+                    DebugLog.Msg($"[Tooltip Debug] No tooltip text found for element");
                 }
             }
             catch (Exception ex)

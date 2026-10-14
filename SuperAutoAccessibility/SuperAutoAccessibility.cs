@@ -85,6 +85,7 @@ namespace SuperAutoAccessibility
             TolkSpeech.Initialize();
             TolkSpeech.Speak("Super Auto Pets Accessibility Mod loaded!", true);
 
+            DebugLog.Initialize();
             AccessibilityManager.Initialize();
             SoundManager.Initialize();
             Tree.SapA11y.Initialize();

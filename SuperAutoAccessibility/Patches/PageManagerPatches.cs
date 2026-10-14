@@ -92,7 +92,7 @@ namespace SuperAutoAccessibility.Patches
             try
             {
                 string pageName = page.gameObject.name;
-                MelonLogger.Msg($"[Page Debug] PageManager.Open postfix for: {pageName}");
+                DebugLog.Msg($"[Page Debug] PageManager.Open postfix for: {pageName}");
 
                 // Invalidate section cache on page change
                 SectionManager.InvalidateCache();

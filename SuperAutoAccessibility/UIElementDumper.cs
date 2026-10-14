@@ -21,6 +21,8 @@ namespace SuperAutoAccessibility
 
         public static void QueueDump()
         {
+            // Diagnostic only: the dump is a hundred lines per page change.
+            if (!DebugLog.Enabled) return;
             _pendingDump = true;
             _dumpFrameDelay = DUMP_FRAME_DELAY;
         }
