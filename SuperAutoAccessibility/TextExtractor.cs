@@ -88,7 +88,9 @@ namespace SuperAutoAccessibility
             if (string.IsNullOrWhiteSpace(text))
                 return "";
 
-            // Remove rich text tags first (they may contain newlines)
+            // Sprites that stand for a word say it ("+2<sprite name=Attack>" is "+2 Attack"),
+            // then the remaining rich text tags go (they may contain newlines).
+            text = UnityA11y.Unity.UGuiSource.SpritesAsWords(text);
             text = System.Text.RegularExpressions.Regex.Replace(text, @"<[^>]+>", "");
 
             // Zero-width characters: TextMeshPro input fields append U+200B to their text, so an

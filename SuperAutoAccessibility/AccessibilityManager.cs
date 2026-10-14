@@ -552,8 +552,10 @@ namespace SuperAutoAccessibility
                     else if (!elementText.Contains(tooltipText))
                     {
                         DebugLog.Msg($"[Tooltip Debug] Speaking tooltip now...");
-                        TolkSpeech.Speak(tooltipText, false); // Don't interrupt â€” queue after current speech
-                        MelonLogger.Msg($"Announced Tooltip: {tooltipText}");
+                        // Raw text spoke markup aloud ("Introduces <sprite name="Mana"> mana").
+                        string spokenTip = TextExtractor.CleanTextPublic(tooltipText);
+                        TolkSpeech.Speak(spokenTip, false); // Don't interrupt â€” queue after current speech
+                        MelonLogger.Msg($"Announced Tooltip: {spokenTip}");
                     }
                     else
                     {
