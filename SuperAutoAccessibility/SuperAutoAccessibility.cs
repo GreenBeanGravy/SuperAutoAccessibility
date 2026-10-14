@@ -341,25 +341,31 @@ namespace SuperAutoAccessibility
             // Battle control keybinds (P=pause/play, G=fast forward, K=skip)
             if (Gameplay.GameplayPhaseDetector.IsBattlePhase())
             {
+                WatchBattlePause();
+
                 if (Input.GetKeyDown(KeyCode.P))
                 {
                     try
                     {
-                        var uiBattle = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.MonoBehaviours.Battle.UIBattle>();
-                        if (uiBattle != null)
+                        // Press whichever of the game's Play and Pause buttons is showing. The
+                        // battle's state field can read Initial while the battle sits paused, and
+                        // P then did nothing at all, which left a player stuck mid-battle.
+                        var speed = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.MonoBehaviours.Battle.UIBattle>()?._UIBattleSpeed;
+                        bool canPause = speed?.PauseButton?.Button != null && speed.PauseButton.gameObject.activeInHierarchy;
+                        bool canPlay = speed?.PlayButton?.Button != null && speed.PlayButton.gameObject.activeInHierarchy;
+                        if (canPause)
                         {
-                            if (uiBattle._currentState == Il2CppSpacewood.Unity.MonoBehaviours.Battle.UIBattle.State.BattlePlaying)
-                            {
-                                uiBattle.Pause();
-                                AccessibilityManager.Announce("Battle paused");
-                                MelonLogger.Msg("[Battle] Paused via P key");
-                            }
-                            else if (uiBattle._currentState == Il2CppSpacewood.Unity.MonoBehaviours.Battle.UIBattle.State.BattlePaused)
-                            {
-                                uiBattle.Play();
-                                AccessibilityManager.Announce("Battle resumed");
-                                MelonLogger.Msg("[Battle] Resumed via P key");
-                            }
+                            speed.PauseButton.Button.Click();
+                            _battlePausedByPlayer = true;
+                            AccessibilityManager.Announce("Battle paused");
+                            MelonLogger.Msg("[Battle] Paused via P key");
+                        }
+                        else if (canPlay)
+                        {
+                            speed.PlayButton.Button.Click();
+                            _battlePausedByPlayer = false;
+                            AccessibilityManager.Announce("Battle resumed");
+                            MelonLogger.Msg("[Battle] Resumed via P key");
                         }
                     }
                     catch (System.Exception ex)
@@ -387,6 +393,27 @@ namespace SuperAutoAccessibility
                     catch (System.Exception ex)
                     {
                         MelonLogger.Warning($"Battle fast forward error: {ex.Message}");
+                    }
+                }
+                else if (Input.GetKeyDown(KeyCode.U))
+                {
+                    // With autoplay off the game plays one exchange per Play press. The button is
+                    // on screen only, so a keyboard player could not switch it back on.
+                    try
+                    {
+                        var speed = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.MonoBehaviours.Battle.UIBattle>()?._UIBattleSpeed;
+                        var autoBtn = speed?.AutoPlayButton?.Button;
+                        if (autoBtn != null)
+                        {
+                            autoBtn.Click();
+                            bool on = BattleAutoplayOn(speed);
+                            AccessibilityManager.Announce($"Autoplay {(on ? "on" : "off")}");
+                            MelonLogger.Msg($"[Battle] Autoplay {(on ? "on" : "off")} via U key");
+                        }
+                    }
+                    catch (System.Exception ex)
+                    {
+                        MelonLogger.Warning($"Battle autoplay error: {ex.Message}");
                     }
                 }
                 else if (Input.GetKeyDown(KeyCode.K))
@@ -3495,6 +3522,61 @@ namespace SuperAutoAccessibility
 
         // Battle fast forward state tracking
         private static bool _fastForwardActive = false;
+
+        // A battle the game paused on its own (Play showing, nothing narrated) gave a blind player
+        // no sign at all. After it has sat paused for a moment, say so once.
+        private static bool _battlePausedByPlayer;
+        // Once per battle: with autoplay off the game pauses after every exchange.
+        private static bool _battlePauseHintGiven;
+
+        /// <summary>
+        /// Whether the battle plays through on its own. With it off, each Play runs one exchange.
+        /// Read from the battle's resolver settings, which the autoplay button flips at once.
+        /// </summary>
+        private static bool BattleAutoplayOn(Il2Cpp.UIBattleSpeed speed)
+        {
+            try
+            {
+                var bc = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.MonoBehaviours.Battle.BattleController>();
+                return bc?.ResolverSettings == null || bc.ResolverSettings.AutoPlay;
+            }
+            catch { return true; }
+        }
+
+        private static bool _battlePauseAnnounced;
+        private static float _battlePausedSince = -1f;
+        private static float _nextBattlePauseCheck;
+
+        private static void WatchBattlePause()
+        {
+            float now = Time.realtimeSinceStartup;
+            if (now < _nextBattlePauseCheck) return;
+            _nextBattlePauseCheck = now + 0.25f;
+            try
+            {
+                var speed = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.MonoBehaviours.Battle.UIBattle>()?._UIBattleSpeed;
+                bool paused = speed?.PlayButton != null && speed.PlayButton.gameObject.activeInHierarchy &&
+                              !(speed.PauseButton != null && speed.PauseButton.gameObject.activeInHierarchy);
+                if (!paused)
+                {
+                    _battlePausedSince = -1f;
+                    _battlePauseAnnounced = false;
+                    _battlePausedByPlayer = false;
+                    return;
+                }
+                if (_battlePausedSince < 0f) _battlePausedSince = now;
+                if (!_battlePauseAnnounced && !_battlePausedByPlayer && !_battlePauseHintGiven &&
+                    now - _battlePausedSince >= 1.5f)
+                {
+                    _battlePauseAnnounced = true;
+                    _battlePauseHintGiven = true;
+                    AccessibilityManager.Announce(BattleAutoplayOn(speed)
+                        ? "Battle paused. Press P to play."
+                        : "Battle paused. Autoplay is off: press P for each step, or U to turn autoplay on.");
+                }
+            }
+            catch { }
+        }
         private static int _pendingFastForwardFrames = 0;
         private const int FAST_FORWARD_APPLY_DELAY = 10; // Wait for battle UI to be ready
 
@@ -3504,6 +3586,7 @@ namespace SuperAutoAccessibility
         /// </summary>
         public static void ResetBattleState()
         {
+            _battlePauseHintGiven = false;
             if (_fastForwardActive)
                 _pendingFastForwardFrames = FAST_FORWARD_APPLY_DELAY;
         }
@@ -3946,6 +4029,7 @@ namespace SuperAutoAccessibility
                     "P: Pause or resume",
                     "G: Fast forward on or off",
                     "K: Skip battle",
+                    "U: Autoplay on or off",
                     "Space: Repeat last announcement"
                 }));
                 _helpCategories.Add(("General", new List<string>
