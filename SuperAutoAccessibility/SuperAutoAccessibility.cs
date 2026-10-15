@@ -3828,7 +3828,7 @@ namespace SuperAutoAccessibility
                     // Match the counter: digits / digits (e.g., "0 / 5" or "124 / 500")
                     if (Regex.IsMatch(text.Trim(), @"^\d+\s*/\s*\d+$"))
                     {
-                        AccessibilityManager.Announce($"Snacks: {text.Trim()}");
+                        AccessibilityManager.Announce("Snacks: " + Regex.Replace(text.Trim(), @"^(\d+)\s*/\s*(\d+)$", "$1 of $2"));
                         return;
                     }
                 }
@@ -4876,10 +4876,8 @@ namespace SuperAutoAccessibility
                             hasReward = true;
                     }
                     catch { }
-                    if (hasReward)
-                        announcement += " Press Enter to claim reward.";
-                    else
-                        announcement += " Press Enter to continue.";
+                    announcement = TextExtractor.JoinSentences(new[] {
+                        announcement, hasReward ? "Press Enter to claim reward." : "Press Enter to continue." });
                     AccessibilityManager.Announce(announcement);
                     MelonLogger.Msg($"[TallyArenaFinale] {announcement}");
                 }
@@ -4988,7 +4986,8 @@ namespace SuperAutoAccessibility
                     string announcement = ReadTallyArenaRewardDetails(reward);
                     if (string.IsNullOrEmpty(announcement))
                         announcement = "Reward unlocked.";
-                    announcement += " Press Enter to continue.";
+                    // "Remaining unlockables: 122 Press Enter" ran the count into the key.
+                    announcement = TextExtractor.JoinSentences(new[] { announcement, "Press Enter to continue." });
                     AccessibilityManager.Announce(announcement);
                     MelonLogger.Msg($"[TallyArenaReward] {announcement}");
                 }
@@ -5028,7 +5027,7 @@ namespace SuperAutoAccessibility
                 }
                 catch { }
 
-                return parts.Count > 0 ? string.Join(". ", parts) : null;
+                return parts.Count > 0 ? TextExtractor.JoinSentences(parts) : null;
             }
             catch { return null; }
         }

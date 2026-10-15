@@ -818,7 +818,8 @@ namespace SuperAutoAccessibility.Tree
                     if (string.IsNullOrEmpty(s) || !seen.Add(s)) continue;
                     // The lobby's "28 / 50" counter says nothing on its own. The game calls these
                     // snacks (Stats: "Snacks gained").
-                    if (UnderObjectNamed(t.transform, "Snacks", screenRoot.transform)) s = "Snacks: " + s;
+                    if (UnderObjectNamed(t.transform, "Snacks", screenRoot.transform))
+                        s = "Snacks: " + System.Text.RegularExpressions.Regex.Replace(s, @"^(\d+)\s*/\s*(\d+)$", "$1 of $2");
                     if (readElsewhere.Exists(f => s.Contains(f))) continue;
                     // A control already says it (an empty page's message on its Back button).
                     if (s.Length >= 12 && labels.Exists(l => l.Contains(s))) continue;
