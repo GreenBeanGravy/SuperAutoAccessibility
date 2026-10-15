@@ -234,6 +234,12 @@ namespace SuperAutoAccessibility.Gameplay
                 }
             }
 
+            // A menu over the run (pause menu, settings, a picker) has the keys. The pause menu
+            // traps only the handlers that run after this one, so a key did two things: arrows
+            // and End moved this zone and the menu, and Enter pressed both the menu item and
+            // the zone's action (buy, roll).
+            if (SectionManager.MenuOverlayOpen()) return;
+
             // Guard: skip if text input is focused
             var currentObj = EventSystem.current?.currentSelectedGameObject;
             if (currentObj != null && currentObj.GetComponent<InputFieldBase>() != null) return;
