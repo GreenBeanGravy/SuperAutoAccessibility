@@ -1,35 +1,132 @@
-# SuperAutoAccessibility
+Super Auto Pets Accessibility is a [MelonLoader](https://melonwiki.xyz/) mod that makes Super Auto Pets playable with a screen reader. Speech goes through Tolk, which works with most screen readers.
 
-This is the development repo for [SuperAutoAccessibility](https://github.com/GreenBeanGravy/SuperAutoAccessibility), a [MelonLoader](https://melonwiki.xyz/) mod that adds screen reader support to Super Auto Pets for blind and visually impaired players.
+## What it does
 
-## How it talks to your screen reader
+In the menus, the mod:
 
-Menus (sign in, settings, pickers, the pause menu and the rest) are published to Windows as a UI Automation tree through [UnityA11y](https://github.com/GreenBeanGravy/UnityA11y). NVDA, JAWS and Narrator read them the way they read any other app: in your screen reader's own voice and wording, with braille, and with its review and object navigation. You move around the menus with the mod's keys as before.
+- shows the game's menus to Windows as real controls through [UnityA11y](https://github.com/GreenBeanGravy/UnityA11y), so your screen reader reads them natively, with each control's position in its section
+- lets you move with the arrow keys, jump between sections with Tab or Page Up and Page Down, and back out with Escape
+- reads each button's description as soon as you reach it
+- makes the Pack Shop and its leaderboard, Achievements, Stats, News, the Versus Lobby, pickers and Settings usable
+- has a keyword dictionary of pets, food, toys, triggers, statuses and game mechanics, with search
 
-The shop, the board and battles are still spoken through Tolk.
+In a run, the mod:
 
-If no screen reader is running, or the tree cannot attach to the game window, the mod speaks the menus through Tolk as well, so nothing goes silent.
+- lets you jump between the pet shop, the food shop, your team and the action buttons with one key each, and buy, sell, roll, freeze and end your turn from the keyboard
+- reads each pet and food line by line: stats, ability, tier and experience
+- speaks your gold, lives, turn, wins, the turn timer and snacks on request
+- narrates battles, and lets you pause, step through, fast forward or skip them
+- announces level-up rewards and "Choose one" screens, and opens the deck viewer and Last battle
+- reads the Versus scoreboard opponent by opponent and pet by pet
+- shows the upcoming bullies in Daily
 
-Two settings in `UserData/MelonPreferences.cfg`, under `[SAPAccess]`:
+Press H anywhere for a list of every key on the screen you're on.
 
-- `UseAccessibilityTree` (default `true`): set it to `false` to have every menu spoken through Tolk.
-- `DebugLogging` (default `false`): writes tooltip, modal and page tracing and UI dumps to the MelonLoader log. Only useful when reporting a bug.
+## Installing
 
-## Installing the mod
+1. Download `SAPAccess.Installer.exe` from the latest release on the [releases page](https://github.com/GreenBeanGravy/SuperAutoAccessibility/releases).
+2. Run it. It finds Super Auto Pets, installs or updates MelonLoader, and installs the mod.
+3. Start Super Auto Pets as usual.
 
-The easiest way to install the mod is to download `SAPAccess Installer.exe` from [Releases](https://github.com/GreenBeanGravy/SuperAutoAccessibility/releases) and run it. The installer finds your Super Auto Pets installation, installs the latest MelonLoader, and copies the mod DLL into the `Mods/` folder.
+The mod checks for a new release each time the game starts and offers to install it.
 
-To install it manually:
+### Installing by hand
 
-1. Install [MelonLoader](https://melonloader.co/) and select your `Super Auto Pets.exe`. If you haven't used MelonLoader before, follow its [installation guide](https://melonwiki.xyz/#/?id=automated-installation). The game moved to Unity 6, which needs MelonLoader 0.7.3 or later; older versions crash at startup.
-2. Run Super Auto Pets once so MelonLoader creates the `Mods/` folder.
-3. Download `SuperAutoAccessibility.dll` from [Releases](https://github.com/GreenBeanGravy/SuperAutoAccessibility/releases) and copy it into `Super Auto Pets/Mods/`.
+1. Install [MelonLoader](https://melonloader.co/) 0.7.3 or newer for `Super Auto Pets.exe`. See its [installation guide](https://melonwiki.xyz/#/?id=automated-installation).
+2. Start the game once, so MelonLoader creates the `Mods` folder.
+3. Download `SuperAutoAccessibility.dll` from the latest release and put it in `Super Auto Pets/Mods`.
 
-The mod supports automatic updates with either installation method. Each time you start the game, it compares its SHA-256 hash with the latest release asset and prompts you when an update is available.
+## Settings
 
-## Building the mod from source
+In `UserData/MelonPreferences.cfg`, under `[SAPAccess]`:
 
-You'll need the [.NET 6 SDK](https://dotnet.microsoft.com/download/dotnet/6.0) and a Steam installation of Super Auto Pets with [MelonLoader](https://melonloader.co/) installed. Follow the [MelonLoader installation guide](https://melonwiki.xyz/#/?id=automated-installation) if you need to set it up.
+| Setting | What it does |
+| --- | --- |
+| `UseAccessibilityTree` | `true` (default): your screen reader reads the menus. `false`: the mod speaks them through Tolk. |
+| `DebugLogging` | `true` writes detailed tracing to the MelonLoader log, for bug reports. Default `false`. |
+
+Change them with the game closed. The game saves this file when it quits.
+
+## Default keybinds
+
+### Menus
+
+| Key | Action |
+| --- | --- |
+| Up / Down arrow | Previous / next item |
+| Tab or Page Down | Next section |
+| Shift+Tab or Page Up | Previous section |
+| Home / End | First / last item |
+| Enter | Activate |
+| Escape | Back, or the pause menu |
+| R | Read the current screen |
+| B | Snacks |
+| J | Keyword dictionary (Ctrl+F searches inside it) |
+| H | Help |
+
+### Shop
+
+| Key | Action |
+| --- | --- |
+| S / F / T | Pet shop / food shop / team |
+| D | Action buttons: roll, freeze, sell, deck viewer, last battle |
+| V | Upcoming bullies (Daily) |
+| Left / Right arrow | Previous / next slot |
+| Home / End | First / last slot |
+| Up / Down arrow | Detail lines |
+| Space | Repeat the detail line |
+| Enter | Buy or select |
+| X | Sell |
+| Q | Roll |
+| Z | Freeze or unfreeze |
+| E | End turn |
+| Backspace | Cancel |
+
+### Information
+
+| Key | Action |
+| --- | --- |
+| I | Detailed info |
+| A | Gold |
+| L | Lives |
+| N | Turn and tier |
+| W | Wins |
+| C | Turn timer |
+| R | Full board status |
+| O | Versus scoreboard |
+
+### Battle
+
+| Key | Action |
+| --- | --- |
+| P | Pause or resume. With autoplay off, plays the next step |
+| U | Autoplay on or off |
+| G | Fast forward on or off |
+| K | Skip the battle |
+| Space | Repeat the last announcement |
+
+### Versus scoreboard
+
+| Key | Action |
+| --- | --- |
+| Tab or Page Down | Next opponent |
+| Shift+Tab or Page Up | Previous opponent |
+| Left / Right arrow | Previous / next pet |
+| Home / End | First / last pet |
+| Up / Down arrow | The pet's details |
+| Enter | Read all of the pet's details |
+| O or Escape | Close |
+
+## Troubleshooting
+
+- The game crashes at startup: Super Auto Pets runs on Unity 6, which needs MelonLoader 0.7.3 or newer. Run the installer again to update it.
+- Menus speak, but your screen reader's own reading of them is missing: check that `UseAccessibilityTree` is `true`. Without it, or if the game window can't be reached, the mod speaks the menus itself.
+- The mod loads twice: an old `SuperAutoPetsMod.dll` is still in `Mods`. Delete it, or run the installer, which removes it.
+- Something else: the log is `MelonLoader/Latest.log` in the game folder. Set `DebugLogging` to `true`, reproduce the problem, and attach the log to an issue.
+
+## Building from source
+
+You need the [.NET 6 SDK](https://dotnet.microsoft.com/download/dotnet/6.0) and Super Auto Pets with MelonLoader installed and started once.
 
 ```bash
 git clone --recurse-submodules https://github.com/GreenBeanGravy/SuperAutoAccessibility.git
@@ -37,23 +134,19 @@ cd SuperAutoAccessibility/SuperAutoAccessibility
 dotnet build -c Release
 ```
 
-UnityA11y is a git submodule in `UnityA11y/`, and its sources are compiled into the mod's DLL. If you cloned without `--recurse-submodules`, run `git submodule update --init` before building.
+UnityA11y is a git submodule, compiled into the mod's DLL. In a clone without it, run `git submodule update --init`.
 
-The build finds your Super Auto Pets installation through the Steam registry. If the game is outside the default Steam library, specify its path:
+The build finds the game through Steam. If it's somewhere else, pass its folder:
 
 ```bash
 dotnet build -c Release /p:SAPPath="C:\path\to\Super Auto Pets"
 ```
 
-The built DLL is at `SuperAutoAccessibility/bin/Release/net6.0/SuperAutoAccessibility.dll`. Copy it into your `Super Auto Pets/Mods/` folder. It carries AccessKit's native `accesskit.dll` inside and extracts it, with its license notices, to `Mods/AccessKitLibs/` on first start, so the release is still that one file.
+The DLL is at `SuperAutoAccessibility/bin/Release/net6.0/SuperAutoAccessibility.dll`. It carries `accesskit.dll` inside and extracts it to `Mods/AccessKitLibs` on first start, so a release is that one file. Put an empty file named `SAPAccess.dev` next to a development build to stop it offering to update itself.
 
-To keep a development build from offering to update itself to the latest release, put an empty file named `SAPAccess.dev` next to it in `Mods/`.
+### Building the installer
 
-## Building the installer from source
-
-The installer source is in [installer/installer.py](installer/installer.py). It's a wxPython app that finds your Super Auto Pets installation and downloads the latest MelonLoader and mod DLL. It also updates itself from this repo's latest release.
-
-You'll need Python 3.10 or later:
+The installer is a wxPython app in [installer/installer.py](installer/installer.py). It also updates itself from the latest release. With Python 3.10 or newer:
 
 ```bash
 pip install pyinstaller wxpython requests
@@ -61,4 +154,6 @@ cd installer
 pyinstaller --onefile --windowed --name "SAPAccess Installer" --uac-admin installer.py
 ```
 
-The built installer is at `installer/dist/SAPAccess Installer.exe`.
+The installer is at `installer/dist/SAPAccess Installer.exe`. GitHub renames it `SAPAccess.Installer.exe` on upload, and installed copies look for that name.
+
+Super Auto Pets Accessibility is a fan-made mod and is not affiliated with or endorsed by Team Wood Games, the developer of Super Auto Pets.
