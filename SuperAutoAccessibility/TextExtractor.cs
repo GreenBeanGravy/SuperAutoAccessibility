@@ -80,6 +80,13 @@ namespace SuperAutoAccessibility
         /// </summary>
         public static string CleanTextPublic(string text) => CleanText(text);
 
+        /// <summary>"1 win", "3 wins": a count with its noun ("1 lives" read wrong).</summary>
+        public static string Count(object number, string one, string many)
+        {
+            string n = number?.ToString().Trim() ?? "";
+            return n == "1" ? $"1 {one}" : $"{n} {many}";
+        }
+
         public static bool HasLetter(string s)
         {
             foreach (char c in s)

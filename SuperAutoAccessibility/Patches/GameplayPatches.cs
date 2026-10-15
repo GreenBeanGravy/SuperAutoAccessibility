@@ -317,7 +317,7 @@ namespace SuperAutoAccessibility.Patches
                 if (current == _lastAnnouncedLives) return;
                 _lastAnnouncedLives = current;
 
-                AccessibilityManager.Announce($"{current} lives", interrupt: false);
+                AccessibilityManager.Announce(TextExtractor.Count(current, "life", "lives"), interrupt: false);
             }
             catch { }
         }

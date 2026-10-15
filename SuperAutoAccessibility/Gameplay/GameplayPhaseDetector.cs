@@ -437,7 +437,7 @@ namespace SuperAutoAccessibility.Gameplay
                 try
                 {
                     if (intro.Victories != null && !string.IsNullOrWhiteSpace(intro.Victories.text))
-                        infoParts.Add($"{intro.Victories.text.Trim()} wins");
+                        infoParts.Add(TextExtractor.Count(intro.Victories.text, "win", "wins"));
                 }
                 catch { }
 
@@ -445,7 +445,7 @@ namespace SuperAutoAccessibility.Gameplay
                 try
                 {
                     if (intro.Lives != null && !string.IsNullOrWhiteSpace(intro.Lives.text))
-                        infoParts.Add($"{intro.Lives.text.Trim()} lives");
+                        infoParts.Add(TextExtractor.Count(intro.Lives.text, "life", "lives"));
                 }
                 catch { }
 

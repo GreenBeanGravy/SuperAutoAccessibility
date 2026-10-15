@@ -322,8 +322,8 @@ namespace SuperAutoAccessibility.Gameplay
                 catch { }
                 try { parts.Add($"tier {board.Tier}"); } catch { }
                 try { parts.Add($"{board.Lives} of {board.LivesMax} lives"); } catch { }
-                try { parts.Add($"{board.Victories} wins"); } catch { }
-                try { parts.Add($"{board.Losses} losses"); } catch { }
+                try { parts.Add(TextExtractor.Count(board.Victories, "win", "wins")); } catch { }
+                try { parts.Add(TextExtractor.Count(board.Losses, "loss", "losses")); } catch { }
 
                 bool isBullyRush = false;
                 try
@@ -403,7 +403,7 @@ namespace SuperAutoAccessibility.Gameplay
             if (board == null) return "Wins unknown";
             try
             {
-                string baseStr = $"{board.Victories} wins, {board.Losses} losses";
+                string baseStr = $"{TextExtractor.Count(board.Victories, "win", "wins")}, {TextExtractor.Count(board.Losses, "loss", "losses")}";
                 bool isBullyRush = false;
                 try
                 {
@@ -476,7 +476,7 @@ namespace SuperAutoAccessibility.Gameplay
                 // Lives
                 try
                 {
-                    parts.Add($"{opponent.Lives} lives");
+                    parts.Add(TextExtractor.Count(opponent.Lives, "life", "lives"));
                 }
                 catch { }
 

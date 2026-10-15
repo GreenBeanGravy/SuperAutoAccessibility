@@ -1337,7 +1337,7 @@ namespace SuperAutoAccessibility.Gameplay
                     {
                         var livesText = hangar.Overlay?.Lives?.TextMesh?.text;
                         if (!string.IsNullOrEmpty(livesText))
-                            AccessibilityManager.Announce($"{livesText} lives");
+                            AccessibilityManager.Announce(TextExtractor.Count(livesText, "life", "lives"));
                         else
                             AccessibilityManager.Announce("Lives unknown");
                     }

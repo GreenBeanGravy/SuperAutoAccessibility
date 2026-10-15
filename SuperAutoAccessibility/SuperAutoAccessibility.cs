@@ -3287,7 +3287,7 @@ namespace SuperAutoAccessibility
                 try
                 {
                     string victories = item.VictoryText?.text;
-                    if (!string.IsNullOrWhiteSpace(victories)) parts.Add($"{victories.Trim()} wins");
+                    if (!string.IsNullOrWhiteSpace(victories)) parts.Add(TextExtractor.Count(victories, "win", "wins"));
                 }
                 catch { }
 
@@ -3295,7 +3295,7 @@ namespace SuperAutoAccessibility
                 try
                 {
                     string lives = item.LivesText?.text;
-                    if (!string.IsNullOrWhiteSpace(lives)) parts.Add($"{lives.Trim()} lives");
+                    if (!string.IsNullOrWhiteSpace(lives)) parts.Add(TextExtractor.Count(lives, "life", "lives"));
                 }
                 catch { }
 
@@ -4683,7 +4683,7 @@ namespace SuperAutoAccessibility
                                 if (victoriesMax > 0)
                                     parts.Add($"{victories} of {victoriesMax} trophies");
                                 else
-                                    parts.Add($"{victories} trophies");
+                                    parts.Add(TextExtractor.Count(victories, "trophy", "trophies"));
                             }
                         }
                         catch { }
@@ -4871,7 +4871,7 @@ namespace SuperAutoAccessibility
                     int victories = finale.Victories;
                     int points = finale.PointsGained;
                     if (victories > 0)
-                        parts.Add($"{victories} wins");
+                        parts.Add(TextExtractor.Count(victories, "win", "wins"));
                     if (points > 0)
                         parts.Add($"{points} snacks earned");
                 }
