@@ -1,4 +1,6 @@
-Super Auto Pets Accessibility is a [MelonLoader](https://melonwiki.xyz/) mod that makes Super Auto Pets playable with a screen reader. Speech goes through Tolk, which works with most screen readers.
+# SuperAutoAccessibility: Super Auto Pets accessibility for blind and visually impaired players
+
+SuperAutoAccessibility is a [MelonLoader](https://melonwiki.xyz/) mod that makes Super Auto Pets playable with a screen reader. Speech goes through Tolk, which works with most screen readers.
 
 ## What it does
 
@@ -156,4 +158,4 @@ pyinstaller --onefile --windowed --name "SAPAccess Installer" --uac-admin instal
 
 The installer is at `installer/dist/SAPAccess Installer.exe`. GitHub renames it `SAPAccess.Installer.exe` on upload, and installed copies look for that name.
 
-Super Auto Pets Accessibility is a fan-made mod and is not affiliated with or endorsed by Team Wood Games, the developer of Super Auto Pets.
+SuperAutoAccessibility is a fan-made mod and is not affiliated with or endorsed by Team Wood Games, the developer of Super Auto Pets.
