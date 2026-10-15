@@ -469,7 +469,7 @@ namespace SuperAutoAccessibility.Tree
                 node.Role = AccessRole.Button;
                 string over = SectionManager.GetLabelOverride(go);
                 node.Label = !string.IsNullOrEmpty(over) && !left.Contains(over) ? over + ", " + left : left;
-                node.Value = right;
+                node.Value = AccessibilityManager.RankPoints(go) ?? right;
                 node.Description = TooltipOf(go);
                 node.AddAction(AccessAction.Click);
                 return;
@@ -657,6 +657,8 @@ namespace SuperAutoAccessibility.Tree
             if (modal != null)
             {
                 screenRoot = modal.gameObject;
+                // The leaderboard's modal object is called "Modal2".
+                if (modal.GetComponentInParent<VersusLeaderboard>() != null) return "Leaderboard";
                 return Patches.PageManagerPatches.SplitCamelCase(modal.gameObject.name);
             }
 
@@ -757,6 +759,10 @@ namespace SuperAutoAccessibility.Tree
             var versusLobby = screenRoot.GetComponentInChildren<VersusLobby>();
             if (versusLobby != null && versusLobby.gameObject.activeInHierarchy)
                 return Patches.PageManagerPatches.VersusLobbySummary(versusLobby);
+            // The leaderboard: its board and your rank, and the keys; its rows are read one by one.
+            var leaderboardRoot = screenRoot.GetComponentInParent<VersusLeaderboard>();
+            if (leaderboardRoot != null)
+                return TextExtractor.JoinSentences(new[] { LeaderboardNavigator.Summary(leaderboardRoot), LeaderboardNavigator.Hint });
             // The shop's overlays: what they hold and the keys, rather than every row's "Turn 3".
             var chooserRoot = screenRoot.GetComponent<Il2CppSpacewood.Scripts.MonoBehaviours.Build.Hangar.Chooser>();
             if (chooserRoot != null) return Gameplay.ShopOverlays.ChooserHint(chooserRoot);

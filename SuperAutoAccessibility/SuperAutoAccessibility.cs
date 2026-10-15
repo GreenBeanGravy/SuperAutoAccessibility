@@ -1151,6 +1151,9 @@ namespace SuperAutoAccessibility
             // Poll the scoreboard (shop, last opponent, battle tally)
             Gameplay.ScoreboardNavigator.Poll();
 
+            // The leaderboard the Pack Shop's rank button opens
+            LeaderboardNavigator.Poll();
+
             // Poll VersusLobby for player joins/leaves
             PollVersusLobby();
 
@@ -1552,6 +1555,10 @@ namespace SuperAutoAccessibility
 
             // Scoreboard keys: Tab between opponents, Left/Right between pets, Up/Down details
             if (Gameplay.ScoreboardNavigator.IsOpen && Gameplay.ScoreboardNavigator.HandleInput())
+                return;
+
+            // Leaderboard: Up and Down read the players, R your rank
+            if (LeaderboardNavigator.HandleInput())
                 return;
 
             // Achievements: Tab between the filters and the pet list, arrows through the pets

@@ -27,6 +27,9 @@ namespace SuperAutoAccessibility
             try
             {
                 var target = picker.ButtonTarget;
+                // The leaderboard's board picker would be titled after the current board ("Party").
+                if (target != null && target.GetComponentInParent<Il2CppSpacewood.Unity.VersusLeaderboard>() != null)
+                    return "Leaderboard";
                 if (target != null)
                 {
                     if (target.Label != null && !string.IsNullOrWhiteSpace(target.Label.text))

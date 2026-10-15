@@ -230,6 +230,10 @@ namespace SuperAutoAccessibility
                     }
 
                     string announcement = string.IsNullOrEmpty(allText) ? "dialog" : allText;
+                    // The leaderboard's text is every row run together ("1.. Tokieda_Yukari. 1820").
+                    var leaderboard = modal.GetComponentInParent<Il2CppSpacewood.Unity.VersusLeaderboard>();
+                    if (leaderboard != null)
+                        announcement = TextExtractor.JoinSentences(new[] { LeaderboardNavigator.Summary(leaderboard), LeaderboardNavigator.Hint });
                     // With the tree, the screen reader introduces the modal itself (a dialog
                     // named after it, its text as the description) as focus lands inside.
                     if (!Tree.SapA11y.SpeaksScreen(modal.gameObject))
@@ -796,6 +800,13 @@ namespace SuperAutoAccessibility
                 deckItem = true;
             }
             bool readOnlyItem = scoreboardPet || achievementEntry || deckItem;
+            // The rank button's texts are the board and the bare number ("Party, 1474"); the
+            // number is read as its value, "1474 points".
+            if (RankPoints(go) != null)
+            {
+                var rankButton = go.GetComponent<ButtonBase>();
+                elementText = rankButton?.Label != null ? TextExtractor.CleanTextPublic(rankButton.Label.text) : null;
+            }
             string labelOverride = SectionManager.GetLabelOverride(go);
             if (!string.IsNullOrEmpty(labelOverride))
             {
@@ -1037,6 +1048,19 @@ namespace SuperAutoAccessibility
             return baseAnnouncement;
         }
 
+        /// <summary>"1474 points" for the Pack Shop's rank button, otherwise null.</summary>
+        internal static string RankPoints(GameObject go)
+        {
+            try
+            {
+                var rank = go.GetComponentInParent<Il2CppSpacewood.Unity.VersusRank>();
+                if (rank?.Button == null || rank.Button.gameObject != go) return null;
+                string value = rank.Button.LabelRight != null ? TextExtractor.CleanTextPublic(rank.Button.LabelRight.text) : null;
+                return string.IsNullOrWhiteSpace(value) ? null : value + " points";
+            }
+            catch { return null; }
+        }
+
         private static string GetRole(GameObject go)
         {
             var picker = PickerInfo.OwnerOf(go);
@@ -1055,6 +1079,10 @@ namespace SuperAutoAccessibility
         public static string GetControlValue(GameObject go)
         {
             if (go == null) return null;
+
+            // The Pack Shop's rank: "1474" is rank points.
+            string rankPoints = RankPoints(go);
+            if (rankPoints != null) return rankPoints;
 
             // Slider: show current value or percentage
             var slider = go.GetComponent<SliderBase>();
@@ -1322,6 +1350,13 @@ namespace SuperAutoAccessibility
             var modal = GetActiveModal();
             if (modal != null && modal.gameObject != null)
             {
+                // The leaderboard's text is every row run together: read its summary instead.
+                var leaderboard = modal.GetComponentInParent<Il2CppSpacewood.Unity.VersusLeaderboard>();
+                if (leaderboard != null)
+                {
+                    Announce(LeaderboardNavigator.Summary(leaderboard));
+                    return;
+                }
                 string allText = TextExtractor.GetAllTextFromHierarchy(modal.gameObject);
                 if (!string.IsNullOrEmpty(allText))
                 {

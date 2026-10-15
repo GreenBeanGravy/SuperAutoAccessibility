@@ -292,7 +292,9 @@ namespace SuperAutoAccessibility
             }
             catch { }
 
-            return $"{pageName}|sidebar:{sidebarOpen}|tab:{activeTab}|picker:{pickerOpen}|sub:{subPage}|versus:{versusItemCount}|lbm:{lastBattleMenuOpen}|dv:{deckViewerOpen}{deckViewerSwitches}|sb:{scoreboard}|ch:{chooser}|lang:{langPickerOpen}";
+            bool leaderboard = LeaderboardNavigator.Active() != null;
+
+            return $"{pageName}|sidebar:{sidebarOpen}|tab:{activeTab}|picker:{pickerOpen}|sub:{subPage}|versus:{versusItemCount}|lbm:{lastBattleMenuOpen}|dv:{deckViewerOpen}{deckViewerSwitches}|sb:{scoreboard}|ch:{chooser}|lang:{langPickerOpen}|lb:{leaderboard}";
         }
 
         private static void RebuildSections()
@@ -354,6 +356,20 @@ namespace SuperAutoAccessibility
                     }
                 }
                 catch { }
+
+                // The leaderboard is a modal over the Pack Shop: its own controls only, or the
+                // arrow keys move through the packs hidden behind it.
+                var leaderboard = LeaderboardNavigator.Active();
+                if (leaderboard != null)
+                {
+                    var board = new NavigationSection("Leaderboard");
+                    TryAddWithLabel(board, leaderboard.Column.RankButton, "Leaderboard");
+                    TryAddWithLabel(board, leaderboard.Column.PackButton, "Pack");
+                    if (board.Elements.Count > 0) _sections.Add(board);
+                    _currentSectionIndex = 0;
+                    _currentElementIndex = 0;
+                    return;
+                }
 
                 var menu = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.Menu>();
 
@@ -1018,7 +1034,8 @@ namespace SuperAutoAccessibility
             {
                 var versusRank = packShop.VersusRank;
                 if (versusRank?.Button != null)
-                    TryAddWithLabel(settingsSection, versusRank.Button, "Ranked Mode");
+                    // Your rank on the board it names ("Party", 1474): it opens the leaderboard.
+                    TryAddWithLabel(settingsSection, versusRank.Button, "Rank");
             }
             catch { }
             if (settingsSection.Elements.Count > 0) _sections.Add(settingsSection);
