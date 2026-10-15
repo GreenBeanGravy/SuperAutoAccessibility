@@ -414,6 +414,11 @@ namespace SuperAutoAccessibility
                         else if (TryBuildByActiveComponent<Il2CppSpacewood.Unity.BrowseShops>(BuildBrowseShopsSections)) { }
                         else { BuildFallbackSections(); }
                     }
+                    else if (currentPageName.Contains("Spectate"))
+                    {
+                        // Opened from History, but a page of its own: the History branch never saw it.
+                        TryBuildByActiveComponent<Il2CppSpacewood.Unity.Spectate>(BuildSpectateSections);
+                    }
                     else if (currentPageName.Contains("History"))
                     {
                         // "History" is the parent page for StatsSummary, Achievements, Replay, Spectate, and HistoryMenu.
@@ -1443,7 +1448,35 @@ namespace SuperAutoAccessibility
             // Back button
             var actionsSection = new NavigationSection("Actions");
             FindAndAddBackButton(actionsSection, spectate.gameObject);
+            if (section.Elements.Count == 0 && actionsSection.Elements.Count == 0)
+            {
+                // Nothing to spectate: the page holds only its message, so nothing was focused and
+                // nothing said beyond "Spectate". The app bar's Back carries the message.
+                string message = null;
+                try
+                {
+                    foreach (var t in spectate.GetComponentsInChildren<Il2CppTMPro.TMP_Text>(false))
+                    {
+                        string s = TextExtractor.CleanTextPublic(t.text);
+                        if (!string.IsNullOrEmpty(s)) { message = s; break; }
+                    }
+                }
+                catch { }
+                TryAddWithLabel(actionsSection, AppBarBack(), message != null ? message + " Back" : "Back");
+            }
             if (actionsSection.Elements.Count > 0) _sections.Add(actionsSection);
+        }
+
+        /// <summary>The menu's app bar Back button, top left on every page.</summary>
+        private static SelectableBase AppBarBack()
+        {
+            try
+            {
+                var menu = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.Menu>();
+                var back = menu != null ? menu.transform.Find("AppBar/Canvas/NotchPadding/Layout/Back") : null;
+                return back != null ? back.GetComponent<SelectableBase>() : null;
+            }
+            catch { return null; }
         }
 
         /// <summary>

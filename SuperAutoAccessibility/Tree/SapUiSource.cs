@@ -589,6 +589,21 @@ namespace SuperAutoAccessibility.Tree
 
             for (var t = first != null ? first.transform : null; t != null; t = t.parent)
             {
+                // The app bar's Back stands in for an empty page's controls (Spectate with nothing
+                // to watch); the screen is the open page, not "App Bar".
+                if (t.name == "AppBar")
+                {
+                    try
+                    {
+                        var page = UnityEngine.Object.FindObjectOfType<PageManager>()?.CurrentPage;
+                        if (page != null)
+                        {
+                            screenRoot = page.gameObject;
+                            return Patches.PageManagerPatches.SplitCamelCase(page.gameObject.name);
+                        }
+                    }
+                    catch { }
+                }
                 if (t.GetComponent<Il2CppSpacewood.Unity.MonoBehaviours.Build.HangarScoreboard>() != null)
                 {
                     screenRoot = t.gameObject;
@@ -651,8 +666,14 @@ namespace SuperAutoAccessibility.Tree
             try
             {
                 var controls = new HashSet<int>();
+                var labels = new List<string>();
                 foreach (var pair in live)
-                    foreach (var e in pair.Value) controls.Add(e.gameObject.transform.GetInstanceID());
+                    foreach (var e in pair.Value)
+                    {
+                        controls.Add(e.gameObject.transform.GetInstanceID());
+                        string over = SectionManager.GetLabelOverride(e.gameObject);
+                        if (!string.IsNullOrEmpty(over)) labels.Add(over);
+                    }
 
                 // Text a section reads line by line itself (the news screen's patch notes) stays
                 // out: as the dialog's description the screen reader would read all of it every
@@ -695,6 +716,8 @@ namespace SuperAutoAccessibility.Tree
                     // snacks (Stats: "Snacks gained").
                     if (UnderObjectNamed(t.transform, "Snacks", screenRoot.transform)) s = "Snacks: " + s;
                     if (readElsewhere.Exists(f => s.Contains(f))) continue;
+                    // A control already says it (an empty page's message on its Back button).
+                    if (s.Length >= 12 && labels.Exists(l => l.Contains(s))) continue;
                     AppendSentence(sb, s);
                 }
                 return sb.Length > 0 ? sb.ToString() : null;
