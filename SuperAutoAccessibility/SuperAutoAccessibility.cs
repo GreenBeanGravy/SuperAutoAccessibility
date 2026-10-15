@@ -2115,14 +2115,18 @@ namespace SuperAutoAccessibility
             _newsEnrichBaseAnnouncement = baseAnnouncement;
         }
 
-        private static void BuildNewsCodecDetailLines(Il2CppSpacewood.Scripts.Codec.CodecEntry codec)
+        /// <summary>
+        /// The lines a codec card shows: summary (name, tier, stats, page), then the text before
+        /// the level markers, then one line per level. Used by the news screen's Left and Right
+        /// and by the accessibility tree's description of the focused news item.
+        /// </summary>
+        internal static List<string> ReadCodecLines(Il2CppSpacewood.Scripts.Codec.CodecEntry codec, out string name, out int currentPage)
         {
-            _newsCodecDetailLines.Clear();
-            _newsCodecDetailLineIndex = 0;
-
+            var lines = new List<string>();
+            name = "";
+            currentPage = 0;
             try
             {
-                string name = "";
                 string tierText = "";
                 string statsText = "";
                 string pageText = "";
@@ -2136,10 +2140,7 @@ namespace SuperAutoAccessibility
                 }
                 catch { }
 
-                int currentPage = 0;
                 try { currentPage = codec.CurrentPage; } catch { }
-                // Set cache key after reading both name and page (avoids empty key on partial failure)
-                _lastNewsCodecHeader = $"{name}__p{currentPage}";
 
                 // Tier
                 try
@@ -2184,7 +2185,7 @@ namespace SuperAutoAccessibility
                 if (!string.IsNullOrEmpty(tierText)) summaryParts.Add(tierText);
                 if (!string.IsNullOrEmpty(statsText)) summaryParts.Add(statsText);
                 if (!string.IsNullOrEmpty(pageText)) summaryParts.Add(pageText);
-                _newsCodecDetailLines.Add(string.Join(". ", summaryParts));
+                lines.Add(string.Join(". ", summaryParts));
 
                 // Parse body text into individual level lines
                 try
@@ -2205,7 +2206,7 @@ namespace SuperAutoAccessibility
                         string preLevelText = TextExtractor.CleanTextPublic(levelParts[0]);
                         if (!string.IsNullOrWhiteSpace(preLevelText))
                         {
-                            _newsCodecDetailLines.Add(preLevelText);
+                            lines.Add(preLevelText);
                         }
 
                         // Process matched level groups
@@ -2216,7 +2217,7 @@ namespace SuperAutoAccessibility
                             string ability = TextExtractor.CleanTextPublic(abilityRaw);
                             if (!string.IsNullOrWhiteSpace(ability))
                             {
-                                _newsCodecDetailLines.Add($"Lvl {levelNum}: {ability}");
+                                lines.Add($"Lvl {levelNum}: {ability}");
                             }
                         }
 
@@ -2226,12 +2227,30 @@ namespace SuperAutoAccessibility
                         {
                             string fullBody = TextExtractor.CleanTextPublic(rawBody);
                             if (!string.IsNullOrWhiteSpace(fullBody))
-                                _newsCodecDetailLines.Add(fullBody);
+                                lines.Add(fullBody);
                         }
                     }
                 }
                 catch { }
 
+            }
+            catch (System.Exception ex)
+            {
+                MelonLogger.Warning($"ReadCodecLines error: {ex.Message}");
+            }
+            return lines;
+        }
+
+        private static void BuildNewsCodecDetailLines(Il2CppSpacewood.Scripts.Codec.CodecEntry codec)
+        {
+            _newsCodecDetailLines.Clear();
+            _newsCodecDetailLineIndex = 0;
+
+            try
+            {
+                _newsCodecDetailLines = ReadCodecLines(codec, out string name, out int currentPage);
+                // Cache key after reading both name and page (avoids empty key on partial failure)
+                _lastNewsCodecHeader = $"{name}__p{currentPage}";
                 MelonLogger.Msg($"[News Codec] Built {_newsCodecDetailLines.Count} detail lines for {name}");
             }
             catch (System.Exception ex)

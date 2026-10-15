@@ -406,8 +406,39 @@ namespace SuperAutoAccessibility.Tree
             node.Label = LabelFor(go);
             string value = AccessibilityManager.GetControlValue(go);
             if (!string.IsNullOrEmpty(value) && (node.Label == null || !node.Label.Contains(value))) node.Value = value;
-            node.Description = TooltipOf(go);
+            node.Description = TooltipOf(go) ?? NewsItemDetails(go, node.Label);
             node.AddAction(AccessAction.Click);
+        }
+
+        /// <summary>
+        /// A news item's tier and ability, from the card the mod opens for the selected item. Only
+        /// while the card shows this item: it fills a frame or two after the selection moves,
+        /// and the previous item's text must not be read as this one's.
+        /// </summary>
+        private static string NewsItemDetails(GameObject go, string label)
+        {
+            try
+            {
+                if (!SAPMod._lastNewsOpen || string.IsNullOrEmpty(label)) return null;
+                if (go.transform.parent == null ||
+                    go.transform.parent.GetComponent<Il2CppSpacewood.Unity.MonoBehaviours.Build.DeckViewerItem>() == null)
+                    return null;
+                var announcement = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.News>()?.Announcement;
+                var codec = announcement?.Codec;
+                var group = announcement?.CodecGroup;
+                if (codec == null || group == null || group.alpha <= 0f) return null;
+                var lines = SAPMod.ReadCodecLines(codec, out string name, out _);
+                if (string.IsNullOrEmpty(name) || !label.StartsWith(name, StringComparison.OrdinalIgnoreCase) || lines.Count == 0)
+                    return null;
+                // The summary starts with the name the label already says.
+                if (lines[0].StartsWith(name, StringComparison.OrdinalIgnoreCase))
+                    lines[0] = lines[0].Substring(name.Length).TrimStart('.', ',', ' ');
+                return TextExtractor.JoinSentences(lines);
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         /// <summary>The same label the mod's own announcement used, minus role, value and position.</summary>
@@ -649,22 +680,22 @@ namespace SuperAutoAccessibility.Tree
                     string line = StatsLine(item);
                     statsItems.Add(item.transform.GetInstanceID());
                     if (string.IsNullOrEmpty(line) || sb.Length >= MaxDescription) continue;
-                    if (sb.Length > 0) sb.Append(". ");
-                    sb.Append(line);
+                    AppendSentence(sb, line);
                 }
                 for (int i = 0; i < texts.Length && sb.Length < MaxDescription; i++)
                 {
                     var t = texts[i];
                     if (t == null || InsideControl(t.transform, screenRoot.transform, controls)) continue;
                     if (statsItems.Count > 0 && InsideAny(t.transform, screenRoot.transform, statsItems)) continue;
+                    // A hover card (the news screen's codec) describes one item, and the item says it.
+                    if (t.GetComponentInParent<Il2CppSpacewood.Scripts.Codec.CodecEntry>() != null) continue;
                     string s = UGuiSource.Clean(t.text);
                     if (string.IsNullOrEmpty(s) || !seen.Add(s)) continue;
                     // The lobby's "28 / 50" counter says nothing on its own. The game calls these
                     // snacks (Stats: "Snacks gained").
                     if (UnderObjectNamed(t.transform, "Snacks", screenRoot.transform)) s = "Snacks: " + s;
                     if (readElsewhere.Exists(f => s.Contains(f))) continue;
-                    if (sb.Length > 0) sb.Append(". ");
-                    sb.Append(s);
+                    AppendSentence(sb, s);
                 }
                 return sb.Length > 0 ? sb.ToString() : null;
             }
@@ -672,6 +703,17 @@ namespace SuperAutoAccessibility.Tree
             {
                 return null;
             }
+        }
+
+        /// <summary>". " between texts, or a space after one that ends a sentence ("details.. Minor").</summary>
+        private static void AppendSentence(StringBuilder sb, string s)
+        {
+            if (sb.Length > 0)
+            {
+                char end = sb[sb.Length - 1];
+                sb.Append(end == '.' || end == '!' || end == '?' || end == ':' ? " " : ". ");
+            }
+            sb.Append(s);
         }
 
         private static string StatsLine(StatsSummaryItem item)
