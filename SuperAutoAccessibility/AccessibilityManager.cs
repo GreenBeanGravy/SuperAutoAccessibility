@@ -771,6 +771,10 @@ namespace SuperAutoAccessibility
 
             // Extract text content (with label override for context or fallback)
             string elementText = Tree.SapUiSource.PackSpeechText(go) ?? TextExtractor.GetElementText(go);
+            // A scoreboard pet's own texts are its bare attack and health ("1, 3"); its summary
+            // is the label.
+            bool scoreboardPet = Gameplay.ScoreboardNavigator.IsPetButton(go);
+            if (scoreboardPet) elementText = null;
             string labelOverride = SectionManager.GetLabelOverride(go);
             if (!string.IsNullOrEmpty(labelOverride))
             {
@@ -828,7 +832,6 @@ namespace SuperAutoAccessibility
             if (role == "button" && tabList != null && tabList.IsTabList)
                 role = tabList.SelectedElement == go ? "tab, selected" : "tab";
             // A scoreboard pet is something to read, not a button to press.
-            bool scoreboardPet = Gameplay.ScoreboardNavigator.IsPetButton(go);
             if (scoreboardPet) role = null;
             if (!string.IsNullOrEmpty(role))
             {

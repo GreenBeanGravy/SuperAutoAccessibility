@@ -304,7 +304,12 @@ namespace SuperAutoAccessibility.Gameplay
             var board = Active();
             if (board != null && board != _board) Open(board);
             else if (board == null && _board != null) Closed();
+            else if (_board != null && _emptySince >= 0f) WaitForOpponents(now);
         }
+
+        // The board can open a frame before its entries are spawned; "no opponents" waits a bit.
+        private static float _emptySince = -1f;
+        private const float EmptyGraceSeconds = 0.5f;
 
         private static void Open(HangarScoreboard board)
         {
@@ -315,13 +320,44 @@ namespace SuperAutoAccessibility.Gameplay
             if (GameplayPhaseDetector.IsShopPhase()) ShopNavigationManager.IsInputSuppressed = true;
             SectionManager.InvalidateCache();
 
+            _emptySince = -1f;
             if (_opponents.Count == 0)
             {
-                AccessibilityManager.Announce("Scoreboard. No opponents yet.");
-                MelonLogger.Msg("[Scoreboard] Opened with no opponents");
+                _emptySince = Time.realtimeSinceStartup;
                 return;
             }
+            Introduce();
+        }
 
+        private static void WaitForOpponents(float now)
+        {
+            _opponents = Read(_board);
+            if (_opponents.Count > 0)
+            {
+                _emptySince = -1f;
+                SectionManager.InvalidateCache();
+                Introduce();
+                return;
+            }
+            if (now - _emptySince < EmptyGraceSeconds) return;
+            _emptySince = -1f;
+            // Arena has no other players: an empty board over the shop would only hold the keys,
+            // so it closes again, as it always has.
+            if (GameplayPhaseDetector.IsShopPhase())
+            {
+                try { GameplayPhaseDetector.GetHangarMain()?.CloseScoreboards(); } catch { }
+                Closed();
+                AccessibilityManager.Announce("No opponents");
+            }
+            else
+            {
+                AccessibilityManager.Announce("Scoreboard. No opponents.");
+            }
+            MelonLogger.Msg("[Scoreboard] Opened with no opponents");
+        }
+
+        private static void Introduce()
+        {
             // Start on the next opponent when the game marks one.
             _opp = 0;
             for (int i = 0; i < _opponents.Count; i++)
@@ -340,6 +376,7 @@ namespace SuperAutoAccessibility.Gameplay
         private static void Closed()
         {
             _board = null;
+            _emptySince = -1f;
             _opponents.Clear();
             _linesByView.Clear();
             _hintAt = -1f;
