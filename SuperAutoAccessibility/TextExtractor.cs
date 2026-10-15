@@ -91,6 +91,9 @@ namespace SuperAutoAccessibility
             // Sprites that stand for a word say it ("+2<sprite name=Attack>" is "+2 Attack"),
             // then the remaining rich text tags go (they may contain newlines).
             text = UnityA11y.Unity.UGuiSource.SpritesAsWords(text);
+            // A line break is a space ("perk.<br>Before" read "perk.Before").
+            text = System.Text.RegularExpressions.Regex.Replace(text, @"<br\s*/?>", " ",
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
             text = System.Text.RegularExpressions.Regex.Replace(text, @"<[^>]+>", "");
 
             // Zero-width characters: TextMeshPro input fields append U+200B to their text, so an

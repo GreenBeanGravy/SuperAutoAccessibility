@@ -86,6 +86,9 @@ namespace SuperAutoAccessibility
             TolkSpeech.Speak("Super Auto Pets Accessibility Mod loaded!", true);
 
             DebugLog.Initialize();
+            // Ability text puts an arrow sprite between trigger and effect ("Faint [arrow] Summon
+            // one 1/1 Cricket"); read as a colon, the way the mod's own ability reader says it.
+            UnityA11y.Unity.UGuiSource.SpriteText["ArrowRight"] = ":";
             AccessibilityManager.Initialize();
             SoundManager.Initialize();
             Tree.SapA11y.Initialize();
@@ -1621,7 +1624,13 @@ namespace SuperAutoAccessibility
                                         string pre = TextExtractor.CleanTextPublic(split[0]);
                                         if (!string.IsNullOrWhiteSpace(pre))
                                         {
-                                            if (pre.Length > 80) pre = pre.Substring(0, 77) + "...";
+                                            // Brief on arrival, cut at a word ("Remove 5 atta..."
+                                            // was cut mid-word); Left and Right read it all.
+                                            if (pre.Length > 80)
+                                            {
+                                                int cut = pre.LastIndexOf(' ', 77);
+                                                pre = pre.Substring(0, cut > 40 ? cut : 77).TrimEnd(',', ';', ' ') + "...";
+                                            }
                                             parts.Add(pre);
                                         }
                                     }
