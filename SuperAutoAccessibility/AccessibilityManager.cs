@@ -430,8 +430,10 @@ namespace SuperAutoAccessibility
                             ExecuteEvents.Execute(_currentSelectedObject, pointerData, ExecuteEvents.pointerExitHandler);
                         }
 
-                        // Enter new
-                        ExecuteEvents.Execute(selected, pointerData, ExecuteEvents.pointerEnterHandler);
+                        // Enter new (let through the filter for hovers from a resting mouse)
+                        Patches.SelectableBasePatches.Synthetic = true;
+                        try { ExecuteEvents.Execute(selected, pointerData, ExecuteEvents.pointerEnterHandler); }
+                        finally { Patches.SelectableBasePatches.Synthetic = false; }
                     }
                     catch (Exception ex)
                     {

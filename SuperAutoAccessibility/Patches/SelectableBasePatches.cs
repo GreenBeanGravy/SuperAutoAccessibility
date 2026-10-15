@@ -87,6 +87,12 @@ namespace SuperAutoAccessibility.Patches
             catch { }
         }
 
+        /// <summary>
+        /// Set while the mod sends its own pointer enter to the focused control, which makes the
+        /// game show that control's tooltip. Blocking it with the hovers left every tooltip stale.
+        /// </summary>
+        internal static bool Synthetic;
+
         /// <summary>The mouse has not moved for a while: a pointer enter is not a hover.</summary>
         public static bool MouseParked() =>
             UnityEngine.Time.realtimeSinceStartup - _lastMouseMoveAt > 0.5f;
@@ -97,7 +103,7 @@ namespace SuperAutoAccessibility.Patches
         /// as the choices slid in, the Danger pack when the Pack Shop opened. Focus jumped away
         /// from where the keys had put it. A pointer enter without the mouse moving is ignored.
         /// </summary>
-        private static bool PointerEnter_Prefix() => !MouseParked();
+        private static bool PointerEnter_Prefix() => Synthetic || !MouseParked();
 
         /// <summary>
         /// Postfix patch for SelectableBase.PointerEnter
