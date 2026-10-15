@@ -120,6 +120,9 @@ namespace SuperAutoAccessibility
             // selection the rest of this frame's code starts from.
             Tree.SapA11y.Tick();
 
+            // When the mouse last moved: a pointer enter from a still cursor is not a hover.
+            Patches.SelectableBasePatches.TrackMouse();
+
             // Poll Bootstrap loading screen text and announce changes
             PollBootstrapText();
 
@@ -1037,6 +1040,10 @@ namespace SuperAutoAccessibility
                     try
                     {
                         string newValue = AccessibilityManager.GetControlValue(_pendingValueCheck) ?? "";
+                        // A picker option says only "checked"; one that toggles in place (the
+                        // Cursed modifier) went silent when switched off.
+                        if (newValue.Length == 0 && _preClickValue == "checked" && PickerInfo.OwnerOf(_pendingValueCheck) != null)
+                            newValue = "not checked";
                         if (newValue != _preClickValue && !string.IsNullOrEmpty(newValue) &&
                             !Tree.SapA11y.SpeaksFor(_pendingValueCheck))
                         {
@@ -1812,7 +1819,10 @@ namespace SuperAutoAccessibility
                 if (hitObject != null && hitObject != _lastMouseTrackedObject)
                 {
                     _lastMouseTrackedObject = hitObject;
-                    AccessibilityManager.AnnounceSelectedElement(hitObject, true);
+                    // A control that appeared under a still cursor was not pointed at: the
+                    // Pack Shop opening read "Danger pack" over the first control's name.
+                    if (!Patches.SelectableBasePatches.MouseParked())
+                        AccessibilityManager.AnnounceSelectedElement(hitObject, true);
                 }
                 else if (hitObject == null)
                 {
@@ -2864,8 +2874,17 @@ namespace SuperAutoAccessibility
             bool right    = Input.GetKeyDown(KeyCode.RightArrow);
             bool pageUp   = Input.GetKeyDown(KeyCode.PageUp);
             bool pageDown = Input.GetKeyDown(KeyCode.PageDown);
+            // Home and End jump to either end of the group (they did nothing in menus, the
+            // chooser included), except in a text field, where they move the caret.
+            bool home = Input.GetKeyDown(KeyCode.Home);
+            bool end = Input.GetKeyDown(KeyCode.End);
+            if (home || end)
+            {
+                var selected = EventSystem.current?.currentSelectedGameObject;
+                if (selected != null && selected.GetComponent<InputFieldBase>() != null) home = end = false;
+            }
 
-            if (!tab && !up && !down && !left && !right && !pageUp && !pageDown) return;
+            if (!tab && !up && !down && !left && !right && !pageUp && !pageDown && !home && !end) return;
 
             // Tab/Shift+Tab or Page Down/Page Up: move between sections
             if (pageDown || (tab && !shiftDown))    SectionManager.MoveToNextSection();
@@ -2873,6 +2892,7 @@ namespace SuperAutoAccessibility
             // Up/Down: move within current section
             else if (down)              SectionManager.MoveToNextElement();
             else if (up)                SectionManager.MoveToPrevElement();
+            else if (home || end)       SectionManager.MoveToEdgeElement(end);
             // Left/Right: adjust sliders (no-op on non-slider elements)
             else if (left || right)     HandleSliderAdjust(right);
         }
@@ -4035,6 +4055,7 @@ namespace SuperAutoAccessibility
                     "Tab or Page Down: Next section",
                     "Shift Tab or Page Up: Previous section",
                     "Up and Down arrows: Navigate items",
+                    "Home and End: First or last item",
                     "Enter: Activate",
                     "Escape: Back or menu"
                 }));

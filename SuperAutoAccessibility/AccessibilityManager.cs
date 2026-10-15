@@ -1073,6 +1073,16 @@ namespace SuperAutoAccessibility
                 return null;
             }
 
+            // The Pack Shop's Difficulty shows the Cursed modifier (a bad toy every two turns)
+            // only as an icon beside the difficulty's name.
+            try
+            {
+                var difficulty = go.GetComponent<Il2CppSpacewood.Unity.UI.DifficultyButton>();
+                if (difficulty != null)
+                    return difficulty.Cursed != null && difficulty.Cursed.gameObject.activeInHierarchy ? "cursed" : null;
+            }
+            catch { }
+
             // The deck viewer's switches (achievements, custom) show their state only by sprite.
             try
             {

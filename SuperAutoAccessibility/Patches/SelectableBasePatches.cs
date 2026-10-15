@@ -46,10 +46,14 @@ namespace SuperAutoAccessibility.Patches
                     typeof(SelectableBasePatches),
                     nameof(PointerEnter_Postfix)
                 );
+                var prefixMethod = AccessTools.Method(
+                    typeof(SelectableBasePatches),
+                    nameof(PointerEnter_Prefix)
+                );
 
                 if (originalMethod != null && postfixMethod != null)
                 {
-                    harmony.Patch(originalMethod, postfix: new HarmonyMethod(postfixMethod));
+                    harmony.Patch(originalMethod, prefix: new HarmonyMethod(prefixMethod), postfix: new HarmonyMethod(postfixMethod));
                     MelonLogger.Msg($"SelectableBase pointer enter patched successfully: {originalMethod.Name}");
                 }
                 else
@@ -65,6 +69,36 @@ namespace SuperAutoAccessibility.Patches
             }
         }
 
+        private static UnityEngine.Vector3 _lastMousePosition;
+        private static float _lastMouseMoveAt;
+
+        /// <summary>Called every frame: notes when the mouse last moved.</summary>
+        public static void TrackMouse()
+        {
+            try
+            {
+                var pos = UnityEngine.Input.mousePosition;
+                if (pos != _lastMousePosition)
+                {
+                    _lastMousePosition = pos;
+                    _lastMouseMoveAt = UnityEngine.Time.realtimeSinceStartup;
+                }
+            }
+            catch { }
+        }
+
+        /// <summary>The mouse has not moved for a while: a pointer enter is not a hover.</summary>
+        public static bool MouseParked() =>
+            UnityEngine.Time.realtimeSinceStartup - _lastMouseMoveAt > 0.5f;
+
+        /// <summary>
+        /// A control that appears under a mouse cursor left still (a blind player's mouse rests
+        /// wherever it was) took the game's selection, as if hovered: the chooser's third choice
+        /// as the choices slid in, the Danger pack when the Pack Shop opened. Focus jumped away
+        /// from where the keys had put it. A pointer enter without the mouse moving is ignored.
+        /// </summary>
+        private static bool PointerEnter_Prefix() => !MouseParked();
+
         /// <summary>
         /// Postfix patch for SelectableBase.PointerEnter
         /// Called when mouse hovers over an element
@@ -72,6 +106,9 @@ namespace SuperAutoAccessibility.Patches
         private static void PointerEnter_Postfix(Il2CppSpacewood.Unity.UI.SelectableBase __instance)
         {
             if (__instance == null || __instance.gameObject == null)
+                return;
+            // Ignored above; reading it would announce a control nobody hovered.
+            if (MouseParked())
                 return;
 
             try

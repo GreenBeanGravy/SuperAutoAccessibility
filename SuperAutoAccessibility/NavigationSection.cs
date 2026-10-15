@@ -1009,6 +1009,9 @@ namespace SuperAutoAccessibility
                 }
             }
             catch { }
+            // Versus: how many players, in screen order before the time and mirror modes (it
+            // used to sit in Actions beside Start).
+            TryAddWithLabel(settingsSection, packShop.PlayersButton, "Players");
             TryAddWithLabel(settingsSection, packShop.TimeButton, "Time Mode");
             TryAddWithLabel(settingsSection, packShop.MirrorButton, "Mirror Mode");
             try
@@ -1024,7 +1027,6 @@ namespace SuperAutoAccessibility
             var actionsSection = new NavigationSection("Actions");
             TryAddWithLabel(actionsSection, packShop.ContinueButton, "Start");
             TryAddWithLabel(actionsSection, packShop.CreateCustomButton, "Create Custom Pack");
-            TryAddWithLabel(actionsSection, packShop.PlayersButton, "Players");
             // Find Back button by searching for it under NotchPadding
             try
             {
@@ -2548,6 +2550,17 @@ namespace SuperAutoAccessibility
             if (!ValidateSection()) return;
             var section = sections[_currentSectionIndex];
             _currentElementIndex = (_currentElementIndex - 1 + section.Elements.Count) % section.Elements.Count;
+            FocusCurrent();
+        }
+
+        /// <summary>Home and End: the first or last control of the current section.</summary>
+        public static void MoveToEdgeElement(bool last)
+        {
+            var sections = GetSections();
+            if (sections.Count == 0) return;
+            if (!ValidateSection()) return;
+            var section = sections[_currentSectionIndex];
+            _currentElementIndex = last ? section.Elements.Count - 1 : 0;
             FocusCurrent();
         }
 
