@@ -80,6 +80,34 @@ namespace SuperAutoAccessibility
         /// </summary>
         public static string CleanTextPublic(string text) => CleanText(text);
 
+        public static bool HasLetter(string s)
+        {
+            foreach (char c in s)
+                if (char.IsLetter(c)) return true;
+            return false;
+        }
+
+        /// <summary>
+        /// Joins texts with ". ", unless one already ends a sentence: lines usually end in a full
+        /// stop, and a plain join read "trigger type.. Hey!".
+        /// </summary>
+        public static string JoinSentences(System.Collections.Generic.IEnumerable<string> parts)
+        {
+            var sb = new System.Text.StringBuilder();
+            foreach (var raw in parts)
+            {
+                string p = raw?.Trim();
+                if (string.IsNullOrEmpty(p)) continue;
+                if (sb.Length > 0)
+                {
+                    char end = sb[sb.Length - 1];
+                    sb.Append(end == '.' || end == '!' || end == '?' || end == ':' ? " " : ". ");
+                }
+                sb.Append(p);
+            }
+            return sb.ToString();
+        }
+
         /// <summary>
         /// Cleans up text for speech (removes extra whitespace, special chars, etc.)
         /// </summary>

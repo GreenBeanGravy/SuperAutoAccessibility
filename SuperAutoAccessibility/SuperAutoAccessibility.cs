@@ -2398,7 +2398,7 @@ namespace SuperAutoAccessibility
 
                     string pageText = ReadTipsPage(tips);
                     string announcement = !string.IsNullOrEmpty(pageText)
-                        ? JoinSentences(new[] { "Tips", pageText, "Left and Right to navigate pages. Escape to close." })
+                        ? TextExtractor.JoinSentences(new[] { "Tips", pageText, "Left and Right to navigate pages. Escape to close." })
                         : "Tips opened. Left and Right to navigate pages. Escape to close.";
                     AccessibilityManager.Announce(announcement);
                     MelonLogger.Msg($"Tips opened at page {pageIndex}");
@@ -2488,7 +2488,7 @@ namespace SuperAutoAccessibility
                                         if (t == mainText) continue;
                                         // Numbers on the page's pictures (costs, attack and
                                         // health) read as "3. 3. 3" without them.
-                                        if (!HasLetter(t)) continue;
+                                        if (!TextExtractor.HasLetter(t)) continue;
                                         parts.Add(TextExtractor.CleanTextPublic(t));
                                     }
                                     catch { }
@@ -2499,38 +2499,11 @@ namespace SuperAutoAccessibility
                 }
                 catch { }
 
-                return parts.Count > 0 ? JoinSentences(parts) : null;
+                return parts.Count > 0 ? TextExtractor.JoinSentences(parts) : null;
             }
             catch { return null; }
         }
 
-        /// <summary>
-        /// Joins texts with ". ", unless one already ends a sentence: tip texts end in a full
-        /// stop, and a plain join read "trigger type.. Hey!".
-        /// </summary>
-        private static bool HasLetter(string s)
-        {
-            foreach (char c in s)
-                if (char.IsLetter(c)) return true;
-            return false;
-        }
-
-        private static string JoinSentences(System.Collections.Generic.IEnumerable<string> parts)
-        {
-            var sb = new System.Text.StringBuilder();
-            foreach (var raw in parts)
-            {
-                string p = raw?.Trim();
-                if (string.IsNullOrEmpty(p)) continue;
-                if (sb.Length > 0)
-                {
-                    char end = sb[sb.Length - 1];
-                    sb.Append(end == '.' || end == '!' || end == '?' || end == ':' ? " " : ". ");
-                }
-                sb.Append(p);
-            }
-            return sb.ToString();
-        }
 
         /// <summary>
         /// Polls for the HangarTutorialPrompt (tutorial popup during shop phase).
