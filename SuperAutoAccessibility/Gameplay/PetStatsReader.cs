@@ -483,7 +483,7 @@ namespace SuperAutoAccessibility.Gameplay
                 // Pack
                 try
                 {
-                    string packName = SplitCamelCase(opponent.Pack.ToString());
+                    string packName = ScoreboardNavigator.PackName(opponent.Pack);
                     if (!string.IsNullOrWhiteSpace(packName))
                         parts.Add($"{packName} pack");
                 }

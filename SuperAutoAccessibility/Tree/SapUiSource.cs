@@ -373,6 +373,18 @@ namespace SuperAutoAccessibility.Tree
 
             if (TryPopulatePack(go, node)) return;
 
+            // A pet on the scoreboard: summary as the name, perk, ability, tier and experience as
+            // the description. Readable whether or not the board lets it be clicked.
+            if (Gameplay.ScoreboardNavigator.TryDescribe(go, out string petLabel, out string petDetails))
+            {
+                node.Role = AccessRole.Button;
+                node.Label = petLabel;
+                node.Description = petDetails;
+                node.Disabled = false;
+                node.AddAction(AccessAction.Click);
+                return;
+            }
+
             // Option buttons (settings) show their name on the left and the current choice on the
             // right ("Window mode ... Off"). Publish those as name and value, so the choice is
             // spoken as a value and a change to it is reported as one.
@@ -546,6 +558,11 @@ namespace SuperAutoAccessibility.Tree
 
             for (var t = first != null ? first.transform : null; t != null; t = t.parent)
             {
+                if (t.GetComponent<Il2CppSpacewood.Unity.MonoBehaviours.Build.HangarScoreboard>() != null)
+                {
+                    screenRoot = t.gameObject;
+                    return "Scoreboard";
+                }
                 if (t.GetComponent<SideBar>() != null)
                 {
                     screenRoot = t.gameObject;
@@ -596,6 +613,10 @@ namespace SuperAutoAccessibility.Tree
         private static string ScreenDescription(GameObject screenRoot, List<KeyValuePair<NavigationSection, List<SelectableBase>>> live, string title)
         {
             if (screenRoot == null) return null;
+            // The scoreboard's own text is every entry's name and lives again; its groups say
+            // that. The keys are what the screen reader user needs on arrival.
+            if (screenRoot.GetComponent<Il2CppSpacewood.Unity.MonoBehaviours.Build.HangarScoreboard>() != null)
+                return Gameplay.ScoreboardNavigator.Hint;
             try
             {
                 var controls = new HashSet<int>();

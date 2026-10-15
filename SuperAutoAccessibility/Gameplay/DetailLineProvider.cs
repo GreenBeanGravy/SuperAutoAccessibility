@@ -442,147 +442,76 @@ namespace SuperAutoAccessibility.Gameplay
             }
         }
         /// <summary>
-        /// Builds detail lines for an opponent in the scoreboard.
-        /// Includes opponent header info, then full pet-by-pet breakdown
-        /// with the same level of detail as the player's own team.
+        /// Lines for an opponent's pet on the scoreboard. Line 0 is the summary read on focus
+        /// ("Level 2 Ant, 3 attack, 4 health, Honey"); then perk, ability, the perks the ability
+        /// names, tier, experience and mana, as for the player's own team.
         /// </summary>
-        public static List<string> BuildOpponentDetailLines(Il2CppSpacewood.Core.Models.UserVersusOpponent opponent)
+        public static List<string> BuildOpponentMinionLines(MinionModel minion)
         {
             var lines = new List<string>();
-            if (opponent == null) { lines.Add("No opponent data"); return lines; }
+            if (minion == null) { lines.Add("Empty"); return lines; }
 
-            // Line 1: Name + board description
+            var summary = new List<string>();
             try
             {
-                string name = opponent.DisplayName ?? "Unknown";
+                string name = PetStatsReader.GetLocalizedName(minion);
                 try
                 {
-                    string adj = opponent.BoardAdjective;
-                    string noun = opponent.BoardNoun;
-                    if (!string.IsNullOrEmpty(adj) && !string.IsNullOrEmpty(noun))
-                        name += $", The {adj} {noun}";
-                    else if (!string.IsNullOrEmpty(noun))
-                        name += $", {noun}";
+                    int level = minion.Level;
+                    if (level > 1) name = $"Level {level} {name}";
                 }
                 catch { }
-                lines.Add(name);
+                summary.Add(name);
             }
-            catch { lines.Add("Unknown opponent"); }
-
-            // Line 2: Lives + Pack
+            catch { summary.Add("Unknown pet"); }
             try
             {
-                string livesAndPack = $"{opponent.Lives} lives";
-                try
-                {
-                    string packName = PetStatsReader.SplitCamelCase(opponent.Pack.ToString());
-                    if (!string.IsNullOrEmpty(packName))
-                        livesAndPack += $", {packName} Pack";
-                }
-                catch { }
-                lines.Add(livesAndPack);
+                int attack = minion.Attack != null ? minion.Attack.Total : 0;
+                int health = minion.Health != null ? minion.Health.Total : 0;
+                summary.Add($"{attack} attack, {health} health");
             }
-            catch { lines.Add("Lives unknown"); }
-
-            // Lines 3+: Per-pet details
+            catch { }
             try
             {
-                var minions = opponent.Minions;
-                if (minions != null && minions.Count > 0)
-                {
-                    for (int i = 0; i < minions.Count; i++)
-                    {
-                        try
-                        {
-                            var m = minions[i];
-                            if (m == null) continue;
-
-                            // Pet header: "Pet N: Name"
-                            string petName = PetStatsReader.GetLocalizedName(m);
-                            try
-                            {
-                                int level = m.Level;
-                                if (level > 1) petName = $"Level {level} {petName}";
-                            }
-                            catch { }
-                            lines.Add($"Pet {i + 1}: {petName}");
-
-                            // Stats + perk keyword
-                            try
-                            {
-                                int attack = m.Attack != null ? m.Attack.Total : 0;
-                                int health = m.Health != null ? m.Health.Total : 0;
-                                string statsLine = $"{attack} attack, {health} health";
-                                try
-                                {
-                                    string opPerkTitle = MinionModelExtensions.GetPerkTitleLocalized(m);
-                                    if (!string.IsNullOrEmpty(opPerkTitle))
-                                        statsLine += $", {opPerkTitle}";
-                                }
-                                catch { }
-                                lines.Add(statsLine);
-                            }
-                            catch { lines.Add("Stats unknown"); }
-
-                            // Perk description (native)
-                            try
-                            {
-                                string opPerkAbility = MinionModelExtensions.GetPerkAbilityLocalized(m);
-                                if (!string.IsNullOrEmpty(opPerkAbility))
-                                {
-                                    opPerkAbility = PetStatsReader.StripRichTextTags(opPerkAbility).Trim();
-                                    lines.Add($"Perk: {opPerkAbility}");
-                                }
-                            }
-                            catch { }
-
-                            // Ability
-                            string abilityText = null;
-                            try
-                            {
-                                abilityText = PetStatsReader.ReadMinionAbility(m);
-                                if (!string.IsNullOrEmpty(abilityText))
-                                    lines.Add(abilityText);
-                            }
-                            catch { }
-
-                            // Referenced perk descriptions in ability text
-                            AppendReferencedPerkDescriptions(lines, abilityText, null);
-
-                            // Tier
-                            try { lines.Add($"Tier {m.Tier}"); }
-                            catch { }
-                        }
-                        catch { }
-                    }
-                }
-                else
-                {
-                    lines.Add("No team");
-                }
+                string perkTitle = MinionModelExtensions.GetPerkTitleLocalized(minion);
+                if (!string.IsNullOrEmpty(perkTitle)) summary.Add(perkTitle);
             }
-            catch { lines.Add("Team unknown"); }
+            catch { }
+            lines.Add(string.Join(", ", summary));
 
-            // Relics
             try
             {
-                var relics = opponent.Relics;
-                if (relics != null && relics.Count > 0)
-                {
-                    var relicNames = new List<string>();
-                    for (int i = 0; i < relics.Count; i++)
-                    {
-                        try
-                        {
-                            var r = relics[i];
-                            if (r != null)
-                                relicNames.Add(PetStatsReader.SplitCamelCase(r.Enum.ToString()));
-                        }
-                        catch { }
-                    }
-                    if (relicNames.Count > 0)
-                        lines.Add("Relics: " + string.Join(", ", relicNames));
-                }
+                string perkAbility = MinionModelExtensions.GetPerkAbilityLocalized(minion);
+                if (!string.IsNullOrEmpty(perkAbility))
+                    lines.Add($"Perk: {PetStatsReader.StripRichTextTags(perkAbility).Trim()}");
+            }
+            catch { }
+
+            string abilityText = null;
+            try
+            {
+                abilityText = PetStatsReader.ReadMinionAbility(minion);
+                lines.Add(string.IsNullOrEmpty(abilityText) ? "No ability" : abilityText);
+            }
+            catch { lines.Add("No ability"); }
+            AppendReferencedPerkDescriptions(lines, abilityText, null);
+
+            try { lines.Add($"Tier {minion.Tier}"); }
+            catch { }
+
+            try
+            {
+                int level = minion.Level;
+                int exp = minion.Exp;
+                int expNeeded = level < 3 ? GetExpForNextLevel(level) : 0;
+                lines.Add(expNeeded > 0 ? $"Level {level}, {exp} of {expNeeded} experience" : $"Level {level}");
+            }
+            catch { }
+
+            try
+            {
+                int mana = minion.Mana;
+                if (mana > 0) lines.Add($"{mana} mana");
             }
             catch { }
 

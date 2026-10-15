@@ -827,6 +827,9 @@ namespace SuperAutoAccessibility
             var tabList = SectionManager.SectionOf(go, out _);
             if (role == "button" && tabList != null && tabList.IsTabList)
                 role = tabList.SelectedElement == go ? "tab, selected" : "tab";
+            // A scoreboard pet is something to read, not a button to press.
+            bool scoreboardPet = Gameplay.ScoreboardNavigator.IsPetButton(go);
+            if (scoreboardPet) role = null;
             if (!string.IsNullOrEmpty(role))
             {
                 if (sb.Length > 0) sb.Append(", ");
@@ -834,7 +837,8 @@ namespace SuperAutoAccessibility
             }
 
             // Add current value for interactive controls (slider %, button state, etc.)
-            string valueInfo = GetControlValue(go);
+            // A scoreboard pet's stat labels are already in its summary ("1 attack, 3 health").
+            string valueInfo = scoreboardPet ? null : GetControlValue(go);
             if (!string.IsNullOrEmpty(valueInfo))
             {
                 // Skip if the value is already present in the announcement text
@@ -856,7 +860,7 @@ namespace SuperAutoAccessibility
 
             // Add disabled state
             var selectable = go.GetComponent<SelectableBase>();
-            if (selectable != null && !selectable.GetInteractable())
+            if (selectable != null && !selectable.GetInteractable() && !scoreboardPet)
             {
                 if (sb.Length > 0) sb.Append(", ");
                 sb.Append("disabled");

@@ -60,6 +60,12 @@ namespace SuperAutoAccessibility
         /// Returns true if the current selection change was triggered by the mod (keyboard nav).
         /// Consumed on read (resets to false).
         /// </summary>
+        /// <summary>The next selection change is the mod's own and is announced.</summary>
+        public static void MarkModDriven()
+        {
+            _modDrivenSelection = true;
+        }
+
         public static bool ConsumeModDrivenFlag()
         {
             bool val = _modDrivenSelection;
@@ -235,7 +241,6 @@ namespace SuperAutoAccessibility
             // Detect LastBattleMenu, DeckViewer, and Scoreboard overlay states
             bool lastBattleMenuOpen = false;
             bool deckViewerOpen = false;
-            bool scoreboardOpen = false;
             try
             {
                 var hangar = Gameplay.GameplayPhaseDetector.GetHangarMain();
@@ -253,16 +258,11 @@ namespace SuperAutoAccessibility
                             deckViewerOpen = hangar.DeckViewer.gameObject.activeInHierarchy;
                     }
                     catch { }
-                    try
-                    {
-                        var sbGo = hangar.GetScoreboard();
-                        if (sbGo != null)
-                            scoreboardOpen = sbGo.activeInHierarchy;
-                    }
-                    catch { }
                 }
             }
             catch { }
+            // The scoreboard in the shop or the battle's tally; changes as entries and pets arrive.
+            string scoreboard = Gameplay.ScoreboardNavigator.Signature(Gameplay.ScoreboardNavigator.Active());
 
             // Check if LanguagePicker is visible (Bootstrap scene)
             bool langPickerOpen = false;
@@ -278,7 +278,7 @@ namespace SuperAutoAccessibility
             }
             catch { }
 
-            return $"{pageName}|sidebar:{sidebarOpen}|tab:{activeTab}|picker:{pickerOpen}|sub:{subPage}|versus:{versusItemCount}|lbm:{lastBattleMenuOpen}|dv:{deckViewerOpen}|sb:{scoreboardOpen}|lang:{langPickerOpen}";
+            return $"{pageName}|sidebar:{sidebarOpen}|tab:{activeTab}|picker:{pickerOpen}|sub:{subPage}|versus:{versusItemCount}|lbm:{lastBattleMenuOpen}|dv:{deckViewerOpen}|sb:{scoreboard}|lang:{langPickerOpen}";
         }
 
         private static void RebuildSections()
@@ -435,6 +435,11 @@ namespace SuperAutoAccessibility
                         // Dialog/consent page â€” scan for buttons so Tab navigation works
                         BuildDialogPageSections(currentPageName);
                     }
+                    else if (Gameplay.ScoreboardNavigator.Active() != null)
+                    {
+                        // The scoreboard over the shop, or the battle's tally after a Versus battle
+                        BuildScoreboardSections(Gameplay.ScoreboardNavigator.Active());
+                    }
                     else
                     {
                         // Check for gameplay hangar (shop/build phase)
@@ -443,21 +448,6 @@ namespace SuperAutoAccessibility
                         {
                             // Check overlay menus FIRST â€” they overlay the shop
                             bool builtOverlay = false;
-
-                            // Scoreboard (opponent list)
-                            if (!builtOverlay)
-                            {
-                                try
-                                {
-                                    var sbGo = hangarMain.GetScoreboard();
-                                    if (sbGo != null && sbGo.activeInHierarchy)
-                                    {
-                                        BuildScoreboardSections(hangarMain);
-                                        builtOverlay = true;
-                                    }
-                                }
-                                catch { }
-                            }
 
                             // LastBattleMenu
                             if (!builtOverlay)
@@ -587,7 +577,8 @@ namespace SuperAutoAccessibility
             float now = Time.realtimeSinceStartup;
             if (now - _menuOverlayCheckedAt < 0.1f) return _menuOverlayOpen;
             _menuOverlayCheckedAt = now;
-            _menuOverlayOpen = OpenSideBar() != null || IsSettingsMenuVisible() || PickerOpen();
+            _menuOverlayOpen = OpenSideBar() != null || IsSettingsMenuVisible() || PickerOpen() ||
+                               Gameplay.ScoreboardNavigator.Active() != null;
             return _menuOverlayOpen;
         }
 
@@ -1971,80 +1962,38 @@ namespace SuperAutoAccessibility
         }
 
         /// <summary>
-        /// Builds sections for the Scoreboard overlay (opponent list).
-        /// Each opponent becomes a navigable entry with their team info read out.
+        /// The scoreboard: one section per opponent holding that opponent's pets, so the tree
+        /// has a group per opponent and a control per pet, then the close button.
         /// </summary>
-        private static void BuildScoreboardSections(HangarMain hangarMain)
+        private static void BuildScoreboardSections(Il2CppSpacewood.Unity.MonoBehaviours.Build.HangarScoreboard board)
         {
             try
             {
-                var scoreboard = hangarMain.Scoreboard;
-                if (scoreboard == null) { BuildFallbackSections(); return; }
-
-                var entries = scoreboard.Entries;
-                if (entries == null || entries.Count == 0) { BuildFallbackSections(); return; }
-
-                var opponentsSection = new NavigationSection("Opponents");
-
-                for (int i = 0; i < entries.Count; i++)
+                foreach (var opp in Gameplay.ScoreboardNavigator.Read(board))
                 {
-                    try
+                    var section = new NavigationSection(opp.Header) { DisplayName = opp.GroupLabel };
+                    foreach (var pet in opp.Pets)
                     {
-                        var entry = entries[i];
-                        if (entry?.gameObject == null || !entry.gameObject.activeInHierarchy) continue;
-
-                        var btn = entry.Button;
-                        if (btn == null) continue;
-
-                        // Build label from entry data
-                        string label = $"Opponent {i + 1}";
+                        // Pets read whether or not the board lets them be clicked.
                         try
                         {
-                            // Check if this is the player's own entry
-                            bool isSelf = false;
-                            try { isSelf = entry.Self; } catch { }
-                            if (isSelf) continue; // Skip own entry
-
-                            string displayName = "";
-                            try { displayName = entry.DisplayName; } catch { }
-
-                            int lives = 0;
-                            try { lives = entry.Lives; } catch { }
-
-                            bool isNext = false;
-                            try { isNext = entry.Next; } catch { }
-
-                            // Brief label â€” full detail is now handled by scoreboard detail line navigation
-                            if (!string.IsNullOrWhiteSpace(displayName))
-                                label = (isNext ? "Next: " : "") + $"{displayName}, {lives} lives";
-                            else
-                                label = (isNext ? "Next: " : "") + $"Opponent, {lives} lives";
+                            if (pet.Button == null || !pet.Button.gameObject.activeInHierarchy) continue;
+                            section.Elements.Add(pet.Button);
+                            _labelOverrides[pet.Button.gameObject] = pet.Lines[0];
                         }
                         catch { }
-
-                        TryAddWithLabel(opponentsSection, btn, label);
                     }
-                    catch { }
+                    if (section.Elements.Count == 0 && opp.Entry != null)
+                        TryAddWithLabel(section, opp.Entry.Button, opp.GroupLabel);
+                    if (section.Elements.Count > 0) _sections.Add(section);
                 }
 
-                // Add close button
-                try
-                {
-                    TryAddWithLabel(opponentsSection, scoreboard.CloseLeftButton, "Close");
-                }
-                catch { }
-                try
-                {
-                    if (opponentsSection.Elements.Count == 0 ||
-                        (scoreboard.CloseLeftButton?.gameObject == null || !scoreboard.CloseLeftButton.gameObject.activeInHierarchy))
-                        TryAddWithLabel(opponentsSection, scoreboard.CloseRightButton, "Close");
-                }
-                catch { }
+                var actions = new NavigationSection("Actions");
+                TryAddWithLabel(actions, board.CloseLeftButton, "Close");
+                if (actions.Elements.Count == 0) TryAddWithLabel(actions, board.CloseRightButton, "Close");
+                if (actions.Elements.Count > 0) _sections.Add(actions);
 
-                if (opponentsSection.Elements.Count > 0)
-                    _sections.Add(opponentsSection);
-                else
-                    BuildFallbackSections();
+                if (_sections.Count == 0) BuildFallbackSections();
             }
             catch (Exception ex)
             {

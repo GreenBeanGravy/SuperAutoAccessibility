@@ -708,19 +708,10 @@ namespace SuperAutoAccessibility
                     return;
                 }
 
-                // 0.65. Close Scoreboard overlay if open
-                if (_scoreboardOpen)
+                // 0.65. Close the scoreboard if open
+                if (Gameplay.ScoreboardNavigator.IsOpen)
                 {
-                    try
-                    {
-                        var hangar = Gameplay.GameplayPhaseDetector.GetHangarMain();
-                        hangar?.CloseScoreboards();
-                    }
-                    catch { }
-                    _scoreboardOpen = false;
-                    Gameplay.ShopNavigationManager.IsInputSuppressed = false;
-                    SectionManager.InvalidateCache();
-                    AccessibilityManager.Announce("Scoreboard closed");
+                    Gameplay.ScoreboardNavigator.Close();
                     LoggerInstance.Msg("Escape: Closed Scoreboard");
                     return;
                 }
@@ -1145,8 +1136,8 @@ namespace SuperAutoAccessibility
             // Poll DeckViewer overlay
             PollDeckViewer();
 
-            // Poll Scoreboard overlay
-            PollScoreboard();
+            // Poll the scoreboard (shop, last opponent, battle tally)
+            Gameplay.ScoreboardNavigator.Poll();
 
             // Poll VersusLobby for player joins/leaves
             PollVersusLobby();
@@ -1534,52 +1525,9 @@ namespace SuperAutoAccessibility
                 return;
             }
 
-            // Handle Scoreboard input â€” custom navigation with Left/Right for opponents, Up/Down for detail lines
-            if (_scoreboardOpen)
-            {
-                // Skip O-key close on the same frame the scoreboard opened
-                if (_scoreboardJustOpened)
-                {
-                    _scoreboardJustOpened = false;
-                }
-                else if (Input.GetKeyDown(KeyCode.O))
-                {
-                    // O key closes scoreboard (toggle)
-                    try
-                    {
-                        var hangar = Gameplay.GameplayPhaseDetector.GetHangarMain();
-                        hangar?.CloseScoreboards();
-                    }
-                    catch { }
-                    _scoreboardOpen = false;
-                    Gameplay.ShopNavigationManager.IsInputSuppressed = false;
-                    SectionManager.InvalidateCache();
-                    AccessibilityManager.Announce("Scoreboard closed");
-                    LoggerInstance.Msg("O key: Closed Scoreboard");
-                    return;
-                }
-
-                // Left/Right: browse between opponents
-                if (Input.GetKeyDown(KeyCode.LeftArrow))  { MoveScoreboardOpponent(-1); return; }
-                if (Input.GetKeyDown(KeyCode.RightArrow)) { MoveScoreboardOpponent(1); return; }
-
-                // Up/Down: browse detail lines for current opponent
-                if (Input.GetKeyDown(KeyCode.UpArrow))    { MoveScoreboardDetailLine(-1); return; }
-                if (Input.GetKeyDown(KeyCode.DownArrow))  { MoveScoreboardDetailLine(1); return; }
-
-                // Space: re-read current detail line
-                if (Input.GetKeyDown(KeyCode.Space))
-                {
-                    if (_scoreboardDetailLines.Count > 0 && _scoreboardDetailLineIndex < _scoreboardDetailLines.Count)
-                        AccessibilityManager.Announce(_scoreboardDetailLines[_scoreboardDetailLineIndex]);
-                    return;
-                }
-
-                // Consume all other non-escape input to prevent fallthrough
-                if (Input.GetKeyDown(KeyCode.Tab) || Input.GetKeyDown(KeyCode.PageUp) ||
-                    Input.GetKeyDown(KeyCode.PageDown))
-                    return;
-            }
+            // Scoreboard keys: Tab between opponents, Left/Right between pets, Up/Down details
+            if (Gameplay.ScoreboardNavigator.IsOpen && Gameplay.ScoreboardNavigator.HandleInput())
+                return;
 
             // Handle deferred news enrichment (wait for codec to populate after Tab to a new item)
             if (_newsEnrichPending > 0)
@@ -2856,25 +2804,6 @@ namespace SuperAutoAccessibility
                 }
                 catch { _deckViewerOpen = false; Gameplay.ShopNavigationManager.IsInputSuppressed = false; }
             }
-
-            // Validate _scoreboardOpen
-            if (_scoreboardOpen)
-            {
-                try
-                {
-                    var hangar = Gameplay.GameplayPhaseDetector.GetHangarMain();
-                    bool stillOpen = false;
-                    var sbGo = hangar?.GetScoreboard();
-                    if (sbGo != null) stillOpen = sbGo.activeInHierarchy;
-                    if (!stillOpen)
-                    {
-                        _scoreboardOpen = false;
-                        Gameplay.ShopNavigationManager.IsInputSuppressed = false;
-                        MelonLogger.Msg("ValidateFlags: Cleared stale _scoreboardOpen");
-                    }
-                }
-                catch { _scoreboardOpen = false; Gameplay.ShopNavigationManager.IsInputSuppressed = false; }
-            }
         }
 
         // Whether to try focusing the Resume button specifically on sidebar open
@@ -3123,19 +3052,6 @@ namespace SuperAutoAccessibility
 
         // DeckViewer overlay tracking
         private static bool _deckViewerOpen = false;
-
-        // Scoreboard (opponent list) overlay tracking
-        private static bool _scoreboardOpen = false;
-        private static bool _scoreboardJustOpened = false; // Skip O-key close on the frame it opens
-
-        // Scoreboard detail line navigation
-        private static List<Il2CppSpacewood.Core.Models.UserVersusOpponent> _scoreboardOpponents =
-            new List<Il2CppSpacewood.Core.Models.UserVersusOpponent>();
-        private static List<Il2CppSpacewood.Unity.UI.SelectableBase> _scoreboardButtons =
-            new List<Il2CppSpacewood.Unity.UI.SelectableBase>();
-        private static List<string> _scoreboardDetailLines = new List<string>();
-        private static int _scoreboardDetailLineIndex = 0;
-        private static int _scoreboardOpponentIndex = 0;
 
         // Replay page navigation tracking
         private static bool _replayPageOpen = false;
@@ -4021,7 +3937,17 @@ namespace SuperAutoAccessibility
                     "C: Timer",
                     "R: Full board status",
                     "B: Snacks",
-                    "O: Scoreboard"
+                    "O: Scoreboard (Versus)"
+                }));
+                _helpCategories.Add(("Scoreboard", new List<string>
+                {
+                    "Tab or Page Down: Next opponent",
+                    "Shift Tab or Page Up: Previous opponent",
+                    "Left and Right arrows: Previous or next pet",
+                    "Home and End: First or last pet",
+                    "Up and Down arrows: The pet's details",
+                    "Enter: Read all of the pet's details",
+                    "O or Escape: Close"
                 }));
                 _helpCategories.Add(("General", new List<string>
                 {
@@ -5267,192 +5193,6 @@ namespace SuperAutoAccessibility
                 }
             }
             catch { }
-        }
-
-        /// <summary>
-        /// Polls for Scoreboard overlay (opponent list) opening/closing.
-        /// When open, suppresses shop input and provides section-based navigation.
-        /// </summary>
-        private static void PollScoreboard()
-        {
-            if (!Gameplay.GameplayPhaseDetector.IsShopPhase()) return;
-
-            try
-            {
-                var hangar = Gameplay.GameplayPhaseDetector.GetHangarMain();
-                if (hangar == null) return;
-
-                bool isOpen = false;
-                try
-                {
-                    var sbGo = hangar.GetScoreboard();
-                    if (sbGo != null)
-                        isOpen = sbGo.activeInHierarchy;
-                }
-                catch { }
-
-                if (isOpen && !_scoreboardOpen)
-                {
-                    // Scoreboard just opened
-                    _scoreboardOpen = true;
-                    _scoreboardJustOpened = true; // Prevent O key from closing on same frame
-                    Gameplay.ShopNavigationManager.IsInputSuppressed = true;
-                    SectionManager.InvalidateCache();
-
-                    // Build opponents list for detail line navigation
-                    _scoreboardOpponents.Clear();
-                    _scoreboardButtons.Clear();
-                    _scoreboardOpponentIndex = 0;
-                    _scoreboardDetailLines.Clear();
-                    _scoreboardDetailLineIndex = 0;
-
-                    try
-                    {
-                        var entries = hangar.Scoreboard?.Entries;
-                        if (entries != null)
-                        {
-                            for (int i = 0; i < entries.Count; i++)
-                            {
-                                try
-                                {
-                                    var e = entries[i];
-                                    if (e == null || e.Self) continue;
-                                    var opp = e.Opponent;
-                                    _scoreboardOpponents.Add(opp); // may be null, handled later
-                                    _scoreboardButtons.Add(e.Button);
-                                }
-                                catch { }
-                            }
-                        }
-                    }
-                    catch { }
-
-                    if (_scoreboardOpponents.Count == 0)
-                    {
-                        // No opponents â€” close scoreboard and announce
-                        try
-                        {
-                            var sbGo2 = hangar.GetScoreboard();
-                            if (sbGo2 != null) sbGo2.SetActive(false);
-                        }
-                        catch { }
-                        _scoreboardOpen = false;
-                        Gameplay.ShopNavigationManager.IsInputSuppressed = false;
-                        AccessibilityManager.Announce("No opponents");
-                        MelonLogger.Msg("Scoreboard: No opponents, closed immediately");
-                    }
-                    else
-                    {
-                        // Build detail lines for first opponent
-                        BuildScoreboardDetailLines();
-
-                        int oppCount = _scoreboardOpponents.Count;
-                        string firstLine = _scoreboardDetailLines.Count > 0 ? _scoreboardDetailLines[0] : "Unknown";
-                        AccessibilityManager.Announce(
-                            $"Scoreboard. {oppCount} opponent{(oppCount != 1 ? "s" : "")}. " +
-                            $"{firstLine}. " +
-                            "Left/Right to browse opponents, Up/Down for details. Escape to close.");
-
-                        // Focus the first opponent's button for visual highlight
-                        if (_scoreboardButtons.Count > 0 && _scoreboardButtons[0] != null &&
-                            EventSystem.current != null)
-                        {
-                            EventSystem.current.SetSelectedGameObject(_scoreboardButtons[0].gameObject);
-                        }
-
-                        MelonLogger.Msg("Scoreboard opened");
-                    }
-                }
-                else if (!isOpen && _scoreboardOpen)
-                {
-                    // Scoreboard closed
-                    _scoreboardOpen = false;
-                    Gameplay.ShopNavigationManager.IsInputSuppressed = false;
-                    SectionManager.InvalidateCache();
-                    MelonLogger.Msg("Scoreboard closed");
-                }
-            }
-            catch { }
-        }
-
-        /// <summary>
-        /// Builds detail lines for the currently selected scoreboard opponent.
-        /// Uses DetailLineProvider.BuildOpponentDetailLines for full pet-by-pet breakdown.
-        /// </summary>
-        private static void BuildScoreboardDetailLines()
-        {
-            _scoreboardDetailLines.Clear();
-            _scoreboardDetailLineIndex = 0;
-
-            if (_scoreboardOpponentIndex < 0 || _scoreboardOpponentIndex >= _scoreboardOpponents.Count)
-                return;
-
-            var opponent = _scoreboardOpponents[_scoreboardOpponentIndex];
-            _scoreboardDetailLines = Gameplay.DetailLineProvider.BuildOpponentDetailLines(opponent);
-        }
-
-        /// <summary>
-        /// Navigates between opponents in the scoreboard (Left/Right).
-        /// Rebuilds detail lines and announces the first line (opponent name).
-        /// </summary>
-        private static void MoveScoreboardOpponent(int direction)
-        {
-            if (_scoreboardOpponents.Count == 0) return;
-
-            int newIndex = _scoreboardOpponentIndex + direction;
-            if (newIndex < 0) newIndex = 0;
-            if (newIndex >= _scoreboardOpponents.Count) newIndex = _scoreboardOpponents.Count - 1;
-
-            if (newIndex == _scoreboardOpponentIndex && direction != 0)
-            {
-                // At boundary â€” re-read current opponent's first line
-                if (_scoreboardDetailLines.Count > 0)
-                {
-                    string posInfo = $"{_scoreboardOpponentIndex + 1} of {_scoreboardOpponents.Count}. ";
-                    AccessibilityManager.Announce(posInfo + _scoreboardDetailLines[0]);
-                }
-                return;
-            }
-
-            _scoreboardOpponentIndex = newIndex;
-            BuildScoreboardDetailLines();
-
-            // Update visual focus on the opponent's button
-            if (_scoreboardButtons.Count > newIndex && _scoreboardButtons[newIndex] != null &&
-                EventSystem.current != null)
-            {
-                EventSystem.current.SetSelectedGameObject(_scoreboardButtons[newIndex].gameObject);
-            }
-
-            // Announce first line with position context
-            if (_scoreboardDetailLines.Count > 0)
-            {
-                string posInfo = $"{_scoreboardOpponentIndex + 1} of {_scoreboardOpponents.Count}. ";
-                AccessibilityManager.Announce(posInfo + _scoreboardDetailLines[0]);
-            }
-        }
-
-        /// <summary>
-        /// Navigates detail lines for the current scoreboard opponent (Up/Down).
-        /// </summary>
-        private static void MoveScoreboardDetailLine(int direction)
-        {
-            if (_scoreboardDetailLines.Count == 0) return;
-
-            int newIndex = _scoreboardDetailLineIndex + direction;
-            if (newIndex < 0) newIndex = 0;
-            if (newIndex >= _scoreboardDetailLines.Count) newIndex = _scoreboardDetailLines.Count - 1;
-
-            if (newIndex == _scoreboardDetailLineIndex && direction != 0)
-            {
-                // At boundary â€” re-read current line
-                if (_scoreboardDetailLineIndex < _scoreboardDetailLines.Count)
-                    AccessibilityManager.Announce(_scoreboardDetailLines[_scoreboardDetailLineIndex]);
-                return;
-            }
-
-            _scoreboardDetailLineIndex = newIndex;
-            AccessibilityManager.Announce(_scoreboardDetailLines[_scoreboardDetailLineIndex]);
         }
 
         // Track VersusLobby player count for polling
