@@ -206,7 +206,12 @@ namespace SuperAutoAccessibility.Gameplay
 
                 int turn = 0;
                 try { turn = boardModel.Turn; } catch { }
-                bool stale = turn <= 0 || (_shopAnnounceFrom == GamePhase.Battle && turn <= _lastShopTurn);
+                // Resuming a run saved after a battle shows the shop with the board still in
+                // PreBuild (the battle's turn, 0 gold) for most of a second before the next turn
+                // starts: "Turn 4, 0 gold" when it was turn 5 with 10.
+                bool preBuild = false;
+                try { preBuild = boardModel.State == Il2CppSpacewood.Core.Enums.BoardState.PreBuild; } catch { }
+                bool stale = turn <= 0 || preBuild || (_shopAnnounceFrom == GamePhase.Battle && turn <= _lastShopTurn);
                 if (stale && _shopAnnounceWaits < ShopAnnounceMaxWaits)
                 {
                     _shopAnnounceWaits++;
