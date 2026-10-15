@@ -220,10 +220,17 @@ namespace SuperAutoAccessibility.Gameplay
                     return true;
                 }
 
-                // An ability card (a toy's or a transformation's): its text is all there is.
-                string text = item.Ability != null && item.Ability.gameObject.activeInHierarchy
-                    ? TextExtractor.GetElementText(item.Ability.gameObject)
-                    : TextExtractor.GetElementText(go);
+                // An ability card (a cursed toy's, a transformation's): its name, then what it does.
+                var card = item.Ability;
+                if (card != null && card.gameObject.activeInHierarchy)
+                {
+                    label = CardText(card.TextName);
+                    var details = new List<string> { CardText(card.TextBody), CardText(card.TextRight) };
+                    description = TextExtractor.JoinSentences(details);
+                    if (string.IsNullOrEmpty(description)) description = null;
+                    if (!string.IsNullOrEmpty(label)) return true;
+                }
+                string text = TextExtractor.GetElementText(go);
                 label = string.IsNullOrEmpty(text) ? "Choice" : text;
                 return true;
             }
@@ -233,6 +240,17 @@ namespace SuperAutoAccessibility.Gameplay
                 label = "Choice";
                 return true;
             }
+        }
+
+        private static string CardText(Il2CppTMPro.TMP_Text t)
+        {
+            try
+            {
+                if (t == null || !t.gameObject.activeInHierarchy) return null;
+                string s = TextExtractor.CleanTextPublic(t.text);
+                return string.IsNullOrEmpty(s) ? null : s;
+            }
+            catch { return null; }
         }
 
         // ---- deck viewer ---------------------------------------------------------------------

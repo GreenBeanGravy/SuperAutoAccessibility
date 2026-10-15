@@ -5238,8 +5238,22 @@ namespace SuperAutoAccessibility
             catch { }
         }
 
+        /// <summary>The confirm dialog's button as the game labels it, or Confirm / Cancel.</summary>
+        private static string Alert2ButtonLabel(Il2CppSpacewood.Unity.Alert2 alert, bool confirm)
+        {
+            try
+            {
+                var button = confirm ? alert.ConfirmButton : alert.CancelButton;
+                string text = button != null ? TextExtractor.GetElementText(button.gameObject) : null;
+                if (!string.IsNullOrWhiteSpace(text)) return text;
+            }
+            catch { }
+            return confirm ? "Confirm" : "Cancel";
+        }
+
         private static bool _chooserOpen;
         private static bool _chooserChoicesShown;
+        private static string _chooserPicked;
 
         /// <summary>
         /// A key the game's own Submit answers to is down. An overlay that takes focus during the
@@ -5259,6 +5273,16 @@ namespace SuperAutoAccessibility
             var chooser = Gameplay.GameplayPhaseDetector.IsShopPhase() ? Gameplay.ShopOverlays.OpenChooser() : null;
             if (chooser != null)
             {
+                // What Enter last had under it, for the word after the chooser closes.
+                try
+                {
+                    var selected = EventSystem.current?.currentSelectedGameObject;
+                    if (selected != null && Gameplay.ShopOverlays.DescribeChoice(selected, out string picked, out _))
+                        _chooserPicked = picked + " chosen";
+                    else if (selected != null && chooser.SkipButton != null && selected == chooser.SkipButton.gameObject)
+                        _chooserPicked = "Skipped";
+                }
+                catch { }
                 bool shown = Gameplay.ShopOverlays.ChoicesShown(chooser);
                 // The choices are spawned a frame or two after the canvas shows, then slide in;
                 // a choice that lands under the parked mouse cursor takes the selection, so
@@ -5289,7 +5313,11 @@ namespace SuperAutoAccessibility
                 _chooserOpen = false;
                 Gameplay.ShopNavigationManager.IsInputSuppressed = false;
                 SectionManager.InvalidateCache();
-                MelonLogger.Msg("Chooser closed");
+                // The chooser closed without a word, leaving the player unsure the pick took.
+                if (_chooserPicked != null && Gameplay.GameplayPhaseDetector.IsShopPhase())
+                    AccessibilityManager.Announce(_chooserPicked);
+                MelonLogger.Msg($"Chooser closed: {_chooserPicked}");
+                _chooserPicked = null;
             }
         }
 
