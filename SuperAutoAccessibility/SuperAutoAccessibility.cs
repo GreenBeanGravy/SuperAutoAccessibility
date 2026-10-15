@@ -1503,7 +1503,12 @@ namespace SuperAutoAccessibility
                     Gameplay.ShopNavigationManager.ResetTurnEnded();
                     AccessibilityManager.Announce("Cancelled");
                 }
-                else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow))
+                // The two buttons sit side by side: Left and Right and Tab move between them
+                // as well as Up and Down (only Up and Down did, so Right said nothing and Enter
+                // then cancelled).
+                else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) ||
+                         Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow) ||
+                         Input.GetKeyDown(KeyCode.Tab))
                 {
                     // Navigate between cancel and confirm buttons with position
                     try
@@ -1516,12 +1521,12 @@ namespace SuperAutoAccessibility
                             if (onCancel && alert.ConfirmButton?.gameObject != null)
                             {
                                 EventSystem.current.SetSelectedGameObject(alert.ConfirmButton.gameObject);
-                                AccessibilityManager.Announce("Confirm, button, 2 of 2");
+                                AccessibilityManager.Announce($"{Alert2ButtonLabel(alert, true)}, button, 2 of 2");
                             }
                             else if (alert.CancelButton?.gameObject != null)
                             {
                                 EventSystem.current.SetSelectedGameObject(alert.CancelButton.gameObject);
-                                AccessibilityManager.Announce("Cancel, button, 1 of 2");
+                                AccessibilityManager.Announce($"{Alert2ButtonLabel(alert, false)}, button, 1 of 2");
                             }
                         }
                     }
@@ -4277,7 +4282,8 @@ namespace SuperAutoAccessibility
                         message = "Alert";
 
                     _lastIconAlertText = message;
-                    string announcement = $"{message}. Press Enter to continue.";
+                    // "Tier 2 pets unlocked!" read "unlocked!. Press Enter".
+                    string announcement = TextExtractor.JoinSentences(new[] { message, "Press Enter to continue." });
                     AccessibilityManager.Announce(announcement);
                     MelonLogger.Msg($"IconAlert opened: {message}");
                 }
@@ -4417,24 +4423,20 @@ namespace SuperAutoAccessibility
                     try
                     {
                         // Try reading the TextMesh first (rendered text)
+                        string txt = null;
                         if (alert.TextMesh != null && !string.IsNullOrWhiteSpace(alert.TextMesh.text))
-                        {
-                            string txt = alert.TextMesh.text.Trim();
-                            if (txt.Length > 1)
-                                dialogText = $"{txt}. Dialog";
-                        }
+                            txt = TextExtractor.CleanTextPublic(alert.TextMesh.text);
                         // Fallback to model text
                         else if (alert.Model != null && !string.IsNullOrEmpty(alert.Model.Text))
-                        {
-                            string txt = alert.Model.Text.Trim();
-                            if (txt.Length > 1)
-                                dialogText = $"{txt}. Dialog";
-                        }
+                            txt = TextExtractor.CleanTextPublic(alert.Model.Text);
+                        // "End turn with excess gold?" read "gold?. Dialog".
+                        if (txt != null && txt.Length > 1)
+                            dialogText = TextExtractor.JoinSentences(new[] { txt, "Dialog" });
                     }
                     catch { }
 
                     // Announce dialog text, then auto-focused button with position
-                    AccessibilityManager.Announce($"{dialogText}. Cancel, button, 1 of 2");
+                    AccessibilityManager.Announce($"{dialogText}. {Alert2ButtonLabel(alert, false)}, button, 1 of 2");
 
                     // Set input cooldown â€” prevents Enter carry-over from the button
                     // that opened this dialog. The cooldown handler deselects while
@@ -4883,21 +4885,24 @@ namespace SuperAutoAccessibility
                     var snackbar = finale.Snackbar;
                     if (snackbar != null)
                     {
-                        // Sum text (current total)
+                        // Total and next milestone as one line: "Snacks: 28 of 50" (the bare
+                        // "28. goal: 50" did not say what either number was).
+                        string sum = null, goal = null;
                         try
                         {
                             if (snackbar.Sum != null && !string.IsNullOrWhiteSpace(snackbar.Sum.text))
-                                parts.Add(snackbar.Sum.text.Trim());
+                                sum = TextExtractor.CleanTextPublic(snackbar.Sum.text);
                         }
                         catch { }
-
-                        // Goal text (next milestone)
                         try
                         {
                             if (snackbar.Goal != null && !string.IsNullOrWhiteSpace(snackbar.Goal.text))
-                                parts.Add($"goal: {snackbar.Goal.text.Trim()}");
+                                goal = TextExtractor.CleanTextPublic(snackbar.Goal.text).TrimStart('/', ' ');
                         }
                         catch { }
+                        if (sum != null && goal != null) parts.Add($"Snacks: {sum} of {goal}");
+                        else if (sum != null) parts.Add($"Snacks: {sum}");
+                        else if (goal != null) parts.Add($"Snack goal: {goal}");
 
                         // Message text (e.g., level up message)
                         try
@@ -4911,7 +4916,10 @@ namespace SuperAutoAccessibility
                 }
                 catch { }
 
-                return parts.Count > 0 ? string.Join(". ", parts) : null;
+                if (parts.Count == 0) return null;
+                // The caller adds "Press Enter to continue." after it.
+                string text = TextExtractor.JoinSentences(parts);
+                return ".!?".IndexOf(text[text.Length - 1]) >= 0 ? text : text + ".";
             }
             catch { return null; }
         }
@@ -5456,9 +5464,13 @@ namespace SuperAutoAccessibility
 
                     string currentAdj = GetDockBoxText(dock.Adjective);
                     string currentNoun = GetDockBoxText(dock.Noun);
+                    // A new run's team has no name yet: that read "Current name: unknown unknown".
+                    string current = currentAdj == "unknown" || currentNoun == "unknown"
+                        ? "Choose a name for your team."
+                        : $"Current name: {currentAdj} {currentNoun}.";
 
                     AccessibilityManager.Announce(
-                        $"Team name picker. Current name: {currentAdj} {currentNoun}. " +
+                        $"Team name picker. {current} " +
                         "Left and Right to browse, Up and Down to switch between adjectives and nouns, " +
                         "Enter to select.");
 
