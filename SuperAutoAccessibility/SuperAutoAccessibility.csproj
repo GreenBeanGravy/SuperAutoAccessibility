@@ -115,6 +115,15 @@
       <HintPath>$(SAPPath)\MelonLoader\Il2CppAssemblies\Unity.TextMeshPro.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <!-- Unity 6's LocalizedString derives from a UI Toolkit binding type. -->
+    <Reference Include="UnityEngine.UIElementsModule">
+      <HintPath>$(SAPPath)\MelonLoader\Il2CppAssemblies\UnityEngine.UIElementsModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Localization">
+      <HintPath>$(SAPPath)\MelonLoader\Il2CppAssemblies\Unity.Localization.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEngine.TextRenderingModule">
       <HintPath>$(SAPPath)\MelonLoader\Il2CppAssemblies\UnityEngine.TextRenderingModule.dll</HintPath>
       <Private>False</Private>

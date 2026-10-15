@@ -609,14 +609,40 @@ namespace SuperAutoAccessibility.Tree
             return t != null ? t.GetComponent<Il2CppTMPro.TMP_Text>() : null;
         }
 
+        /// <summary>
+        /// The button's tooltip, whether or not it is on screen. The game shows it half a second
+        /// after a hover, and until a tooltip has opened once its text mesh holds the prefab's
+        /// placeholder (Private's read the Arena rules, Difficulty's "The packs you play
+        /// against"). So the shown text is used while shown, and otherwise the localized
+        /// string the tooltip will show. Focus is published the frame it moves, long before
+        /// the tooltip opens; reading only the shown text left the description out.
+        /// </summary>
         internal static string TooltipOf(GameObject go)
         {
             try
             {
                 var button = go.GetComponent<ButtonBase>();
                 if (button == null || button.TooltipDisabled || button.Tooltip == null) return null;
-                var text = Text(button.Tooltip.TextMesh);
+                var text = Text(button.Tooltip.TextMesh) ?? LocalizedText(button.Tooltip.LocalizeTextMesh);
                 return string.IsNullOrEmpty(text) ? null : text;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private static string LocalizedText(BestLocalizeTextMesh localizer)
+        {
+            try
+            {
+                if (localizer == null || localizer.DisableTranslation) return null;
+                var localized = localizer.LocalizedString;
+                if (localized == null || localized.IsEmpty) return null;
+                var s = localized.GetLocalizedString();
+                if (string.IsNullOrEmpty(s) || s.StartsWith("No translation found", StringComparison.Ordinal)) return null;
+                s = UGuiSource.Clean(s);
+                return string.IsNullOrEmpty(s) ? null : s;
             }
             catch
             {

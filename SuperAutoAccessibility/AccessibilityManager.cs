@@ -122,8 +122,10 @@ namespace SuperAutoAccessibility
 
         public static void OnUpdate()
         {
-            // Check for delayed tooltip announcement
-            if (_currentSelectedObject != null && !_tooltipAnnounced)
+            // Check for delayed tooltip announcement. Not in a frame where a key went down: the
+            // key usually moves on, and Tolk queues, so the old control's tooltip was read
+            // before the new control ("Battle against the same 14 teams...", "Versus, button").
+            if (_currentSelectedObject != null && !_tooltipAnnounced && !Input.anyKeyDown)
             {
                 if (Time.time - _selectionTime > TOOLTIP_DELAY)
                 {
@@ -512,57 +514,14 @@ namespace SuperAutoAccessibility
                 // string is unambiguous.
                 string elementText = _lastAnnouncedText ?? "";
 
-                // Strategy 1: Check ButtonBase.Tooltip
+                // Strategy 1: ButtonBase.Tooltip, shown or not. Its text mesh read while hidden
+                // gave the prefab's placeholder: Private spoke the Arena rules when focus left
+                // it before the tooltip opened.
                 var buttonBase = go.GetComponent<ButtonBase>();
                 if (buttonBase != null)
                 {
-                    var tooltip = buttonBase.Tooltip;
-                    if (tooltip != null)
-                    {
-                        DebugLog.Msg($"[Tooltip Debug] Found ButtonTooltip component");
-
-                        // Try TextMesh first
-                        if (tooltip.TextMesh != null)
-                        {
-                            DebugLog.Msg($"[Tooltip Debug] TextMesh exists, text='{tooltip.TextMesh.text}'");
-                            if (!string.IsNullOrWhiteSpace(tooltip.TextMesh.text))
-                            {
-                                tooltipText = tooltip.TextMesh.text.Trim();
-                            }
-                        }
-
-                        // Try LocalizeTextMesh if TextMesh didn't have text
-                        if (string.IsNullOrEmpty(tooltipText) && tooltip.LocalizeTextMesh != null)
-                        {
-                            DebugLog.Msg($"[Tooltip Debug] Checking LocalizeTextMesh");
-                            // LocalizeTextMesh may have a different way to get text
-                            var localizeGO = tooltip.LocalizeTextMesh.gameObject;
-                            if (localizeGO != null)
-                            {
-                                var tmpText = localizeGO.GetComponent<Il2CppTMPro.TextMeshProUGUI>();
-                                if (tmpText != null && !string.IsNullOrWhiteSpace(tmpText.text))
-                                {
-                                    DebugLog.Msg($"[Tooltip Debug] LocalizeTextMesh text='{tmpText.text}'");
-                                    tooltipText = tmpText.text.Trim();
-                                }
-                            }
-                        }
-
-                        // Also check if tooltip GameObject itself has text children
-                        if (string.IsNullOrEmpty(tooltipText) && tooltip.gameObject != null)
-                        {
-                            string tooltipChildText = TextExtractor.GetElementText(tooltip.gameObject);
-                            DebugLog.Msg($"[Tooltip Debug] Tooltip child text='{tooltipChildText}'");
-                            if (!string.IsNullOrWhiteSpace(tooltipChildText))
-                            {
-                                tooltipText = tooltipChildText;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        DebugLog.Msg($"[Tooltip Debug] ButtonBase found but Tooltip is null");
-                    }
+                    tooltipText = Tree.SapUiSource.TooltipOf(go);
+                    DebugLog.Msg($"[Tooltip Debug] ButtonBase tooltip='{tooltipText}'");
                 }
 
                 // Strategy 2: Search for tooltip-named children
