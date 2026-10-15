@@ -778,7 +778,22 @@ namespace SuperAutoAccessibility
             // An achievement entry's own text is "???" for a locked pet; the navigator names it.
             bool achievementEntry = AchievementsNavigator.IsEntry(go);
             if (achievementEntry) elementText = AchievementsNavigator.Label(go);
-            bool readOnlyItem = scoreboardPet || achievementEntry;
+            // A chooser's choice reads its bare numbers ("1, 2, Rabbit, 3, ...") and a deck viewer
+            // item has no text at all: both are named by their label, with what they do after it.
+            string overlayDetails = null;
+            bool deckItem = false;
+            if (Gameplay.ShopOverlays.DescribeChoice(go, out _, out string choiceDetails))
+            {
+                elementText = null;
+                overlayDetails = choiceDetails;
+            }
+            else if (Gameplay.ShopOverlays.DescribeDeckItem(go, out _, out string deckBrief, out _))
+            {
+                elementText = null;
+                overlayDetails = deckBrief;
+                deckItem = true;
+            }
+            bool readOnlyItem = scoreboardPet || achievementEntry || deckItem;
             string labelOverride = SectionManager.GetLabelOverride(go);
             if (!string.IsNullOrEmpty(labelOverride))
             {
@@ -871,6 +886,12 @@ namespace SuperAutoAccessibility
             {
                 if (sb.Length > 0) sb.Append(", ");
                 sb.Append("disabled");
+            }
+
+            if (!string.IsNullOrEmpty(overlayDetails))
+            {
+                if (sb.Length > 0) sb.Append(". ");
+                sb.Append(overlayDetails);
             }
 
             // Guard against degenerate "button" / "slider" / etc announcements:
@@ -1051,6 +1072,16 @@ namespace SuperAutoAccessibility
                 catch { }
                 return null;
             }
+
+            // The deck viewer's switches (achievements, custom) show their state only by sprite.
+            try
+            {
+                var dv = Gameplay.ShopOverlays.OpenDeckViewer();
+                if (dv != null && ((dv.AchievementsButton != null && go == dv.AchievementsButton.gameObject) ||
+                                   (dv.CustomButton != null && go == dv.CustomButton.gameObject)))
+                    return Gameplay.ShopOverlays.SwitchState(dv, go.GetComponent<ButtonBase>());
+            }
+            catch { }
 
             // Picker option: the current choice is marked only by a checked icon, so say it.
             try

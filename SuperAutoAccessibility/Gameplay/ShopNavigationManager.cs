@@ -312,11 +312,13 @@ namespace SuperAutoAccessibility.Gameplay
 
         /// <summary>
         /// Returns true if the ShopNavigationManager is actively handling input
-        /// (i.e., we're in a shop zone and should intercept arrow keys).
+        /// (i.e., we're in a shop zone and should intercept arrow keys). Not while an overlay
+        /// has paused the shop's keys: the deck viewer opened from the action zone kept the
+        /// zone, so its arrows and Tab went nowhere.
         /// </summary>
         public static bool IsActivelyNavigating()
         {
-            return _currentZone != ShopZone.None && GameplayPhaseDetector.IsShopPhase();
+            return _currentZone != ShopZone.None && GameplayPhaseDetector.IsShopPhase() && !IsInputSuppressed;
         }
 
         /// <summary>
@@ -818,6 +820,18 @@ namespace SuperAutoAccessibility.Gameplay
                 {
                     if (overlay.SellButton != null)
                         _actionButtons.Add((overlay.SellButton, "Sell"));
+                }
+                catch { }
+
+                // The deck viewer (the pack's pets and foods by tier) and the last battle menu:
+                // corner buttons a mouse player clicks, which no key reached.
+                try
+                {
+                    var menu = overlay.Menu;
+                    if (menu?.DeckViewerButton != null && menu.DeckViewerButton.gameObject.activeInHierarchy)
+                        _actionButtons.Add((menu.DeckViewerButton, "Deck viewer"));
+                    if (menu?.BattleButton != null && menu.BattleButton.gameObject.activeInHierarchy)
+                        _actionButtons.Add((menu.BattleButton, "Last battle"));
                 }
                 catch { }
             }

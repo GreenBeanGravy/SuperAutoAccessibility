@@ -731,7 +731,8 @@ namespace SuperAutoAccessibility
                     _deckViewerOpen = false;
                     Gameplay.ShopNavigationManager.IsInputSuppressed = false;
                     SectionManager.InvalidateCache();
-                    AccessibilityManager.Announce("Deck viewer closed");
+                    if (!Tree.SapA11y.OwnsSpeech)
+                        AccessibilityManager.Announce("Deck viewer closed");
                     LoggerInstance.Msg("Escape: Closed DeckViewer");
                     return;
                 }
@@ -748,7 +749,8 @@ namespace SuperAutoAccessibility
                     _lastBattleMenuOpen = false;
                     Gameplay.ShopNavigationManager.IsInputSuppressed = false;
                     SectionManager.InvalidateCache();
-                    AccessibilityManager.Announce("Battle menu closed");
+                    if (!Tree.SapA11y.OwnsSpeech)
+                        AccessibilityManager.Announce("Last battle closed");
                     LoggerInstance.Msg("Escape: Closed LastBattleMenu");
                     return;
                 }
@@ -1135,6 +1137,9 @@ namespace SuperAutoAccessibility
 
             // Poll DeckViewer overlay
             PollDeckViewer();
+
+            // Poll the chooser (a reward after a level up, a toy, stock food)
+            PollChooser();
 
             // Poll the scoreboard (shop, last opponent, battle tally)
             Gameplay.ScoreboardNavigator.Poll();
@@ -1532,6 +1537,13 @@ namespace SuperAutoAccessibility
             // Achievements: Tab between the filters and the pet list, arrows through the pets
             if (AchievementsNavigator.HandleInput())
                 return;
+
+            // The chooser: T reads the team a reward would join (the shop's T is paused).
+            if (_chooserOpen && Input.GetKeyDown(KeyCode.T))
+            {
+                AccessibilityManager.Announce(Gameplay.ShopOverlays.TeamSummary());
+                return;
+            }
 
             // Handle deferred news enrichment (wait for codec to populate after Tab to a new item)
             if (_newsEnrichPending > 0)
@@ -3935,7 +3947,7 @@ namespace SuperAutoAccessibility
                     "S: Pet shop",
                     "F: Food shop",
                     "T: Team",
-                    "D: Action buttons",
+                    "D: Action buttons: roll, freeze, sell, deck viewer, last battle",
                     "Left and Right arrows: Navigate slots",
                     "Home: First slot",
                     "End: Last slot",
@@ -5151,14 +5163,19 @@ namespace SuperAutoAccessibility
                 }
                 catch { }
 
-                if (isOpen && !_lastBattleMenuOpen)
+                // Opened with Enter (the action zone's Last battle): focus waits for the key to
+                // come up, or the same press would reach Battle and start the replay.
+                if (isOpen && !_lastBattleMenuOpen && !SubmitKeyHeld())
                 {
                     // LastBattleMenu just opened
                     _lastBattleMenuOpen = true;
                     Gameplay.ShopNavigationManager.IsInputSuppressed = true;
                     SectionManager.InvalidateCache();
-                    AccessibilityManager.Announce(
-                        "Battle menu. Use arrows to choose Battle or Playback. Escape to close.");
+                    SectionManager.RecheckMenuOverlay();
+                    // The tree names the menu when focus lands inside.
+                    if (!Tree.SapA11y.OwnsSpeech)
+                        AccessibilityManager.Announce(
+                            "Last battle. Up and Down choose Battle or Playback. Escape closes.");
                     SectionManager.FocusFirstSection();
                     MelonLogger.Msg("LastBattleMenu opened");
                 }
@@ -5195,14 +5212,17 @@ namespace SuperAutoAccessibility
                 }
                 catch { }
 
-                if (isOpen && !_deckViewerOpen)
+                if (isOpen && !_deckViewerOpen && !SubmitKeyHeld())
                 {
                     // DeckViewer just opened
                     _deckViewerOpen = true;
                     Gameplay.ShopNavigationManager.IsInputSuppressed = true;
                     SectionManager.InvalidateCache();
-                    AccessibilityManager.Announce(
-                        "Deck viewer. Tab between tiers, arrows to browse items. Escape to close.");
+                    SectionManager.RecheckMenuOverlay();
+                    // The tree names the deck viewer, with the pack and keys, when focus lands inside.
+                    if (!Tree.SapA11y.OwnsSpeech)
+                        AccessibilityManager.Announce("Deck viewer. " +
+                            Gameplay.ShopOverlays.DeckViewerHint(hangar.DeckViewer));
                     SectionManager.FocusFirstSection();
                     MelonLogger.Msg("DeckViewer opened");
                 }
@@ -5216,6 +5236,61 @@ namespace SuperAutoAccessibility
                 }
             }
             catch { }
+        }
+
+        private static bool _chooserOpen;
+        private static bool _chooserChoicesShown;
+
+        /// <summary>
+        /// A key the game's own Submit answers to is down. An overlay that takes focus during the
+        /// press would have its first control pressed by it.
+        /// </summary>
+        private static bool SubmitKeyHeld() =>
+            Input.GetKey(KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter) || Input.GetKey(KeyCode.Space);
+
+        /// <summary>
+        /// The chooser: a reward to pick after a pet levels up, a toy, stock food. It came up
+        /// unannounced, read its choices as bare numbers, and Enter bought from the shop behind
+        /// it (the shop cleared the game's selection every frame). Now the shop's keys pause
+        /// while it is up and the game keeps its selection, so Enter takes the focused choice.
+        /// </summary>
+        private static void PollChooser()
+        {
+            var chooser = Gameplay.GameplayPhaseDetector.IsShopPhase() ? Gameplay.ShopOverlays.OpenChooser() : null;
+            if (chooser != null)
+            {
+                bool shown = Gameplay.ShopOverlays.ChoicesShown(chooser);
+                // The choices are spawned a frame or two after the canvas shows, then slide in;
+                // a choice that lands under the parked mouse cursor takes the selection, so
+                // focus waits for the slide to end.
+                if (shown && (Gameplay.ShopOverlays.Choices(chooser).Count == 0 || chooser.IsBlocking)) return;
+                if (SubmitKeyHeld()) return;
+                if (_chooserOpen && shown == _chooserChoicesShown) return;
+
+                bool opened = !_chooserOpen;
+                _chooserOpen = true;
+                _chooserChoicesShown = shown;
+                Gameplay.ShopNavigationManager.IsInputSuppressed = true;
+                SectionManager.InvalidateCache();
+                SectionManager.RecheckMenuOverlay();
+                // The tree names the chooser, with its guide and keys, when focus lands inside.
+                if (!Tree.SapA11y.OwnsSpeech)
+                {
+                    string hint = Gameplay.ShopOverlays.ChooserHint(chooser);
+                    AccessibilityManager.Announce(opened
+                        ? $"{Gameplay.ShopOverlays.ChooserTitle(chooser)}. {hint}"
+                        : hint);
+                }
+                SectionManager.FocusFirstSection();
+                MelonLogger.Msg(opened ? "Chooser opened" : $"Chooser choices {(shown ? "shown" : "hidden")}");
+            }
+            else if (_chooserOpen)
+            {
+                _chooserOpen = false;
+                Gameplay.ShopNavigationManager.IsInputSuppressed = false;
+                SectionManager.InvalidateCache();
+                MelonLogger.Msg("Chooser closed");
+            }
         }
 
         // Track VersusLobby player count for polling

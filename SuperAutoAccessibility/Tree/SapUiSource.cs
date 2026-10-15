@@ -436,6 +436,26 @@ namespace SuperAutoAccessibility.Tree
                 return;
             }
 
+            // A choice in the chooser, a pet or food in the deck viewer: name and stats as the
+            // name, what it does as the description (a deck viewer pet: its ability per level).
+            if (Gameplay.ShopOverlays.DescribeChoice(go, out string choiceLabel, out string choiceDetails))
+            {
+                node.Role = AccessRole.Button;
+                node.Label = choiceLabel;
+                node.Description = choiceDetails;
+                node.AddAction(AccessAction.Click);
+                return;
+            }
+            if (Gameplay.ShopOverlays.DescribeDeckItem(go, out string deckLabel, out _, out string deckDetails))
+            {
+                node.Role = AccessRole.Button;
+                node.Label = deckLabel;
+                node.Description = deckDetails;
+                node.Disabled = false;
+                node.AddAction(AccessAction.Click);
+                return;
+            }
+
             // Option buttons (settings) show their name on the left and the current choice on the
             // right ("Window mode ... Off"). Publish those as name and value, so the choice is
             // spoken as a value and a change to it is reported as one.
@@ -660,6 +680,22 @@ namespace SuperAutoAccessibility.Tree
                     screenRoot = t.gameObject;
                     return "Scoreboard";
                 }
+                if (t.GetComponent<Il2CppSpacewood.Unity.MonoBehaviours.Build.DeckViewer>() != null)
+                {
+                    screenRoot = t.gameObject;
+                    return "Deck viewer";
+                }
+                if (t.GetComponent<Il2CppSpacewood.Unity.LastBattleMenu>() != null)
+                {
+                    screenRoot = t.gameObject;
+                    return "Last battle";
+                }
+                var chooser = t.GetComponent<Il2CppSpacewood.Scripts.MonoBehaviours.Build.Hangar.Chooser>();
+                if (chooser != null)
+                {
+                    screenRoot = t.gameObject;
+                    return Gameplay.ShopOverlays.ChooserTitle(chooser);
+                }
                 if (t.GetComponent<SideBar>() != null)
                 {
                     screenRoot = t.gameObject;
@@ -714,6 +750,11 @@ namespace SuperAutoAccessibility.Tree
             // that. The keys are what the screen reader user needs on arrival.
             if (screenRoot.GetComponent<Il2CppSpacewood.Unity.MonoBehaviours.Build.HangarScoreboard>() != null)
                 return Gameplay.ScoreboardNavigator.Hint;
+            // The shop's overlays: what they hold and the keys, rather than every row's "Turn 3".
+            var chooserRoot = screenRoot.GetComponent<Il2CppSpacewood.Scripts.MonoBehaviours.Build.Hangar.Chooser>();
+            if (chooserRoot != null) return Gameplay.ShopOverlays.ChooserHint(chooserRoot);
+            var deckViewer = screenRoot.GetComponent<Il2CppSpacewood.Unity.MonoBehaviours.Build.DeckViewer>();
+            if (deckViewer != null) return Gameplay.ShopOverlays.DeckViewerHint(deckViewer);
             // Achievements: the counters' bare "4 / 536" said nothing about what they count.
             var achievements = screenRoot.GetComponentInChildren<Achievements>();
             if (achievements != null && achievements == AchievementsNavigator.Active())

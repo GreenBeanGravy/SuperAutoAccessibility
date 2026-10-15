@@ -21,7 +21,7 @@ namespace SuperAutoAccessibility.Gameplay
         // Cached perk name -> (enum value, description) map for fast ability text scanning
         private static Dictionary<string, (Il2CppSpacewood.Core.Enums.Perk perk, string description)> _perkNameCache;
 
-        private static PerkLibrary GetPerkLibrary()
+        internal static PerkLibrary GetPerkLibrary()
         {
             if (_cachedPerkLib == null)
                 _cachedPerkLib = UnityEngine.Object.FindObjectOfType<PerkLibrary>();

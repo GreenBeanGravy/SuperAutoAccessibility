@@ -92,7 +92,7 @@ namespace SuperAutoAccessibility
         }
 
         // An unearned ribbon is drawn black.
-        private static bool Earned(UnityEngine.UI.Image ribbon)
+        internal static bool Earned(UnityEngine.UI.Image ribbon)
         {
             try
             {

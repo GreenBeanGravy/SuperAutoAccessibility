@@ -241,6 +241,7 @@ namespace SuperAutoAccessibility
             // Detect LastBattleMenu, DeckViewer, and Scoreboard overlay states
             bool lastBattleMenuOpen = false;
             bool deckViewerOpen = false;
+            string deckViewerSwitches = "";
             try
             {
                 var hangar = Gameplay.GameplayPhaseDetector.GetHangarMain();
@@ -256,6 +257,10 @@ namespace SuperAutoAccessibility
                     {
                         if (hangar.DeckViewer?.gameObject != null)
                             deckViewerOpen = hangar.DeckViewer.gameObject.activeInHierarchy;
+                        // Its switches are labelled with their state.
+                        if (deckViewerOpen)
+                            deckViewerSwitches = Gameplay.ShopOverlays.SwitchState(hangar.DeckViewer, hangar.DeckViewer.AchievementsButton) +
+                                                 Gameplay.ShopOverlays.SwitchState(hangar.DeckViewer, hangar.DeckViewer.CustomButton);
                     }
                     catch { }
                 }
@@ -263,6 +268,15 @@ namespace SuperAutoAccessibility
             catch { }
             // The scoreboard in the shop or the battle's tally; changes as entries and pets arrive.
             string scoreboard = Gameplay.ScoreboardNavigator.Signature(Gameplay.ScoreboardNavigator.Active());
+            // The chooser: open, with its choices shown or hidden (View), and how many.
+            string chooser = "";
+            try
+            {
+                var c = Gameplay.ShopOverlays.OpenChooser();
+                if (c != null)
+                    chooser = Gameplay.ShopOverlays.ChoicesShown(c) ? "shown" + Gameplay.ShopOverlays.Choices(c).Count : "hidden";
+            }
+            catch { }
 
             // Check if LanguagePicker is visible (Bootstrap scene)
             bool langPickerOpen = false;
@@ -278,7 +292,7 @@ namespace SuperAutoAccessibility
             }
             catch { }
 
-            return $"{pageName}|sidebar:{sidebarOpen}|tab:{activeTab}|picker:{pickerOpen}|sub:{subPage}|versus:{versusItemCount}|lbm:{lastBattleMenuOpen}|dv:{deckViewerOpen}|sb:{scoreboard}|lang:{langPickerOpen}";
+            return $"{pageName}|sidebar:{sidebarOpen}|tab:{activeTab}|picker:{pickerOpen}|sub:{subPage}|versus:{versusItemCount}|lbm:{lastBattleMenuOpen}|dv:{deckViewerOpen}{deckViewerSwitches}|sb:{scoreboard}|ch:{chooser}|lang:{langPickerOpen}";
         }
 
         private static void RebuildSections()
@@ -586,9 +600,10 @@ namespace SuperAutoAccessibility
         /// Used to detect settings opened from the in-game sidebar, where the page name remains "Build".
         /// </summary>
         /// <summary>
-        /// A menu is up over a run: the pause menu, Settings opened from it, or a picker. The
-        /// accessibility tree publishes these like any menu; the run's own overlays stay with the
-        /// mod's speech.
+        /// A menu is up over a run: the pause menu, Settings opened from it, a picker, the
+        /// scoreboard, or one of the shop's overlays (deck viewer, last battle menu, chooser).
+        /// The game keeps its selection there, so Enter presses the focused control, and the
+        /// accessibility tree publishes these like any menu.
         /// </summary>
         public static bool MenuOverlayOpen()
         {
@@ -597,12 +612,18 @@ namespace SuperAutoAccessibility
             if (now - _menuOverlayCheckedAt < 0.1f) return _menuOverlayOpen;
             _menuOverlayCheckedAt = now;
             _menuOverlayOpen = OpenSideBar() != null || IsSettingsMenuVisible() || PickerOpen() ||
-                               Gameplay.ScoreboardNavigator.Active() != null;
+                               Gameplay.ScoreboardNavigator.Active() != null || Gameplay.ShopOverlays.AnyOpen();
             return _menuOverlayOpen;
         }
 
         private static float _menuOverlayCheckedAt = -1f;
         private static bool _menuOverlayOpen;
+
+        /// <summary>
+        /// For a poller that just saw an overlay open: otherwise the shop's clearing of the
+        /// game's selection, going by the cached answer, could undo the focus it is about to set.
+        /// </summary>
+        public static void RecheckMenuOverlay() => _menuOverlayCheckedAt = -1f;
 
         private static bool PickerOpen()
         {
@@ -1723,39 +1744,38 @@ namespace SuperAutoAccessibility
         /// Sections: Match Info (read-only summary), Players (player list), Actions (Start, Leave)
         /// </summary>
         /// <summary>
-        /// Builds sections for the Chooser overlay (food stock / trinket / cursed trinket selection).
+        /// The chooser: a reward to pick after a pet levels up, a toy, stock food. The choices,
+        /// read as pets and foods rather than their bare numbers, then Skip when the choice
+        /// allows it. Closed (its object stays active all run), it gives the shop no sections,
+        /// as before.
         /// </summary>
         private static void BuildChooserSections(Chooser chooser)
         {
-            // Section 1: Choices
-            var choiceSection = new NavigationSection("Choices");
-            try
-            {
-                var items = chooser.Items;
-                if (items != null)
-                {
-                    for (int i = 0; i < items.Count; i++)
-                    {
-                        try
-                        {
-                            var item = items[i];
-                            if (item?.Button == null) continue;
-                            if (!item.Button.gameObject.activeInHierarchy) continue;
-                            choiceSection.Elements.Add(item.Button);
-                        }
-                        catch { }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MelonLogger.Warning($"BuildChooserSections choices error: {ex.Message}");
-            }
-            if (choiceSection.Elements.Count > 0) _sections.Add(choiceSection);
+            if (!Gameplay.ShopOverlays.IsOpen(chooser)) return;
 
-            // Section 2: Actions â€” View, Skip
+            if (Gameplay.ShopOverlays.ChoicesShown(chooser))
+            {
+                var choiceSection = new NavigationSection("Choices");
+                foreach (var go in Gameplay.ShopOverlays.Choices(chooser))
+                {
+                    try
+                    {
+                        var button = go.GetComponent<SelectableBase>();
+                        if (button == null) continue;
+                        choiceSection.Elements.Add(button);
+                        if (Gameplay.ShopOverlays.DescribeChoice(go, out string label, out _))
+                            _labelOverrides[go] = label;
+                    }
+                    catch { }
+                }
+                if (choiceSection.Elements.Count > 0) _sections.Add(choiceSection);
+            }
+
+            // View only hides the choices so a sighted player can see the board; offer it to
+            // bring them back once that happened.
             var actionsSection = new NavigationSection("Actions");
-            TryAddWithLabel(actionsSection, chooser.VisibleButton, "View");
+            if (!Gameplay.ShopOverlays.ChoicesShown(chooser))
+                TryAddWithLabel(actionsSection, chooser.VisibleButton, "Show choices");
             TryAddWithLabel(actionsSection, chooser.SkipButton, "Skip");
             if (actionsSection.Elements.Count > 0) _sections.Add(actionsSection);
         }
@@ -2050,128 +2070,35 @@ namespace SuperAutoAccessibility
         }
 
         /// <summary>
-        /// Builds sections for the DeckViewer overlay (Controls + tier rows with pets/foods).
+        /// The deck viewer: one section per tier with that tier's pets and foods, then its
+        /// switches and Close. Every row is a tier (the first is tier 1, labelled "Turn 1"); this
+        /// used to read the first row as a row of switches, so tier 1 was twelve "Button"s.
         /// </summary>
         private static void BuildDeckViewerSections(DeckViewer deckViewer)
         {
             try
             {
                 var itemRows = deckViewer.ItemRows;
-                if (itemRows == null || itemRows.Count == 0)
-                {
-                    BuildFallbackSections();
-                    return;
-                }
-
-                // Section 1: Controls (row 0 typically has Achievements/Custom/Wacky toggles + Close)
-                var controlsSection = new NavigationSection("Controls");
-                try
-                {
-                    TryAddWithLabel(controlsSection, deckViewer.InformationButton, "Information");
-                    TryAddWithLabel(controlsSection, deckViewer.CloseButton, "Close");
-
-                    // Also scan row 0 for any toggle buttons
-                    if (itemRows.Count > 0)
-                    {
-                        var row0 = itemRows[0];
-                        if (row0?.gameObject != null && row0.gameObject.activeInHierarchy)
-                        {
-                            // Get all ButtonBase children from the row
-                            var buttons = row0.GetComponentsInChildren<ButtonBase>(false);
-                            if (buttons != null)
-                            {
-                                foreach (var btn in buttons)
-                                {
-                                    try
-                                    {
-                                        if (btn == null || btn.gameObject == null) continue;
-                                        if (!btn.gameObject.activeInHierarchy) continue;
-                                        // Skip if already added (Information/Close)
-                                        if (btn == deckViewer.InformationButton || btn == deckViewer.CloseButton) continue;
-                                        TryAddWithLabel(controlsSection, btn, btn.gameObject.name);
-                                    }
-                                    catch { }
-                                }
-                            }
-                        }
-                    }
-                }
-                catch { }
-                if (controlsSection.Elements.Count > 0) _sections.Add(controlsSection);
-
-                // Tier sections (rows 1+)
-                for (int rowIdx = 1; rowIdx < itemRows.Count; rowIdx++)
+                for (int rowIdx = 0; itemRows != null && rowIdx < itemRows.Count; rowIdx++)
                 {
                     try
                     {
                         var row = itemRows[rowIdx];
                         if (row?.gameObject == null || !row.gameObject.activeInHierarchy) continue;
-
-                        // Build section name from row text
-                        string tierName = $"Tier {rowIdx}";
-                        try
-                        {
-                            var textComp = row.Text;
-                            if (textComp != null)
-                            {
-                                string rowText = textComp.text;
-                                if (!string.IsNullOrWhiteSpace(rowText))
-                                    tierName = rowText;
-                            }
-                        }
-                        catch { }
-
-                        // Check if tier is locked (Conceal overlay is active)
-                        bool locked = false;
-                        try
-                        {
-                            if (row.Conceal?.gameObject != null && row.Conceal.gameObject.activeInHierarchy)
-                                locked = true;
-                        }
-                        catch { }
-                        if (locked) tierName += " (locked)";
-
-                        var tierSection = new NavigationSection(tierName);
-
-                        // Scan PetContainer for DeckViewerItems
-                        try
-                        {
-                            if (row.PetContainer != null)
-                            {
-                                var petItems = row.PetContainer.GetComponentsInChildren<DeckViewerItem>(false);
-                                if (petItems != null)
-                                {
-                                    foreach (var item in petItems)
-                                    {
-                                        AddDeckViewerItem(tierSection, item);
-                                    }
-                                }
-                            }
-                        }
-                        catch { }
-
-                        // Scan FoodContainer for DeckViewerItems
-                        try
-                        {
-                            if (row.FoodContainer != null)
-                            {
-                                var foodItems = row.FoodContainer.GetComponentsInChildren<DeckViewerItem>(false);
-                                if (foodItems != null)
-                                {
-                                    foreach (var item in foodItems)
-                                    {
-                                        AddDeckViewerItem(tierSection, item);
-                                    }
-                                }
-                            }
-                        }
-                        catch { }
-
-                        if (tierSection.Elements.Count > 0)
-                            _sections.Add(tierSection);
+                        var tierSection = new NavigationSection(Gameplay.ShopOverlays.RowName(row, rowIdx));
+                        AddDeckViewerItems(tierSection, row.PetContainer);
+                        AddDeckViewerItems(tierSection, row.FoodContainer);
+                        if (tierSection.Elements.Count > 0) _sections.Add(tierSection);
                     }
                     catch { }
                 }
+
+                var controlsSection = new NavigationSection("Controls");
+                TryAddWithLabel(controlsSection, deckViewer.CloseButton, "Close");
+                TryAddWithLabel(controlsSection, deckViewer.InformationButton, "Information");
+                TryAddSwitch(controlsSection, deckViewer, deckViewer.AchievementsButton, "Achievements");
+                TryAddSwitch(controlsSection, deckViewer, deckViewer.CustomButton, "Custom");
+                if (controlsSection.Elements.Count > 0) _sections.Add(controlsSection);
 
                 if (_sections.Count == 0) BuildFallbackSections();
             }
@@ -2182,82 +2109,32 @@ namespace SuperAutoAccessibility
             }
         }
 
-        /// <summary>
-        /// Adds a DeckViewerItem to a section, labeling it using ButtonBase.GetTitle()
-        /// with enum-based fallback. Uses TryAddEvenIfDisabled to include locked items.
-        /// </summary>
-        private static void AddDeckViewerItem(NavigationSection section, DeckViewerItem item)
+        // Its on/off state is the control's value (AccessibilityManager.GetControlValue).
+        private static void TryAddSwitch(NavigationSection section, DeckViewer deckViewer, ButtonBase button, string label)
         {
-            if (item == null) return;
-            try
+            if (button == null || !button.gameObject.activeInHierarchy) return;
+            TryAddWithLabel(section, button, label);
+        }
+
+        /// <summary>
+        /// A row's pets or foods, named from their icons (see ShopOverlays.DescribeDeckItem).
+        /// Items of tiers the run has not reached are listed too.
+        /// </summary>
+        private static void AddDeckViewerItems(NavigationSection section, Transform container)
+        {
+            if (container == null) return;
+            foreach (var item in container.GetComponentsInChildren<DeckViewerItem>(false))
             {
-                var btn = item.Button;
-                if (btn == null || btn.gameObject == null || !btn.gameObject.activeInHierarchy) return;
-
-                string label = "";
-
-                // Primary: use ButtonBase.GetTitle() â€” the game's own labeling
                 try
                 {
-                    label = btn.GetTitle();
+                    var btn = item?.Button;
+                    if (btn == null || !btn.gameObject.activeInHierarchy) continue;
+                    string label = Gameplay.ShopOverlays.DescribeDeckItem(btn.gameObject, out string name, out _, out _)
+                        ? name : "Unknown item";
+                    TryAddEvenIfDisabled(section, btn, label);
                 }
                 catch { }
-
-                // Fallback: try enum-based names if GetTitle() returned nothing
-                if (string.IsNullOrWhiteSpace(label))
-                {
-                    // Try Minion
-                    try
-                    {
-                        var minionNullable = item.Minion;
-                        try
-                        {
-                            var minion = minionNullable.Value;
-                            label = Gameplay.PetStatsReader.SplitCamelCase(minion.ToString());
-                        }
-                        catch { /* Nullable has no value */ }
-                    }
-                    catch { }
-                }
-
-                if (string.IsNullOrWhiteSpace(label))
-                {
-                    // Try Spell (food item)
-                    try
-                    {
-                        var spellNullable = item.Spell;
-                        try
-                        {
-                            var spell = spellNullable.Value;
-                            label = Gameplay.PetStatsReader.SplitCamelCase(spell.ToString());
-                        }
-                        catch { /* Nullable has no value */ }
-                    }
-                    catch { }
-                }
-
-                if (string.IsNullOrWhiteSpace(label))
-                {
-                    // Try Perk
-                    try
-                    {
-                        var perkNullable = item.Perk;
-                        try
-                        {
-                            var perk = perkNullable.Value;
-                            label = "Perk: " + Gameplay.PetStatsReader.GetPerkDisplayName(perk);
-                        }
-                        catch { /* Nullable has no value */ }
-                    }
-                    catch { }
-                }
-
-                if (string.IsNullOrWhiteSpace(label)) label = "Unknown item";
-
-                // Use TryAddEvenIfDisabled so locked tier items still appear
-                TryAddEvenIfDisabled(section, btn, label);
             }
-            catch { }
         }
 
         /// <summary>
