@@ -775,6 +775,10 @@ namespace SuperAutoAccessibility
             // is the label.
             bool scoreboardPet = Gameplay.ScoreboardNavigator.IsPetButton(go);
             if (scoreboardPet) elementText = null;
+            // An achievement entry's own text is "???" for a locked pet; the navigator names it.
+            bool achievementEntry = AchievementsNavigator.IsEntry(go);
+            if (achievementEntry) elementText = AchievementsNavigator.Label(go);
+            bool readOnlyItem = scoreboardPet || achievementEntry;
             string labelOverride = SectionManager.GetLabelOverride(go);
             if (!string.IsNullOrEmpty(labelOverride))
             {
@@ -832,7 +836,7 @@ namespace SuperAutoAccessibility
             if (role == "button" && tabList != null && tabList.IsTabList)
                 role = tabList.SelectedElement == go ? "tab, selected" : "tab";
             // A scoreboard pet is something to read, not a button to press.
-            if (scoreboardPet) role = null;
+            if (readOnlyItem) role = null;
             if (!string.IsNullOrEmpty(role))
             {
                 if (sb.Length > 0) sb.Append(", ");
@@ -841,7 +845,7 @@ namespace SuperAutoAccessibility
 
             // Add current value for interactive controls (slider %, button state, etc.)
             // A scoreboard pet's stat labels are already in its summary ("1 attack, 3 health").
-            string valueInfo = scoreboardPet ? null : GetControlValue(go);
+            string valueInfo = readOnlyItem ? null : GetControlValue(go);
             if (!string.IsNullOrEmpty(valueInfo))
             {
                 // Skip if the value is already present in the announcement text
@@ -854,7 +858,7 @@ namespace SuperAutoAccessibility
             }
 
             // Add position context if in a list
-            string positionInfo = GetPositionContext(go);
+            string positionInfo = achievementEntry ? AchievementsNavigator.Position(go) : GetPositionContext(go);
             if (!string.IsNullOrEmpty(positionInfo))
             {
                 if (sb.Length > 0) sb.Append(", ");
@@ -863,7 +867,7 @@ namespace SuperAutoAccessibility
 
             // Add disabled state
             var selectable = go.GetComponent<SelectableBase>();
-            if (selectable != null && !selectable.GetInteractable() && !scoreboardPet)
+            if (selectable != null && !selectable.GetInteractable() && !readOnlyItem)
             {
                 if (sb.Length > 0) sb.Append(", ");
                 sb.Append("disabled");

@@ -232,7 +232,12 @@ namespace SuperAutoAccessibility.Tree
             // One section adds a group with nothing to say, so its controls sit in the dialog,
             // which then carries the set size: AccessKit answers UIA SizeOfSet from the item's
             // container, so without it every control reads as "n of 0".
-            bool useGroups = live.Count > 1;
+            // The Achievements page's pets: plain Unity Buttons, kept by their own navigator.
+            var achievementItems = AchievementsNavigator.Active() != null
+                ? AchievementsNavigator.Items(AchievementsNavigator.Active())
+                : null;
+            int groupCount = live.Count + (achievementItems != null && achievementItems.Count > 0 ? 1 : 0);
+            bool useGroups = groupCount > 1;
             if (!useGroups && live.Count == 1) screen.SizeOfSet = live[0].Value.Count;
             for (int s = 0; s < live.Count; s++)
             {
@@ -281,6 +286,42 @@ namespace SuperAutoAccessibility.Tree
                     _indexById[id] = i + 1;
                     _sizeById[id] = elements.Count;
                     if (!node.Disabled) _ring.Add(id);
+                }
+            }
+
+            if (achievementItems != null && achievementItems.Count > 0)
+            {
+                AccessNode parent = screen;
+                if (useGroups)
+                {
+                    var group = new AccessNode(FirstSectionId + (ulong)live.Count, AccessRole.Group)
+                    {
+                        Label = "Pets",
+                        Focusable = false,
+                        SizeOfSet = achievementItems.Count,
+                    };
+                    into.Add(group);
+                    screen.Children.Add(group.Id);
+                    parent = group;
+                }
+                else
+                {
+                    screen.SizeOfSet = achievementItems.Count;
+                }
+                for (int i = 0; i < achievementItems.Count; i++)
+                {
+                    var go = achievementItems[i];
+                    ulong id = UGuiSource.StableId(go);
+                    if (into.Contains(id)) continue;
+                    var node = new AccessNode(id, AccessRole.Button);
+                    try { Populate(go, node, i + 1, achievementItems.Count); }
+                    catch { continue; }
+                    into.Add(node);
+                    parent.Children.Add(id);
+                    _goById[id] = go;
+                    _indexById[id] = i + 1;
+                    _sizeById[id] = achievementItems.Count;
+                    _ring.Add(id);
                 }
             }
 
@@ -372,6 +413,16 @@ namespace SuperAutoAccessibility.Tree
             }
 
             if (TryPopulatePack(go, node)) return;
+
+            // An Achievements entry: "Crocodile, sticker, red ribbon".
+            if (AchievementsNavigator.IsEntry(go))
+            {
+                node.Role = AccessRole.Button;
+                node.Label = AchievementsNavigator.Label(go);
+                node.Disabled = false;
+                node.AddAction(AccessAction.Click);
+                return;
+            }
 
             // A pet on the scoreboard: summary as the name, perk, ability, tier and experience as
             // the description. Readable whether or not the board lets it be clicked.
@@ -663,6 +714,10 @@ namespace SuperAutoAccessibility.Tree
             // that. The keys are what the screen reader user needs on arrival.
             if (screenRoot.GetComponent<Il2CppSpacewood.Unity.MonoBehaviours.Build.HangarScoreboard>() != null)
                 return Gameplay.ScoreboardNavigator.Hint;
+            // Achievements: the counters' bare "4 / 536" said nothing about what they count.
+            var achievements = screenRoot.GetComponentInChildren<Achievements>();
+            if (achievements != null && achievements == AchievementsNavigator.Active())
+                return AchievementsNavigator.Description(achievements);
             try
             {
                 var controls = new HashSet<int>();

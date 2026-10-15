@@ -1529,6 +1529,10 @@ namespace SuperAutoAccessibility
             if (Gameplay.ScoreboardNavigator.IsOpen && Gameplay.ScoreboardNavigator.HandleInput())
                 return;
 
+            // Achievements: Tab between the filters and the pet list, arrows through the pets
+            if (AchievementsNavigator.HandleInput())
+                return;
+
             // Handle deferred news enrichment (wait for codec to populate after Tab to a new item)
             if (_newsEnrichPending > 0)
             {
