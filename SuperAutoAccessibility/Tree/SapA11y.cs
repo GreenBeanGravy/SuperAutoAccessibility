@@ -88,6 +88,17 @@ namespace SuperAutoAccessibility.Tree
             }
         }
 
+        /// <summary>
+        /// Once per frame, from SAPMod.OnLateUpdate: publishes a selection the mod or the game
+        /// moved after Tick in this same frame (the mod's keys run after Tick).
+        /// </summary>
+        public static void LateTick()
+        {
+            if (_runtime == null || !_started) return;
+            try { _runtime.FlushFocus(); }
+            catch (Exception ex) { MelonLogger.Warning("[tree] FlushFocus failed: " + ex.Message); }
+        }
+
         public static void Shutdown()
         {
             try { _runtime?.Dispose(); } catch { }

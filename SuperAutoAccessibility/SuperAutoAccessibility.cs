@@ -39,7 +39,7 @@ namespace SuperAutoAccessibility
         {
             try
             {
-                var pageManager = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.PageManager>();
+                var pageManager = SceneObjects.Find<Il2CppSpacewood.Unity.PageManager>();
                 var page = pageManager != null ? pageManager.CurrentPage : null;
                 if (page == null) return false;
 
@@ -114,8 +114,18 @@ namespace SuperAutoAccessibility
             }
         }
 
+        // The scene object lists (SceneObjects) are read again after a scene change.
+        public override void OnSceneWasLoaded(int buildIndex, string sceneName) => SceneObjects.SceneChanged();
+        public override void OnSceneWasUnloaded(int buildIndex, string sceneName) => SceneObjects.SceneChanged();
+
+        // Focus the keys moved this frame reaches the screen reader this frame.
+        public override void OnLateUpdate() => Tree.SapA11y.LateTick();
+
         public override void OnUpdate()
         {
+            // The scene lookups' timed re-read, one a frame.
+            SceneObjects.Tick();
+
             // Publishes the menus to the screen reader. Runs first so the tree reflects the
             // selection the rest of this frame's code starts from.
             Tree.SapA11y.Tick();
@@ -356,7 +366,7 @@ namespace SuperAutoAccessibility
                         // Press whichever of the game's Play and Pause buttons is showing. The
                         // battle's state field can read Initial while the battle sits paused, and
                         // P then did nothing at all, which left a player stuck mid-battle.
-                        var speed = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.MonoBehaviours.Battle.UIBattle>()?._UIBattleSpeed;
+                        var speed = SceneObjects.Find<Il2CppSpacewood.Unity.MonoBehaviours.Battle.UIBattle>()?._UIBattleSpeed;
                         bool canPause = speed?.PauseButton?.Button != null && speed.PauseButton.gameObject.activeInHierarchy;
                         bool canPlay = speed?.PlayButton?.Button != null && speed.PlayButton.gameObject.activeInHierarchy;
                         if (canPause)
@@ -383,7 +393,7 @@ namespace SuperAutoAccessibility
                 {
                     try
                     {
-                        var uiBattle = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.MonoBehaviours.Battle.UIBattle>();
+                        var uiBattle = SceneObjects.Find<Il2CppSpacewood.Unity.MonoBehaviours.Battle.UIBattle>();
                         var speedBtn = uiBattle?._UIBattleSpeed?.FastForwardButton?.Button;
                         if (speedBtn != null)
                         {
@@ -407,7 +417,7 @@ namespace SuperAutoAccessibility
                     // on screen only, so a keyboard player could not switch it back on.
                     try
                     {
-                        var speed = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.MonoBehaviours.Battle.UIBattle>()?._UIBattleSpeed;
+                        var speed = SceneObjects.Find<Il2CppSpacewood.Unity.MonoBehaviours.Battle.UIBattle>()?._UIBattleSpeed;
                         var autoBtn = speed?.AutoPlayButton?.Button;
                         if (autoBtn != null)
                         {
@@ -426,7 +436,7 @@ namespace SuperAutoAccessibility
                 {
                     try
                     {
-                        var uiBattle = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.MonoBehaviours.Battle.UIBattle>();
+                        var uiBattle = SceneObjects.Find<Il2CppSpacewood.Unity.MonoBehaviours.Battle.UIBattle>();
                         var skipBtn = uiBattle?._UIBattleSpeed?.SkipButton?.Button;
                         if (skipBtn != null)
                         {
@@ -468,7 +478,7 @@ namespace SuperAutoAccessibility
                 {
                     try
                     {
-                        var pageManager = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.PageManager>();
+                        var pageManager = SceneObjects.Find<Il2CppSpacewood.Unity.PageManager>();
                         if (pageManager?.CurrentPage?.gameObject != null)
                         {
                             string pageName = pageManager.CurrentPage.gameObject.name;
@@ -591,7 +601,7 @@ namespace SuperAutoAccessibility
                 {
                     try
                     {
-                        var tips = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.MonoBehaviours.Build.Tips>();
+                        var tips = SceneObjects.Find<Il2CppSpacewood.Unity.MonoBehaviours.Build.Tips>();
                         if (tips != null) tips.Close();
                     }
                     catch { }
@@ -604,7 +614,7 @@ namespace SuperAutoAccessibility
                 {
                     try
                     {
-                        var iconAlert = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.IconAlert>();
+                        var iconAlert = SceneObjects.Find<Il2CppSpacewood.Unity.IconAlert>();
                         if (iconAlert != null) iconAlert.Confirm();
                     }
                     catch { }
@@ -618,7 +628,7 @@ namespace SuperAutoAccessibility
                 {
                     try
                     {
-                        var alert = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.Alert2>();
+                        var alert = SceneObjects.Find<Il2CppSpacewood.Unity.Alert2>();
                         if (alert != null) alert.Cancel();
                     }
                     catch { }
@@ -647,7 +657,7 @@ namespace SuperAutoAccessibility
                 {
                     try
                     {
-                        var tally = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.TallyArena>();
+                        var tally = SceneObjects.Find<Il2CppSpacewood.Unity.TallyArena>();
                         if (tally != null && tally.Button != null)
                         {
                             tally.HandleSubmit(tally.Button);
@@ -665,7 +675,7 @@ namespace SuperAutoAccessibility
                 {
                     try
                     {
-                        var finale = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.TallyArenaFinale>();
+                        var finale = SceneObjects.Find<Il2CppSpacewood.Unity.TallyArenaFinale>();
                         if (finale != null)
                         {
                             if (finale.ClaimButton != null)
@@ -685,7 +695,7 @@ namespace SuperAutoAccessibility
                 {
                     try
                     {
-                        var reward = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.TallyArenaReward>();
+                        var reward = SceneObjects.Find<Il2CppSpacewood.Unity.TallyArenaReward>();
                         if (reward != null && reward.Button != null)
                             reward.HandleSubmit(reward.Button);
                     }
@@ -700,7 +710,7 @@ namespace SuperAutoAccessibility
                 {
                     try
                     {
-                        var menu = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.TallyArenaMenu>();
+                        var menu = SceneObjects.Find<Il2CppSpacewood.Unity.TallyArenaMenu>();
                         if (menu != null)
                             menu.Return();
                     }
@@ -761,7 +771,7 @@ namespace SuperAutoAccessibility
                 // 1. Close Picker popup if open
                 try
                 {
-                    var picker = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.UI.Picker>();
+                    var picker = SceneObjects.Find<Il2CppSpacewood.Unity.UI.Picker>();
                     if (picker != null && picker.Container != null &&
                         picker.Container.gameObject.activeInHierarchy)
                     {
@@ -796,7 +806,7 @@ namespace SuperAutoAccessibility
                 {
                     try
                     {
-                        var settingsMenu = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.MonoBehaviours.Build.SettingsMenu>();
+                        var settingsMenu = SceneObjects.Find<Il2CppSpacewood.Unity.MonoBehaviours.Build.SettingsMenu>();
                         if (settingsMenu?.ExitButton != null)
                         {
                             ExecuteEvents.Execute(settingsMenu.ExitButton.gameObject,
@@ -858,7 +868,7 @@ namespace SuperAutoAccessibility
                 // 6. Non-gameplay: Try Page.Back() on the current page
                 try
                 {
-                    var pageManager = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.PageManager>();
+                    var pageManager = SceneObjects.Find<Il2CppSpacewood.Unity.PageManager>();
                     if (pageManager != null && pageManager.CurrentPage != null && pageManager.CurrentPage.CanBack)
                     {
                         pageManager.CurrentPage.Back();
@@ -1062,7 +1072,7 @@ namespace SuperAutoAccessibility
             try
             {
                 bool pickerOpen = false;
-                var picker = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.UI.Picker>();
+                var picker = SceneObjects.Find<Il2CppSpacewood.Unity.UI.Picker>();
                 if (picker != null && picker.Container != null &&
                     picker.Container.gameObject.activeInHierarchy)
                 {
@@ -1173,7 +1183,7 @@ namespace SuperAutoAccessibility
             {
                 try
                 {
-                    var tips = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.MonoBehaviours.Build.Tips>();
+                    var tips = SceneObjects.Find<Il2CppSpacewood.Unity.MonoBehaviours.Build.Tips>();
                     if (tips != null)
                     {
                         if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.Return) ||
@@ -1241,7 +1251,7 @@ namespace SuperAutoAccessibility
                 {
                     try
                     {
-                        var iconAlert = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.IconAlert>();
+                        var iconAlert = SceneObjects.Find<Il2CppSpacewood.Unity.IconAlert>();
                         if (iconAlert != null) iconAlert.Confirm();
                     }
                     catch { }
@@ -1266,7 +1276,7 @@ namespace SuperAutoAccessibility
                         // Confirm action
                         try
                         {
-                            var dock = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.MonoBehaviours.Build.Dock>();
+                            var dock = SceneObjects.Find<Il2CppSpacewood.Unity.MonoBehaviours.Build.Dock>();
                             if (dock?.ConfirmButton != null)
                             {
                                 dock.HandleConfirm(dock.ConfirmButton);
@@ -1323,7 +1333,7 @@ namespace SuperAutoAccessibility
                 {
                     try
                     {
-                        var tally = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.TallyArena>();
+                        var tally = SceneObjects.Find<Il2CppSpacewood.Unity.TallyArena>();
                         if (tally != null && tally.Button != null)
                         {
                             tally.HandleSubmit(tally.Button);
@@ -1338,7 +1348,7 @@ namespace SuperAutoAccessibility
                     // Re-read the result
                     try
                     {
-                        var tally = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.TallyArena>();
+                        var tally = SceneObjects.Find<Il2CppSpacewood.Unity.TallyArena>();
                         if (tally != null)
                         {
                             string resultText = ReadTallyArenaDetails(tally);
@@ -1359,7 +1369,7 @@ namespace SuperAutoAccessibility
                 {
                     try
                     {
-                        var finale = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.TallyArenaFinale>();
+                        var finale = SceneObjects.Find<Il2CppSpacewood.Unity.TallyArenaFinale>();
                         if (finale != null)
                         {
                             // Click the claim button or use HandleSubmit
@@ -1377,7 +1387,7 @@ namespace SuperAutoAccessibility
                     // Re-read summary
                     try
                     {
-                        var finale = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.TallyArenaFinale>();
+                        var finale = SceneObjects.Find<Il2CppSpacewood.Unity.TallyArenaFinale>();
                         string text = ReadTallyArenaFinaleDetails(finale);
                         if (!string.IsNullOrEmpty(text))
                             AccessibilityManager.Announce(text);
@@ -1395,7 +1405,7 @@ namespace SuperAutoAccessibility
                 {
                     try
                     {
-                        var reward = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.TallyArenaReward>();
+                        var reward = SceneObjects.Find<Il2CppSpacewood.Unity.TallyArenaReward>();
                         if (reward != null && reward.Button != null)
                             reward.HandleSubmit(reward.Button);
                     }
@@ -1407,7 +1417,7 @@ namespace SuperAutoAccessibility
                     // Re-read reward
                     try
                     {
-                        var reward = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.TallyArenaReward>();
+                        var reward = SceneObjects.Find<Il2CppSpacewood.Unity.TallyArenaReward>();
                         string text = ReadTallyArenaRewardDetails(reward);
                         if (!string.IsNullOrEmpty(text))
                             AccessibilityManager.Announce(text);
@@ -1436,7 +1446,7 @@ namespace SuperAutoAccessibility
                     // Escape â†’ return to menu
                     try
                     {
-                        var menu = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.TallyArenaMenu>();
+                        var menu = SceneObjects.Find<Il2CppSpacewood.Unity.TallyArenaMenu>();
                         if (menu != null)
                             menu.Return();
                     }
@@ -1485,7 +1495,7 @@ namespace SuperAutoAccessibility
                 {
                     try
                     {
-                        var alert = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.Alert2>();
+                        var alert = SceneObjects.Find<Il2CppSpacewood.Unity.Alert2>();
                         if (alert != null)
                         {
                             // Check which button is currently selected
@@ -1512,7 +1522,7 @@ namespace SuperAutoAccessibility
                 {
                     try
                     {
-                        var alert = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.Alert2>();
+                        var alert = SceneObjects.Find<Il2CppSpacewood.Unity.Alert2>();
                         if (alert != null) alert.Cancel();
                     }
                     catch { }
@@ -1531,7 +1541,7 @@ namespace SuperAutoAccessibility
                     // Navigate between cancel and confirm buttons with position
                     try
                     {
-                        var alert = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.Alert2>();
+                        var alert = SceneObjects.Find<Il2CppSpacewood.Unity.Alert2>();
                         if (alert != null && EventSystem.current != null)
                         {
                             var current = EventSystem.current.currentSelectedGameObject;
@@ -1580,7 +1590,7 @@ namespace SuperAutoAccessibility
                 {
                     try
                     {
-                        var news3 = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.News>();
+                        var news3 = SceneObjects.Find<Il2CppSpacewood.Unity.News>();
                         var ann3 = news3?.Announcement;
                         var codec3 = ann3?.Codec;
                         var cg3 = ann3?.CodecGroup;
@@ -1648,7 +1658,7 @@ namespace SuperAutoAccessibility
                 {
                     try
                     {
-                        var news2 = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.News>();
+                        var news2 = SceneObjects.Find<Il2CppSpacewood.Unity.News>();
                         var ann2 = news2?.Announcement;
                         var codec2 = ann2?.Codec;
                         if (codec2 != null)
@@ -1707,7 +1717,7 @@ namespace SuperAutoAccessibility
                     // Otherwise, navigate codec details for the focused pinboard item
                     try
                     {
-                        var news = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.News>();
+                        var news = SceneObjects.Find<Il2CppSpacewood.Unity.News>();
                         var announcement = news?.Announcement;
                         var codec = announcement?.Codec;
                         var codecGroup = announcement?.CodecGroup;
@@ -1852,7 +1862,7 @@ namespace SuperAutoAccessibility
             // Try to find Bootstrap once; it only exists during the loading screen scene
             if (_bootstrap == null)
             {
-                _bootstrap = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.Bootstrap>();
+                _bootstrap = SceneObjects.Find<Il2CppSpacewood.Unity.Bootstrap>();
                 if (_bootstrap == null) return;
             }
 
@@ -1903,7 +1913,7 @@ namespace SuperAutoAccessibility
             try
             {
                 bool langPickerOpen = false;
-                var langPicker = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.LanguagePicker>();
+                var langPicker = SceneObjects.Find<Il2CppSpacewood.Unity.LanguagePicker>();
                 if (langPicker != null)
                 {
                     var canvas = langPicker.GetComponentInChildren<Canvas>();
@@ -2025,7 +2035,7 @@ namespace SuperAutoAccessibility
                 bool isOpen = false;
                 try
                 {
-                    var news = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.News>();
+                    var news = SceneObjects.Find<Il2CppSpacewood.Unity.News>();
                     if (news != null)
                     {
                         // Check CanvasGroup alpha on the Announcement's Canvas to determine visibility
@@ -2046,7 +2056,7 @@ namespace SuperAutoAccessibility
                     string summary = "";
                     try
                     {
-                        var news = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.News>();
+                        var news = SceneObjects.Find<Il2CppSpacewood.Unity.News>();
                         if (news != null)
                         {
                             var announcement = news.Announcement;
@@ -2348,7 +2358,7 @@ namespace SuperAutoAccessibility
                 Il2CppSpacewood.Scripts.Codec.DeckNamer deckNamer = null;
                 try
                 {
-                    deckNamer = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Scripts.Codec.DeckNamer>();
+                    deckNamer = SceneObjects.Find<Il2CppSpacewood.Scripts.Codec.DeckNamer>();
                     if (deckNamer != null && deckNamer.gameObject.activeInHierarchy)
                         isOpen = true;
                 }
@@ -2392,7 +2402,7 @@ namespace SuperAutoAccessibility
                 Il2CppSpacewood.Unity.MonoBehaviours.Build.Tips tips = null;
                 try
                 {
-                    tips = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.MonoBehaviours.Build.Tips>();
+                    tips = SceneObjects.Find<Il2CppSpacewood.Unity.MonoBehaviours.Build.Tips>();
                     if (tips != null && tips.Canvas != null && tips.Canvas.gameObject.activeInHierarchy)
                         isOpen = true;
                 }
@@ -2530,7 +2540,7 @@ namespace SuperAutoAccessibility
                 Il2CppSpacewood.Unity.MonoBehaviours.Build.HangarTutorialPrompt prompt = null;
                 try
                 {
-                    prompt = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.MonoBehaviours.Build.HangarTutorialPrompt>();
+                    prompt = SceneObjects.Find<Il2CppSpacewood.Unity.MonoBehaviours.Build.HangarTutorialPrompt>();
                     if (prompt != null && prompt.gameObject.activeInHierarchy &&
                         prompt.Button != null && prompt.Button.gameObject.activeInHierarchy)
                         isOpen = true;
@@ -2571,13 +2581,13 @@ namespace SuperAutoAccessibility
 
             try
             {
-                var menu = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.Menu>();
+                var menu = SceneObjects.Find<Il2CppSpacewood.Unity.Menu>();
                 if (menu?.SideBar != null) { _cachedSideBar = menu.SideBar; return _cachedSideBar; }
             }
             catch { }
             try
             {
-                var sidebar = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.SideBar>();
+                var sidebar = SceneObjects.Find<Il2CppSpacewood.Unity.SideBar>();
                 if (sidebar != null) { _cachedSideBar = sidebar; return _cachedSideBar; }
             }
             catch { }
@@ -2640,7 +2650,7 @@ namespace SuperAutoAccessibility
         {
             try
             {
-                var menu = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.Menu>();
+                var menu = SceneObjects.Find<Il2CppSpacewood.Unity.Menu>();
                 if (menu != null)
                 {
                     // Try OpenSideBar first (the game's method)
@@ -2671,7 +2681,7 @@ namespace SuperAutoAccessibility
                 {
                     // Menu component not found â€” try finding SideBar directly
                     MelonLogger.Warning($"OpenPauseMenu: Menu not found, trying SideBar directly ({context})");
-                    var sidebar = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.SideBar>();
+                    var sidebar = SceneObjects.Find<Il2CppSpacewood.Unity.SideBar>();
                     if (sidebar != null)
                     {
                         sidebar.Open();
@@ -2722,7 +2732,7 @@ namespace SuperAutoAccessibility
         {
             try
             {
-                var dock = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.MonoBehaviours.Build.Dock>();
+                var dock = SceneObjects.Find<Il2CppSpacewood.Unity.MonoBehaviours.Build.Dock>();
                 if (dock?.ConfirmButton?.gameObject != null)
                     dock.ConfirmButton.gameObject.SetActive(false);
             }
@@ -2749,7 +2759,7 @@ namespace SuperAutoAccessibility
             {
                 try
                 {
-                    var tips = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.MonoBehaviours.Build.Tips>();
+                    var tips = SceneObjects.Find<Il2CppSpacewood.Unity.MonoBehaviours.Build.Tips>();
                     if (tips == null || tips.Canvas == null || !tips.Canvas.gameObject.activeInHierarchy)
                     {
                         _tipsActive = false;
@@ -2766,7 +2776,7 @@ namespace SuperAutoAccessibility
             {
                 try
                 {
-                    var iconAlert = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.IconAlert>();
+                    var iconAlert = SceneObjects.Find<Il2CppSpacewood.Unity.IconAlert>();
                     if (iconAlert == null || !iconAlert.gameObject.activeInHierarchy)
                     {
                         _iconAlertActive = false;
@@ -2782,7 +2792,7 @@ namespace SuperAutoAccessibility
             {
                 try
                 {
-                    var dock = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.MonoBehaviours.Build.Dock>();
+                    var dock = SceneObjects.Find<Il2CppSpacewood.Unity.MonoBehaviours.Build.Dock>();
                     if (dock?.ConfirmButton?.gameObject == null || !dock.ConfirmButton.gameObject.activeInHierarchy)
                     {
                         _confirmPopupActive = false;
@@ -2798,7 +2808,7 @@ namespace SuperAutoAccessibility
             {
                 try
                 {
-                    var alert = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.Alert2>();
+                    var alert = SceneObjects.Find<Il2CppSpacewood.Unity.Alert2>();
                     if (alert == null || !alert.IsOpen)
                     {
                         _alert2Active = false;
@@ -2814,7 +2824,7 @@ namespace SuperAutoAccessibility
             {
                 try
                 {
-                    var dock = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.MonoBehaviours.Build.Dock>();
+                    var dock = SceneObjects.Find<Il2CppSpacewood.Unity.MonoBehaviours.Build.Dock>();
                     bool stillOpen = false;
                     if (dock?.Adjectives != null && dock.Adjectives.Count > 0)
                     {
@@ -3173,7 +3183,7 @@ namespace SuperAutoAccessibility
 
             try
             {
-                var replayPage = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.Replay>();
+                var replayPage = SceneObjects.Find<Il2CppSpacewood.Unity.Replay>();
                 if (replayPage == null || replayPage.Items == null)
                 {
                     AccessibilityManager.Announce("Replays");
@@ -3209,7 +3219,7 @@ namespace SuperAutoAccessibility
 
             try
             {
-                var replayPage = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.Replay>();
+                var replayPage = SceneObjects.Find<Il2CppSpacewood.Unity.Replay>();
                 if (replayPage == null || replayPage.Items == null || replayPage.Items.Count == 0)
                     return false;
 
@@ -3543,7 +3553,7 @@ namespace SuperAutoAccessibility
         {
             try
             {
-                var bc = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.MonoBehaviours.Battle.BattleController>();
+                var bc = SceneObjects.Find<Il2CppSpacewood.Unity.MonoBehaviours.Battle.BattleController>();
                 return bc?.ResolverSettings == null || bc.ResolverSettings.AutoPlay;
             }
             catch { return true; }
@@ -3560,7 +3570,7 @@ namespace SuperAutoAccessibility
             _nextBattlePauseCheck = now + 0.25f;
             try
             {
-                var speed = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.MonoBehaviours.Battle.UIBattle>()?._UIBattleSpeed;
+                var speed = SceneObjects.Find<Il2CppSpacewood.Unity.MonoBehaviours.Battle.UIBattle>()?._UIBattleSpeed;
                 bool paused = speed?.PlayButton != null && speed.PlayButton.gameObject.activeInHierarchy &&
                               !(speed.PauseButton != null && speed.PauseButton.gameObject.activeInHierarchy);
                 if (!paused)
@@ -3619,7 +3629,7 @@ namespace SuperAutoAccessibility
                     return;
                 }
 
-                var uiBattle = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.MonoBehaviours.Battle.UIBattle>();
+                var uiBattle = SceneObjects.Find<Il2CppSpacewood.Unity.MonoBehaviours.Battle.UIBattle>();
                 var speedBtn = uiBattle?._UIBattleSpeed?.FastForwardButton?.Button;
                 if (speedBtn != null)
                 {
@@ -4271,7 +4281,7 @@ namespace SuperAutoAccessibility
                 Il2CppSpacewood.Unity.IconAlert iconAlert = null;
                 try
                 {
-                    iconAlert = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.IconAlert>();
+                    iconAlert = SceneObjects.Find<Il2CppSpacewood.Unity.IconAlert>();
                     if (iconAlert != null && iconAlert.gameObject.activeInHierarchy)
                         isOpen = true;
                 }
@@ -4350,7 +4360,7 @@ namespace SuperAutoAccessibility
 
                 try
                 {
-                    dock = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.MonoBehaviours.Build.Dock>();
+                    dock = SceneObjects.Find<Il2CppSpacewood.Unity.MonoBehaviours.Build.Dock>();
                     if (dock != null && dock.ConfirmButton != null &&
                         dock.ConfirmButton.gameObject != null &&
                         dock.ConfirmButton.gameObject.activeInHierarchy)
@@ -4427,7 +4437,7 @@ namespace SuperAutoAccessibility
                 Il2CppSpacewood.Unity.Alert2 alert = null;
                 try
                 {
-                    alert = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.Alert2>();
+                    alert = SceneObjects.Find<Il2CppSpacewood.Unity.Alert2>();
                     if (alert != null && alert.IsOpen)
                         isOpen = true;
                 }
@@ -4507,7 +4517,7 @@ namespace SuperAutoAccessibility
                 Il2CppSpacewood.Unity.DesyncAlert desyncAlert = null;
                 try
                 {
-                    desyncAlert = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.DesyncAlert>();
+                    desyncAlert = SceneObjects.Find<Il2CppSpacewood.Unity.DesyncAlert>();
                     if (desyncAlert != null && desyncAlert.IsActive)
                         isOpen = true;
                 }
@@ -4581,7 +4591,7 @@ namespace SuperAutoAccessibility
                 Il2CppSpacewood.Unity.TallyArena tally = null;
                 try
                 {
-                    tally = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.TallyArena>();
+                    tally = SceneObjects.Find<Il2CppSpacewood.Unity.TallyArena>();
                     if (tally != null && tally.gameObject.activeInHierarchy)
                     {
                         // Check if it's waiting for user to continue
@@ -4787,8 +4797,7 @@ namespace SuperAutoAccessibility
         {
             try
             {
-                var tbs = UnityEngine.Object.FindObjectOfType<
-                    Il2CppSpacewood.Unity.TallyBullyScore>();
+                var tbs = SceneObjects.Find<Il2CppSpacewood.Unity.TallyBullyScore>();
                 bool isOpen = tbs != null && tbs.gameObject.activeInHierarchy;
 
                 // The battle screen turns this panel on briefly while it loads in every mode, with
@@ -4860,7 +4869,7 @@ namespace SuperAutoAccessibility
                 Il2CppSpacewood.Unity.TallyArenaFinale finale = null;
                 try
                 {
-                    finale = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.TallyArenaFinale>();
+                    finale = SceneObjects.Find<Il2CppSpacewood.Unity.TallyArenaFinale>();
                     if (finale != null && finale.Canvas != null && finale.Canvas.gameObject.activeInHierarchy)
                         isOpen = true;
                 }
@@ -4976,7 +4985,7 @@ namespace SuperAutoAccessibility
                 Il2CppSpacewood.Unity.TallyArenaReward reward = null;
                 try
                 {
-                    reward = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.TallyArenaReward>();
+                    reward = SceneObjects.Find<Il2CppSpacewood.Unity.TallyArenaReward>();
                     if (reward != null && reward.Canvas != null && reward.Canvas.gameObject.activeInHierarchy)
                         isOpen = true;
                 }
@@ -5051,7 +5060,7 @@ namespace SuperAutoAccessibility
                 Il2CppSpacewood.Unity.TallyArenaMenu menu = null;
                 try
                 {
-                    menu = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.TallyArenaMenu>();
+                    menu = SceneObjects.Find<Il2CppSpacewood.Unity.TallyArenaMenu>();
                     if (menu != null && menu.Canvas != null && menu.Canvas.gameObject.activeInHierarchy)
                         isOpen = true;
                 }
@@ -5382,7 +5391,7 @@ namespace SuperAutoAccessibility
         {
             try
             {
-                var versusLobby = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.VersusLobby>();
+                var versusLobby = SceneObjects.Find<Il2CppSpacewood.Unity.VersusLobby>();
                 if (versusLobby == null || versusLobby.gameObject == null || !versusLobby.gameObject.activeInHierarchy)
                 {
                     if (_versusLobbyActive)
@@ -5480,7 +5489,7 @@ namespace SuperAutoAccessibility
                 Il2CppSpacewood.Unity.MonoBehaviours.Build.Dock dock = null;
                 try
                 {
-                    dock = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.MonoBehaviours.Build.Dock>();
+                    dock = SceneObjects.Find<Il2CppSpacewood.Unity.MonoBehaviours.Build.Dock>();
                     if (dock != null && dock.Adjectives != null && dock.Adjectives.Count > 0
                         && dock.Nouns != null && dock.Nouns.Count > 0)
                     {
@@ -5538,7 +5547,7 @@ namespace SuperAutoAccessibility
         /// </summary>
         private static void HandleNamePickerInput()
         {
-            var dock = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.MonoBehaviours.Build.Dock>();
+            var dock = SceneObjects.Find<Il2CppSpacewood.Unity.MonoBehaviours.Build.Dock>();
             if (dock == null || dock.Adjectives == null || dock.Nouns == null)
             {
                 _namePickerActive = false;
@@ -5717,7 +5726,7 @@ namespace SuperAutoAccessibility
             GameObject searchRoot = null;
             try
             {
-                var pageManager = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.PageManager>();
+                var pageManager = SceneObjects.Find<Il2CppSpacewood.Unity.PageManager>();
                 if (pageManager?.CurrentPage?.gameObject != null)
                     searchRoot = pageManager.CurrentPage.gameObject;
             }

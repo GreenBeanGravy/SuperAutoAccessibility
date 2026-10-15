@@ -62,7 +62,7 @@ namespace SuperAutoAccessibility
             string pageName = "Unknown";
             try
             {
-                var pm = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.PageManager>();
+                var pm = SceneObjects.Find<Il2CppSpacewood.Unity.PageManager>();
                 if (pm?.CurrentPage?.gameObject != null)
                     pageName = pm.CurrentPage.gameObject.name;
             }
@@ -72,7 +72,7 @@ namespace SuperAutoAccessibility
             string sidebarState = "Closed";
             try
             {
-                var menu = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.Menu>();
+                var menu = SceneObjects.Find<Il2CppSpacewood.Unity.Menu>();
                 if (menu?.SideBar?.Container?.gameObject?.activeInHierarchy == true)
                     sidebarState = "Open";
             }

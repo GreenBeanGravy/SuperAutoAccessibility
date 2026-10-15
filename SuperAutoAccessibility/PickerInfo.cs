@@ -108,7 +108,7 @@ namespace SuperAutoAccessibility
             {
                 var pb = go != null ? go.GetComponentInParent<PickerButton>() : null;
                 if (pb == null || pb.Primary == null || pb.Primary.gameObject != go) return null;
-                return go.GetComponentInParent<Picker>() ?? UnityEngine.Object.FindObjectOfType<Picker>();
+                return go.GetComponentInParent<Picker>() ?? SceneObjects.Find<Picker>();
             }
             catch
             {

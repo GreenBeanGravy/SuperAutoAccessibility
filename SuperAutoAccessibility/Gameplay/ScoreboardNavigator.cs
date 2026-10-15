@@ -84,7 +84,7 @@ namespace SuperAutoAccessibility.Gameplay
                 if (GameplayPhaseDetector.IsBattlePhase())
                 {
                     if (_uiBattle == null)
-                        _uiBattle = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.MonoBehaviours.Battle.UIBattle>();
+                        _uiBattle = SceneObjects.Find<Il2CppSpacewood.Unity.MonoBehaviours.Battle.UIBattle>();
                     var tally = _uiBattle != null ? _uiBattle.TallyScoreboard : null;
                     if (tally != null && tally.gameObject.activeInHierarchy &&
                         tally.Scoreboard != null && tally.Scoreboard.gameObject.activeInHierarchy)

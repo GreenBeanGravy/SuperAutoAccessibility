@@ -45,6 +45,8 @@ namespace SuperAutoAccessibility
         private static int _currentSectionIndex = 0;
         private static int _currentElementIndex = 0;
         private static string _cachedContextKey = "";
+        private static float _versusCountAt;
+        private static int _versusCount;
 
         // Label overrides for icon-only buttons (keyed by GameObject instance)
         private static Dictionary<GameObject, string> _labelOverrides = new Dictionary<GameObject, string>();
@@ -146,7 +148,7 @@ namespace SuperAutoAccessibility
 
             try
             {
-                var pageManager = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.PageManager>();
+                var pageManager = SceneObjects.Find<Il2CppSpacewood.Unity.PageManager>();
                 if (pageManager?.CurrentPage?.gameObject != null)
                     pageName = pageManager.CurrentPage.gameObject.name;
             }
@@ -157,7 +159,7 @@ namespace SuperAutoAccessibility
             // Check if Picker popup is open
             try
             {
-                var picker = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.UI.Picker>();
+                var picker = SceneObjects.Find<Il2CppSpacewood.Unity.UI.Picker>();
                 if (picker?.Container?.gameObject != null)
                     pickerOpen = picker.Container.gameObject.activeInHierarchy;
             }
@@ -168,7 +170,7 @@ namespace SuperAutoAccessibility
             {
                 if (pageName.Contains("Settings") || IsSettingsMenuVisible())
                 {
-                    var settingsMenu = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.MonoBehaviours.Build.SettingsMenu>();
+                    var settingsMenu = SceneObjects.Find<Il2CppSpacewood.Unity.MonoBehaviours.Build.SettingsMenu>();
                     if (settingsMenu?.Groups != null)
                     {
                         for (int i = 0; i < settingsMenu.Groups.Count; i++)
@@ -193,47 +195,56 @@ namespace SuperAutoAccessibility
                 if (pageName == "Customize" || pageName == "History")
                 {
                     // Check which sub-page component is active
-                    var petCustomizer = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.PetCustomizer>();
+                    var petCustomizer = SceneObjects.Find<Il2CppSpacewood.Unity.PetCustomizer>();
                     if (petCustomizer != null && petCustomizer.gameObject != null && petCustomizer.gameObject.activeInHierarchy)
                         subPage = "PetCustomizer";
                     else if (HasActiveProductShopItems())
                         subPage = "ProductShop";
                     else
                     {
-                        var browseShops = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.BrowseShops>();
+                        var browseShops = SceneObjects.Find<Il2CppSpacewood.Unity.BrowseShops>();
                         if (browseShops != null && browseShops.gameObject != null && browseShops.gameObject.activeInHierarchy)
                             subPage = "BrowseShops";
                     }
 
                     // History sub-pages
-                    var statsSummary = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.StatsSummary>();
+                    var statsSummary = SceneObjects.Find<Il2CppSpacewood.Unity.StatsSummary>();
                     if (statsSummary != null && statsSummary.gameObject != null && statsSummary.gameObject.activeInHierarchy)
                         subPage = "StatsSummary";
-                    var achievements = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.Achievements>();
+                    var achievements = SceneObjects.Find<Il2CppSpacewood.Unity.Achievements>();
                     if (achievements != null && achievements.gameObject != null && achievements.gameObject.activeInHierarchy)
                         subPage = "Achievements";
-                    var replay = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.Replay>();
+                    var replay = SceneObjects.Find<Il2CppSpacewood.Unity.Replay>();
                     if (replay != null && replay.gameObject != null && replay.gameObject.activeInHierarchy)
                         subPage = "Replay";
-                    var spectate = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.Spectate>();
+                    var spectate = SceneObjects.Find<Il2CppSpacewood.Unity.Spectate>();
                     if (spectate != null && spectate.gameObject != null && spectate.gameObject.activeInHierarchy)
                         subPage = "Spectate";
                 }
             }
             catch { }
 
-            // Track VersusListItem count on ModeMenu so sections rebuild when matches appear
+            // Track VersusListItem count on ModeMenu so sections rebuild when matches appear.
+            // A scene scan (3 ms under IL2CPP), and the key is read several times per key
+            // press: counted at most four times a second.
             int versusItemCount = 0;
             try
             {
                 if (pageName.Contains("ModeMenu"))
                 {
-                    var versusItems = UnityEngine.Object.FindObjectsOfType<Il2CppSpacewood.Unity.VersusListItem>();
-                    foreach (var item in versusItems)
+                    float now = Time.realtimeSinceStartup;
+                    if (now >= _versusCountAt)
                     {
-                        if (item != null && item.gameObject != null && item.gameObject.activeInHierarchy)
-                            versusItemCount++;
+                        _versusCountAt = now + 0.25f;
+                        _versusCount = 0;
+                        var versusItems = UnityEngine.Object.FindObjectsOfType<Il2CppSpacewood.Unity.VersusListItem>();
+                        foreach (var item in versusItems)
+                        {
+                            if (item != null && item.gameObject != null && item.gameObject.activeInHierarchy)
+                                _versusCount++;
+                        }
                     }
+                    versusItemCount = _versusCount;
                 }
             }
             catch { }
@@ -282,7 +293,7 @@ namespace SuperAutoAccessibility
             bool langPickerOpen = false;
             try
             {
-                var langPicker = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.LanguagePicker>();
+                var langPicker = SceneObjects.Find<Il2CppSpacewood.Unity.LanguagePicker>();
                 if (langPicker != null)
                 {
                     var canvas = langPicker.GetComponentInChildren<Canvas>();
@@ -312,7 +323,7 @@ namespace SuperAutoAccessibility
                 bool pickerOpen = false;
                 try
                 {
-                    var picker = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.UI.Picker>();
+                    var picker = SceneObjects.Find<Il2CppSpacewood.Unity.UI.Picker>();
                     if (picker?.Container?.gameObject != null)
                         pickerOpen = picker.Container.gameObject.activeInHierarchy;
                     if (pickerOpen)
@@ -328,7 +339,7 @@ namespace SuperAutoAccessibility
                 // Check if LanguagePicker is open (Bootstrap scene â€” before main menu loads)
                 try
                 {
-                    var langPicker = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.LanguagePicker>();
+                    var langPicker = SceneObjects.Find<Il2CppSpacewood.Unity.LanguagePicker>();
                     if (langPicker != null)
                     {
                         var canvas = langPicker.GetComponentInChildren<Canvas>();
@@ -346,7 +357,7 @@ namespace SuperAutoAccessibility
                 // Check if DesyncAlert is open â€” it overlays everything (desync error during match)
                 try
                 {
-                    var desyncAlert = UnityEngine.Object.FindObjectOfType<DesyncAlert>();
+                    var desyncAlert = SceneObjects.Find<DesyncAlert>();
                     if (desyncAlert != null && desyncAlert.IsActive)
                     {
                         BuildDesyncAlertSections(desyncAlert);
@@ -371,7 +382,7 @@ namespace SuperAutoAccessibility
                     return;
                 }
 
-                var menu = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.Menu>();
+                var menu = SceneObjects.Find<Il2CppSpacewood.Unity.Menu>();
 
                 // Check sidebar FIRST â€” if open, build sidebar sections
                 var openSideBar = OpenSideBar();
@@ -385,7 +396,7 @@ namespace SuperAutoAccessibility
                     string currentPageName = "";
                     try
                     {
-                        var pageManager = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.PageManager>();
+                        var pageManager = SceneObjects.Find<Il2CppSpacewood.Unity.PageManager>();
                         if (pageManager?.CurrentPage?.gameObject != null)
                             currentPageName = pageManager.CurrentPage.gameObject.name;
                     }
@@ -395,7 +406,7 @@ namespace SuperAutoAccessibility
                     bool newsHandled = false;
                     try
                     {
-                        var news = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.News>();
+                        var news = SceneObjects.Find<Il2CppSpacewood.Unity.News>();
                         if (news != null)
                         {
                             var canvasGroup = news.GetComponentInChildren<UnityEngine.CanvasGroup>();
@@ -533,7 +544,7 @@ namespace SuperAutoAccessibility
                             {
                                 try
                                 {
-                                    var chooser = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Scripts.MonoBehaviours.Build.Hangar.Chooser>();
+                                    var chooser = SceneObjects.Find<Il2CppSpacewood.Scripts.MonoBehaviours.Build.Hangar.Chooser>();
                                     if (chooser != null && chooser.gameObject.activeInHierarchy)
                                     {
                                         BuildChooserSections(chooser);
@@ -551,7 +562,7 @@ namespace SuperAutoAccessibility
                         else
                         {
                             // Lobby or unknown page
-                            var lobby = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.Lobby>();
+                            var lobby = SceneObjects.Find<Il2CppSpacewood.Unity.Lobby>();
                             if (lobby != null)
                             {
                                 BuildLobbySections(lobby, menu);
@@ -582,7 +593,7 @@ namespace SuperAutoAccessibility
         {
             try
             {
-                var component = UnityEngine.Object.FindObjectOfType<T>();
+                var component = SceneObjects.Find<T>();
                 if (component != null && component.gameObject != null && component.gameObject.activeInHierarchy)
                 {
                     builder(component);
@@ -645,7 +656,7 @@ namespace SuperAutoAccessibility
         {
             try
             {
-                var picker = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.UI.Picker>();
+                var picker = SceneObjects.Find<Il2CppSpacewood.Unity.UI.Picker>();
                 return picker?.Container?.gameObject != null && picker.Container.gameObject.activeInHierarchy;
             }
             catch { return false; }
@@ -655,7 +666,7 @@ namespace SuperAutoAccessibility
         {
             try
             {
-                var sm = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.MonoBehaviours.Build.SettingsMenu>();
+                var sm = SceneObjects.Find<Il2CppSpacewood.Unity.MonoBehaviours.Build.SettingsMenu>();
                 if (sm?.Groups == null) return false;
                 for (int i = 0; i < sm.Groups.Count; i++)
                 {
@@ -1527,7 +1538,7 @@ namespace SuperAutoAccessibility
         {
             try
             {
-                var menu = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.Menu>();
+                var menu = SceneObjects.Find<Il2CppSpacewood.Unity.Menu>();
                 var back = menu != null ? menu.transform.Find("AppBar/Canvas/NotchPadding/Layout/Back") : null;
                 return back != null ? back.GetComponent<SelectableBase>() : null;
             }
@@ -1603,7 +1614,7 @@ namespace SuperAutoAccessibility
             var actionsSection = new NavigationSection("Actions");
             try
             {
-                var pageManager = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.PageManager>();
+                var pageManager = SceneObjects.Find<Il2CppSpacewood.Unity.PageManager>();
                 if (pageManager?.CurrentPage?.gameObject != null)
                 {
                     FindAndAddBackButton(actionsSection, pageManager.CurrentPage.gameObject);
@@ -2458,7 +2469,7 @@ namespace SuperAutoAccessibility
         {
             try
             {
-                var pageManager = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.PageManager>();
+                var pageManager = SceneObjects.Find<Il2CppSpacewood.Unity.PageManager>();
                 var page = pageManager?.CurrentPage;
                 if (page == null) { BuildFallbackSections(); return; }
 
@@ -2625,10 +2636,10 @@ namespace SuperAutoAccessibility
         {
             try
             {
-                var menu = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.Menu>();
+                var menu = SceneObjects.Find<Il2CppSpacewood.Unity.Menu>();
                 var sidebar = menu != null && menu.SideBar != null
                     ? menu.SideBar
-                    : UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.SideBar>();
+                    : SceneObjects.Find<Il2CppSpacewood.Unity.SideBar>();
                 if (sidebar != null && sidebar.Container != null && sidebar.Container.gameObject.activeInHierarchy)
                     return sidebar;
             }

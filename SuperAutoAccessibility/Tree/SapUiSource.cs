@@ -496,7 +496,7 @@ namespace SuperAutoAccessibility.Tree
                 if (go.transform.parent == null ||
                     go.transform.parent.GetComponent<Il2CppSpacewood.Unity.MonoBehaviours.Build.DeckViewerItem>() == null)
                     return null;
-                var announcement = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.News>()?.Announcement;
+                var announcement = SceneObjects.Find<Il2CppSpacewood.Unity.News>()?.Announcement;
                 var codec = announcement?.Codec;
                 var group = announcement?.CodecGroup;
                 if (codec == null || group == null || group.alpha <= 0f) return null;
@@ -670,7 +670,7 @@ namespace SuperAutoAccessibility.Tree
                 {
                     try
                     {
-                        var page = UnityEngine.Object.FindObjectOfType<PageManager>()?.CurrentPage;
+                        var page = SceneObjects.Find<PageManager>()?.CurrentPage;
                         if (page != null)
                         {
                             screenRoot = page.gameObject;

@@ -942,7 +942,7 @@ namespace SuperAutoAccessibility
                 // (Il2Cpp Nullable<MinionEnum>.Value always returns default=Ant, so we use the sprite instead)
                 try
                 {
-                    var news = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.News>();
+                    var news = SceneObjects.Find<Il2CppSpacewood.Unity.News>();
                     var announcement = news?.Announcement;
                     var codec = announcement?.Codec;
                     if (codec != null)
@@ -1239,7 +1239,10 @@ namespace SuperAutoAccessibility
             {
                 try
                 {
-                    string val = button.GetValue();
+                    // GetValue reads the picker's saved setting. On any other button it throws
+                    // inside the game, which logs a warning with a stack trace first (0.1 to
+                    // 0.5 ms each, and every node of the tree asks on each rebuild).
+                    string val = button.PickerPersistSingleValue ? button.GetValue() : null;
                     if (!string.IsNullOrWhiteSpace(val))
                     {
                         // Skip if the value is already contained in the element text
@@ -1372,7 +1375,7 @@ namespace SuperAutoAccessibility
             // Fall back to current page
             try
             {
-                var pageManager = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.PageManager>();
+                var pageManager = SceneObjects.Find<Il2CppSpacewood.Unity.PageManager>();
                 if (pageManager?.CurrentPage?.gameObject != null)
                 {
                     string pageText = TextExtractor.GetAllTextFromHierarchy(pageManager.CurrentPage.gameObject);

@@ -36,7 +36,7 @@ namespace SuperAutoAccessibility
             _cached = null;
             try
             {
-                foreach (var lb in UnityEngine.Object.FindObjectsOfType<VersusLeaderboard>())
+                foreach (var lb in SceneObjects.All<VersusLeaderboard>())
                 {
                     if (lb?.Modal != null && lb.Column != null && lb.Modal.gameObject.activeInHierarchy)
                     {
@@ -135,7 +135,7 @@ namespace SuperAutoAccessibility
             {
                 if (target == null || !target.activeInHierarchy)
                 {
-                    var rank = UnityEngine.Object.FindObjectOfType<PackShop>()?.VersusRank?.Button;
+                    var rank = SceneObjects.Find<PackShop>()?.VersusRank?.Button;
                     target = rank != null && rank.gameObject.activeInHierarchy ? rank.gameObject : null;
                 }
                 if (target == null || EventSystem.current == null) return;
@@ -182,7 +182,7 @@ namespace SuperAutoAccessibility
         {
             try
             {
-                var picker = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.UI.Picker>();
+                var picker = SceneObjects.Find<Il2CppSpacewood.Unity.UI.Picker>();
                 return picker?.Container != null && picker.Container.gameObject.activeInHierarchy;
             }
             catch { return false; }

@@ -59,8 +59,7 @@ namespace SuperAutoAccessibility.Patches
 
             try
             {
-                var boardController = UnityEngine.Object.FindObjectOfType<
-                    Il2CppSpacewood.Unity.MonoBehaviours.Board.BoardController>();
+                var boardController = SceneObjects.Find<Il2CppSpacewood.Unity.MonoBehaviours.Board.BoardController>();
                 if (boardController == null) return;
 
                 Il2CppSpacewood.Unity.MonoBehaviours.Board.BoardRenderer boardRenderer = null;
@@ -379,7 +378,7 @@ namespace SuperAutoAccessibility.Patches
 
         private static Il2CppSpacewood.Unity.TallyArenaRank FindRankScreen()
         {
-            var tally = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.TallyArenaRank>();
+            var tally = SceneObjects.Find<Il2CppSpacewood.Unity.TallyArenaRank>();
             if (tally == null || !tally.gameObject.activeInHierarchy) return null;
             if (tally.Canvas != null && !tally.Canvas.gameObject.activeInHierarchy) return null;
             return tally;

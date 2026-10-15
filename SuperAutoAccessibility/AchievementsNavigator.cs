@@ -29,7 +29,7 @@ namespace SuperAutoAccessibility
             _cachedPage = null;
             try
             {
-                var page = UnityEngine.Object.FindObjectOfType<PageManager>()?.CurrentPage;
+                var page = SceneObjects.Find<PageManager>()?.CurrentPage;
                 if (page == null || page.gameObject.name != "Achievements") return null;
                 var a = page.GetComponentInChildren<Achievements>();
                 if (a != null && a.gameObject.activeInHierarchy) _cachedPage = a;

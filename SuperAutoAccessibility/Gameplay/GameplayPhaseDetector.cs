@@ -106,7 +106,7 @@ namespace SuperAutoAccessibility.Gameplay
             {
                 if (_hangarMain == null)
                 {
-                    _hangarMain = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.MonoBehaviours.Build.HangarMain>();
+                    _hangarMain = SceneObjects.Find<Il2CppSpacewood.Unity.MonoBehaviours.Build.HangarMain>();
                 }
 
                 if (_hangarMain != null)
@@ -130,7 +130,7 @@ namespace SuperAutoAccessibility.Gameplay
             bool battleActive = false;
             try
             {
-                var battleController = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.MonoBehaviours.Battle.BattleController>();
+                var battleController = SceneObjects.Find<Il2CppSpacewood.Unity.MonoBehaviours.Battle.BattleController>();
                 if (battleController != null)
                 {
                     try
@@ -234,7 +234,7 @@ namespace SuperAutoAccessibility.Gameplay
                             bool isArenaWin = false;
                             try
                             {
-                                var tallyArena = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.TallyArena>();
+                                var tallyArena = SceneObjects.Find<Il2CppSpacewood.Unity.TallyArena>();
                                 isArenaWin = tallyArena != null;
                             }
                             catch { }
@@ -335,7 +335,7 @@ namespace SuperAutoAccessibility.Gameplay
 
             try
             {
-                var battleIntro = UnityEngine.Object.FindObjectOfType<Il2Cpp.UIBattleIntro>();
+                var battleIntro = SceneObjects.Find<Il2Cpp.UIBattleIntro>();
                 if (battleIntro == null)
                 {
                     MelonLogger.Msg($"VS screen: UIBattleIntro not found (attempt {_vsRetryCount + 1}/{VS_MAX_RETRIES + 1})");

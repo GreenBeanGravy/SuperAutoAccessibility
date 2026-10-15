@@ -177,7 +177,7 @@ namespace SuperAutoAccessibility.Patches
 
             try
             {
-                var menu = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.Menu>();
+                var menu = SceneObjects.Find<Il2CppSpacewood.Unity.Menu>();
                 if (menu != null && menu.OneLiner != null)
                 {
                     string oneLinerText = menu.OneLiner.text;
@@ -208,7 +208,7 @@ namespace SuperAutoAccessibility.Patches
 
             try
             {
-                var versusLobby = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.VersusLobby>();
+                var versusLobby = SceneObjects.Find<Il2CppSpacewood.Unity.VersusLobby>();
                 if (versusLobby == null) return;
                 string summary = VersusLobbySummary(versusLobby);
                 if (!string.IsNullOrEmpty(summary))

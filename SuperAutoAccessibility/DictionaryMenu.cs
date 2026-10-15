@@ -170,7 +170,7 @@ namespace SuperAutoAccessibility
         {
             try
             {
-                return UnityEngine.Object.FindObjectOfType<UnityEngine.EventSystems.EventSystem>();
+                return SceneObjects.Find<UnityEngine.EventSystems.EventSystem>();
             }
             catch { return null; }
         }
