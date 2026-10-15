@@ -1039,6 +1039,8 @@ namespace SuperAutoAccessibility
 
         private static string GetRole(GameObject go)
         {
+            var picker = PickerInfo.OwnerOf(go);
+            if (picker != null && PickerInfo.IsCheckbox(picker, go.GetComponent<ButtonBase>())) return "check box";
             if (go.GetComponent<ButtonBase>() != null) return "button";
             if (go.GetComponent<SliderBase>() != null) return "slider";
             if (go.GetComponent<DropdownBase>() != null) return "dropdown";
@@ -1100,7 +1102,13 @@ namespace SuperAutoAccessibility
             {
                 var picker = PickerInfo.OwnerOf(go);
                 if (picker != null)
-                    return PickerInfo.IsPicked(picker, go.GetComponent<ButtonBase>()) ? "checked" : null;
+                {
+                    var option = go.GetComponent<ButtonBase>();
+                    bool picked = PickerInfo.IsPicked(picker, option);
+                    // A check box says both states; of several choices only the current one does.
+                    if (PickerInfo.IsCheckbox(picker, option)) return picked ? "checked" : "not checked";
+                    return picked ? "checked" : null;
+                }
             }
             catch { }
 

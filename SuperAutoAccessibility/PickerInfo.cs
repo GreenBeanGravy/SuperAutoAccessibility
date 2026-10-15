@@ -76,6 +76,28 @@ namespace SuperAutoAccessibility
             }
         }
 
+        /// <summary>
+        /// An option that switches on and off by itself (its icon is the picker's checkbox,
+        /// checked or not) rather than one choice of several: the Difficulty picker's Cursed
+        /// modifier beside Normal, Hard and Super Hard, or every option of a multi-select picker.
+        /// </summary>
+        public static bool IsCheckbox(Picker picker, ButtonBase option)
+        {
+            try
+            {
+                if (picker == null || option?.Icon == null || !option.Icon.gameObject.activeInHierarchy) return false;
+                var sprite = option.Icon.sprite;
+                if (sprite == null) return false;
+                int id = sprite.GetInstanceID();
+                return (picker.Checkbox != null && id == picker.Checkbox.GetInstanceID()) ||
+                       (picker.CheckboxChecked != null && id == picker.CheckboxChecked.GetInstanceID());
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         /// <summary>The open picker this control is an option of, or null.</summary>
         public static Picker OwnerOf(GameObject go)
         {

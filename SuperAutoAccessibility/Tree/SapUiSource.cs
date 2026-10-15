@@ -402,11 +402,13 @@ namespace SuperAutoAccessibility.Tree
             var picker = PickerInfo.OwnerOf(go);
             if (picker != null)
             {
-                bool picked = PickerInfo.IsPicked(picker, go.GetComponent<ButtonBase>());
-                node.Role = AccessRole.RadioButton;
+                var option = go.GetComponent<ButtonBase>();
+                bool picked = PickerInfo.IsPicked(picker, option);
+                bool checkbox = PickerInfo.IsCheckbox(picker, option);
+                node.Role = checkbox ? AccessRole.CheckBox : AccessRole.RadioButton;
                 node.Label = LabelFor(go);
                 node.Toggled = picked ? Toggled.True : Toggled.False;
-                node.Selected = picked;
+                if (!checkbox) node.Selected = picked;
                 node.Description = TooltipOf(go);
                 node.AddAction(AccessAction.Click);
                 return;
