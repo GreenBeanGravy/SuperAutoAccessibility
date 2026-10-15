@@ -1099,18 +1099,11 @@ namespace SuperAutoAccessibility
             }
             catch { }
 
-            // StatsSummaryItem: show "Label: Value" for stat entries
+            // StatsSummaryItem: its button is labeled with the whole tile ("Most bought pet, tier 2:
+            // Spider, 35"), so a "Label: Value" value only repeated half of it.
             try
             {
-                var statItem = go.GetComponentInParent<Il2CppSpacewood.Unity.StatsSummaryItem>();
-                if (statItem != null)
-                {
-                    string label = "";
-                    string value = "";
-                    try { label = statItem.Label?.text ?? ""; } catch { }
-                    try { value = statItem.Value?.text ?? ""; } catch { }
-                    if (!string.IsNullOrEmpty(label)) return $"{label}: {value}".Trim();
-                }
+                if (go.GetComponentInParent<Il2CppSpacewood.Unity.StatsSummaryItem>() != null) return null;
             }
             catch { }
 

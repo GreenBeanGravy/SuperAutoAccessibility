@@ -701,6 +701,7 @@ namespace SuperAutoAccessibility.Tree
                     string line = StatsLine(item);
                     statsItems.Add(item.transform.GetInstanceID());
                     if (string.IsNullOrEmpty(line) || sb.Length >= MaxDescription) continue;
+                    if (labels.Contains(line)) continue; // the tile's own button reads it
                     AppendSentence(sb, line);
                 }
                 for (int i = 0; i < texts.Length && sb.Length < MaxDescription; i++)
@@ -739,7 +740,7 @@ namespace SuperAutoAccessibility.Tree
             sb.Append(s);
         }
 
-        private static string StatsLine(StatsSummaryItem item)
+        internal static string StatsLine(StatsSummaryItem item)
         {
             try
             {

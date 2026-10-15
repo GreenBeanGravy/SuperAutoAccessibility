@@ -414,10 +414,24 @@ namespace SuperAutoAccessibility
                         else if (TryBuildByActiveComponent<Il2CppSpacewood.Unity.BrowseShops>(BuildBrowseShopsSections)) { }
                         else { BuildFallbackSections(); }
                     }
+                    // Opened from History, but pages of their own: the History branch never saw them,
+                    // so their builders never ran (Spectate said only its name, Achievements offered
+                    // Filter and Sort and none of its pets).
                     else if (currentPageName.Contains("Spectate"))
                     {
-                        // Opened from History, but a page of its own: the History branch never saw it.
-                        TryBuildByActiveComponent<Il2CppSpacewood.Unity.Spectate>(BuildSpectateSections);
+                        if (!TryBuildByActiveComponent<Il2CppSpacewood.Unity.Spectate>(BuildSpectateSections)) BuildFallbackSections();
+                    }
+                    else if (currentPageName == "Achievements")
+                    {
+                        if (!TryBuildByActiveComponent<Il2CppSpacewood.Unity.Achievements>(BuildAchievementsSections)) BuildFallbackSections();
+                    }
+                    else if (currentPageName == "Stats")
+                    {
+                        if (!TryBuildByActiveComponent<Il2CppSpacewood.Unity.StatsSummary>(BuildStatsSummarySections)) BuildFallbackSections();
+                    }
+                    else if (currentPageName == "Replay")
+                    {
+                        if (!TryBuildByActiveComponent<Il2CppSpacewood.Unity.Replay>(BuildReplaySections)) BuildFallbackSections();
                     }
                     else if (currentPageName.Contains("History"))
                     {
@@ -1402,7 +1416,8 @@ namespace SuperAutoAccessibility
         private static void BuildReplaySections(Il2CppSpacewood.Unity.Replay replay)
         {
             var section = new NavigationSection("Replay");
-            TryAddWithLabel(section, replay.SharedClipboardPlayButton, "Paste from Clipboard");
+            // The button says "Play replay from clipboard" itself.
+            TryAdd(section, replay.SharedClipboardPlayButton);
             TryAddWithLabel(section, replay.SharedManualPlayButton, "Play Replay");
             TryAdd(section, replay.SharedManualPlayInput);
             if (section.Elements.Count > 0) _sections.Add(section);
@@ -1568,8 +1583,9 @@ namespace SuperAutoAccessibility
         {
             // Section 1: Filters
             var filterSection = new NavigationSection("Filters");
-            TryAddWithLabel(filterSection, statsSummary.ModeFilterButton, "Mode Filter");
+            // Screen order: packs on the left, modes on the right.
             TryAddWithLabel(filterSection, statsSummary.PackFilterButton, "Pack Filter");
+            TryAddWithLabel(filterSection, statsSummary.ModeFilterButton, "Mode Filter");
             if (filterSection.Elements.Count > 0) _sections.Add(filterSection);
 
             // Section 2: Stats items
@@ -1586,10 +1602,8 @@ namespace SuperAutoAccessibility
                             var item = items[i];
                             if (item == null) continue;
                             if (item.Details == null) continue;
-                            if (item.Details.gameObject == null) continue;
-                            if (!item.Details.gameObject.activeInHierarchy) continue;
-                            if (!item.Details.GetInteractable()) continue;
-                            statsSection.Elements.Add(item.Details);
+                            // The tile's button is a magnifying glass: name it after the tile.
+                            TryAddWithLabel(statsSection, item.Details, Tree.SapUiSource.StatsLine(item) ?? "Details");
                         }
                         catch { }
                     }
