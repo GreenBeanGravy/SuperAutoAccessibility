@@ -465,6 +465,26 @@ namespace SuperAutoAccessibility.Gameplay
                     RefreshCurrentZone(hangar);
                 }
 
+                // A team pet picked up (Enter on it) waited silently for where to go.
+                if (stateEnum == HangarState.ArmyMinionFocus && _lastHangarState != HangarState.ArmyMinionFocus &&
+                    _currentZone == ShopZone.Team)
+                {
+                    string name = "Pet";
+                    try
+                    {
+                        MinionModel picked = _currentIndex < _currentSlots.Count ? _currentSlots[_currentIndex]?.MinionModel : null;
+                        if (picked == null)
+                        {
+                            var items = hangar.Overlay?.BoardModel?.Minions?.Items;
+                            if (items != null && _currentIndex < items.Count) picked = items[_currentIndex];
+                        }
+                        if (picked != null) name = PetStatsReader.GetLocalizedName(picked);
+                    }
+                    catch { }
+                    AccessibilityManager.Announce(
+                        $"{name} picked up. Move to a slot or a matching pet and press Enter. Backspace cancels.");
+                }
+
                 _lastHangarState = stateEnum;
             }
             catch { }
@@ -1750,6 +1770,8 @@ namespace SuperAutoAccessibility.Gameplay
 
                     rollButton.Click();
                     MelonLogger.Msg("[Shop Action] Roll");
+                    // This says "Rolled"; the narrator's "Shop rerolled" for the same roll is noise.
+                    ShopNarrator.KeyRollAt = Time.time;
 
                     // Announce tier after roll
                     try

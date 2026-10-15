@@ -172,13 +172,15 @@ namespace SuperAutoAccessibility.Gameplay
                     case "SpendMinionMana":
                         message = NarrateSpendMana(wrapper);
                         break;
+                    case "AddShopMinions":
+                        message = NarrateAddShopMinions(wrapper);
+                        break;
 
                     // Skip lifecycle/internal events even if wrapped in Done
                     case "SpendGold":
                     case "PlaySpell":
                     case "StartTurn":
                     case "EndTurn":
-                    case "AddShopMinions":
                     case "MoveMinion":
                     case "MinionTrade":
                     case "GainGold":
@@ -647,9 +649,42 @@ namespace SuperAutoAccessibility.Gameplay
                 // Skip auto-roll at start of turn â€” not player-initiated
                 if (startOfTurn) return null;
                 if (free) return "Free reroll";
+                // The roll key already said "Rolled. Tier 3."
+                if (Time.time - KeyRollAt < 1.5f) return null;
                 return "Shop rerolled";
             }
             catch { return "Shop rerolled"; }
+        }
+
+        /// <summary>Time of the last roll made with the roll key, which announces itself.</summary>
+        public static float KeyRollAt { get; set; } = -10f;
+
+        /// <summary>
+        /// Pets added to the shop: the bonus pets a level-up brings, or pets an ability stocks.
+        /// They used to appear without a word.
+        /// </summary>
+        private static string NarrateAddShopMinions(IBoardEvent wrapper)
+        {
+            try
+            {
+                var add = EventUnwrapper.ExtractDone<AddShopMinions>(wrapper);
+                var minions = add?.Minions;
+                if (minions == null || minions.Count == 0) return null;
+                var names = new List<string>();
+                for (int i = 0; i < minions.Count; i++)
+                {
+                    var m = minions[i];
+                    if (m == null) continue;
+                    string name = PetStatsReader.GetLocalizedName(m);
+                    try { name += $", tier {m.Tier}"; } catch { }
+                    names.Add(name);
+                }
+                if (names.Count == 0) return null;
+                bool reward = false;
+                try { reward = add.IsReward; } catch { }
+                return (reward ? "Level-up reward in the shop: " : "Added to the shop: ") + string.Join(". ", names);
+            }
+            catch { return null; }
         }
 
         /// <summary>
