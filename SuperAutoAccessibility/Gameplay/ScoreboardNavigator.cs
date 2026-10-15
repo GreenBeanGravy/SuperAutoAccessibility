@@ -24,6 +24,18 @@ namespace SuperAutoAccessibility.Gameplay
             "Tab and Shift Tab move between opponents, Left and Right between their pets, " +
             "Up and Down read a pet's details, Enter reads them all. Escape closes.";
 
+        /// <summary>After a Versus battle the board shares the screen with the result, whose Enter continues.</summary>
+        internal const string TallyHint =
+            "Tab and Shift Tab move between opponents, Left and Right between their pets, " +
+            "Up and Down read a pet's details. Enter continues.";
+
+        /// <summary>The keys for the board on screen.</summary>
+        internal static string CurrentHint => GameplayPhaseDetector.IsBattlePhase() ? TallyHint : Hint;
+
+        // After a battle the board opens with the result screen, which the player hears first:
+        // the board waits for a key before it reads anything.
+        private static bool _waitingForEntry;
+
         internal sealed class Pet
         {
             public SelectableBase Button;   // null when the scoreboard shows no pet views
@@ -367,15 +379,43 @@ namespace SuperAutoAccessibility.Gameplay
             _pet = 0;
             _line = 0;
             SectionManager.GetSections(); // label overrides in place before the focus is announced
-            string count = _opponents.Count == 1 ? "1 opponent" : $"{_opponents.Count} opponents";
-            Focus($"Scoreboard, {count}. {OpponentIntro()}");
-            _hintAt = Time.realtimeSinceStartup + 1.5f;
             MelonLogger.Msg($"[Scoreboard] Opened: {_opponents.Count} opponents");
+            // After a Versus battle the result screen opens with the board and says "Tab reads
+            // the scoreboard". Reading the board here only had the result talk over it, and the
+            // result's keys left the board unreachable.
+            if (GameplayPhaseDetector.IsBattlePhase())
+            {
+                _waitingForEntry = true;
+                return;
+            }
+            _waitingForEntry = false;
+            Focus($"Scoreboard, {CountText()}. {OpponentIntro()}");
+            _hintAt = Time.realtimeSinceStartup + 1.5f;
         }
+
+        private static string CountText() =>
+            _opponents.Count == 1 ? "1 opponent" : $"{_opponents.Count} opponents";
+
+        /// <summary>
+        /// Added to the battle result while the board is up beside it: "Tab reads the
+        /// scoreboard, 2 opponents." Null when there is no board.
+        /// </summary>
+        public static string TallyLine() =>
+            _board != null && _waitingForEntry && _opponents.Count > 0
+                ? $"Tab reads the scoreboard, {CountText()}."
+                : null;
+
+        /// <summary>A key that moves around the board (not Enter or Space, which the result keeps).</summary>
+        public static bool NavigationKeyDown() =>
+            Input.GetKeyDown(KeyCode.Tab) || Input.GetKeyDown(KeyCode.PageDown) || Input.GetKeyDown(KeyCode.PageUp) ||
+            Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow) ||
+            Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) ||
+            Input.GetKeyDown(KeyCode.Home) || Input.GetKeyDown(KeyCode.End);
 
         private static void Closed()
         {
             _board = null;
+            _waitingForEntry = false;
             _emptySince = -1f;
             _opponents.Clear();
             _linesByView.Clear();
@@ -420,6 +460,16 @@ namespace SuperAutoAccessibility.Gameplay
             }
 
             bool shift = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+            if (_waitingForEntry)
+            {
+                // The first move enters the board on its first opponent, whatever the key.
+                if (!NavigationKeyDown()) return false;
+                _waitingForEntry = false;
+                Refresh();
+                if (_opponents.Count == 0) return true;
+                Focus($"Scoreboard, {CountText()}. {OpponentIntro()}");
+                return true;
+            }
             if (Input.GetKeyDown(KeyCode.O) && Time.frameCount != _openedFrame) { Close(); return true; }
             if (Input.GetKeyDown(KeyCode.Tab)) { MoveOpponent(shift ? -1 : 1); return true; }
             if (Input.GetKeyDown(KeyCode.PageDown)) { MoveOpponent(1); return true; }

@@ -749,7 +749,12 @@ namespace SuperAutoAccessibility.Tree
             // The scoreboard's own text is every entry's name and lives again; its groups say
             // that. The keys are what the screen reader user needs on arrival.
             if (screenRoot.GetComponent<Il2CppSpacewood.Unity.MonoBehaviours.Build.HangarScoreboard>() != null)
-                return Gameplay.ScoreboardNavigator.Hint;
+                return Gameplay.ScoreboardNavigator.CurrentHint;
+            // The Versus lobby: its settings as label and value, not its raw texts ("1500.
+            // Opponent. 8-Player Real Time. Players. 3/8...").
+            var versusLobby = screenRoot.GetComponentInChildren<VersusLobby>();
+            if (versusLobby != null && versusLobby.gameObject.activeInHierarchy)
+                return Patches.PageManagerPatches.VersusLobbySummary(versusLobby);
             // The shop's overlays: what they hold and the keys, rather than every row's "Turn 3".
             var chooserRoot = screenRoot.GetComponent<Il2CppSpacewood.Scripts.MonoBehaviours.Build.Hangar.Chooser>();
             if (chooserRoot != null) return Gameplay.ShopOverlays.ChooserHint(chooserRoot);

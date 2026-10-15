@@ -85,6 +85,16 @@ namespace SuperAutoAccessibility.Gameplay
         // (up to ~2 s) for the turn number to move past the last one announced.
         private static int _lastShopTurn;
         private static bool _shopAnnouncePending;
+
+        /// <summary>
+        /// The turn of the battle just shown, from its result screen. The shop after it is a
+        /// later turn. Needed when the game was started in a battle (relaunching resumes one):
+        /// no shop turn had been announced, and the shop said the battle's turn ("Turn 5" for 6).
+        /// </summary>
+        public static void NoteBattleTurn(int turn)
+        {
+            if (turn > _lastShopTurn) _lastShopTurn = turn;
+        }
         private static int _shopAnnounceWaits;
         private const int ShopAnnounceMaxWaits = 8;
         private static GamePhase _shopAnnounceFrom = GamePhase.Unknown;

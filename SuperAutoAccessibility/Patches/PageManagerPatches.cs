@@ -210,57 +210,9 @@ namespace SuperAutoAccessibility.Patches
             {
                 var versusLobby = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.VersusLobby>();
                 if (versusLobby == null) return;
-
-                var parts = new System.Collections.Generic.List<string>();
-
-                // Game name
-                try
+                string summary = VersusLobbySummary(versusLobby);
+                if (!string.IsNullOrEmpty(summary))
                 {
-                    if (versusLobby.InfoPairGameName?.Value != null &&
-                        !string.IsNullOrWhiteSpace(versusLobby.InfoPairGameName.Value.text))
-                        parts.Add(versusLobby.InfoPairGameName.Value.text.Trim());
-                }
-                catch { }
-
-                // Player count
-                try
-                {
-                    if (versusLobby.InfoPairPlayerCount?.Value != null &&
-                        !string.IsNullOrWhiteSpace(versusLobby.InfoPairPlayerCount.Value.text))
-                        parts.Add($"Players: {versusLobby.InfoPairPlayerCount.Value.text.Trim()}");
-                }
-                catch { }
-
-                // Turn duration
-                try
-                {
-                    if (versusLobby.InfoPairTurnDuration?.Value != null &&
-                        !string.IsNullOrWhiteSpace(versusLobby.InfoPairTurnDuration.Value.text))
-                        parts.Add($"Duration: {versusLobby.InfoPairTurnDuration.Value.text.Trim()}");
-                }
-                catch { }
-
-                // Pack mode
-                try
-                {
-                    if (versusLobby.InfoPairPackMode?.Value != null &&
-                        !string.IsNullOrWhiteSpace(versusLobby.InfoPairPackMode.Value.text))
-                        parts.Add($"Packs: {versusLobby.InfoPairPackMode.Value.text.Trim()}");
-                }
-                catch { }
-
-                // Spectator mode
-                try
-                {
-                    if (versusLobby.InfoPairSpectator?.Value != null &&
-                        !string.IsNullOrWhiteSpace(versusLobby.InfoPairSpectator.Value.text))
-                        parts.Add($"Spectators: {versusLobby.InfoPairSpectator.Value.text.Trim()}");
-                }
-                catch { }
-
-                if (parts.Count > 0)
-                {
-                    string summary = string.Join(", ", parts);
                     AccessibilityManager.Announce(summary, interrupt: false);
                     MelonLogger.Msg($"[VersusLobby] Announced summary: {summary}");
                 }
@@ -269,6 +221,34 @@ namespace SuperAutoAccessibility.Patches
             {
                 MelonLogger.Warning($"VersusLobby summary error: {ex.Message}");
             }
+        }
+
+        /// <summary>
+        /// "8-Player Real Time, Players: 3 of 8, Duration: 90 seconds, Packs: Any, Spectators:
+        /// None". Spoken on arrival, and the lobby's description in the accessibility tree (its
+        /// raw text read "1500. Opponent. 8-Player Real Time. Players. 3/8. Timer...").
+        /// </summary>
+        internal static string VersusLobbySummary(Il2CppSpacewood.Unity.VersusLobby versusLobby)
+        {
+            var parts = new System.Collections.Generic.List<string>();
+            void Add(Il2CppSpacewood.Unity.VersusLobbyPair pair, string label)
+            {
+                try
+                {
+                    string value = pair?.Value != null ? pair.Value.text?.Trim() : null;
+                    if (string.IsNullOrEmpty(value)) return;
+                    value = value.Replace("/", " of ");
+                    value = Regex.Replace(value, @"\s+", " ");
+                    parts.Add(label == null ? value : $"{label}: {value}");
+                }
+                catch { }
+            }
+            Add(versusLobby.InfoPairGameName, null);
+            Add(versusLobby.InfoPairPlayerCount, "Players");
+            Add(versusLobby.InfoPairTurnDuration, "Duration");
+            Add(versusLobby.InfoPairPackMode, "Packs");
+            Add(versusLobby.InfoPairSpectator, "Spectators");
+            return parts.Count > 0 ? string.Join(", ", parts) : null;
         }
 
         // "MainMenuPage" â†’ "Main Menu Page"

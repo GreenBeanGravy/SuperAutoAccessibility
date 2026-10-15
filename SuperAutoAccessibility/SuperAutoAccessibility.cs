@@ -1304,9 +1304,17 @@ namespace SuperAutoAccessibility
                 return;
             }
 
+            // Rank screen after a ranked match: Enter continues, R reads it again.
+            if (Patches.GameplayPatches.HandleRankInput()) return;
+
             // Handle TallyArena (battle result) input â€” exclusive when active
             if (_tallyArenaActive)
             {
+                // After a Versus battle the scoreboard is on screen with the result: its
+                // movement keys reach it, Enter and Space still continue.
+                if (Gameplay.ScoreboardNavigator.IsOpen && Gameplay.ScoreboardNavigator.NavigationKeyDown() &&
+                    Gameplay.ScoreboardNavigator.HandleInput())
+                    return;
                 if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) ||
                     Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Escape))
                 {
@@ -4601,9 +4609,15 @@ namespace SuperAutoAccessibility
                         AccessibilityManager.Announce(survivors);
 
                     string resultText = ReadTallyArenaDetails(tally);
-                    string announcement = !string.IsNullOrEmpty(resultText)
-                        ? $"{resultText}. Press Enter or Space to continue."
-                        : "Battle result. Press Enter or Space to continue.";
+                    try { if (tally.Model?.Board != null) Gameplay.GameplayPhaseDetector.NoteBattleTurn(tally.Model.Board.Turn); } catch { }
+                    // A Versus round's result closes by itself about a second later
+                    // (SkipConfirm), so its keys would only be read to a screen that is gone.
+                    bool autoContinues = false;
+                    try { autoContinues = tally.Model != null && tally.Model.SkipConfirm; } catch { }
+                    string announcement = TextExtractor.JoinSentences(new[] {
+                        string.IsNullOrEmpty(resultText) ? "Battle result" : resultText,
+                        autoContinues ? null : "Press Enter or Space to continue.",
+                        autoContinues ? null : Gameplay.ScoreboardNavigator.TallyLine() });
 
                     AccessibilityManager.Announce(announcement, interrupt: false);
                     MelonLogger.Msg($"TallyArena opened: {resultText}");

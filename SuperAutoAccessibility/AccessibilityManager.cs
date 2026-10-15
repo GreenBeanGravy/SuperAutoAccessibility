@@ -1169,16 +1169,15 @@ namespace SuperAutoAccessibility
             }
             catch { }
 
-            // VersusLobbyItem: show player name and rank
+            // VersusLobbyItem: the rank. The player's name is the row's label already
+            // ("GreenBeanGravy, button, GreenBeanGravy, rank 1500").
             try
             {
                 var lobbyItem = go.GetComponentInParent<Il2CppSpacewood.Unity.VersusLobbyItem>();
                 if (lobbyItem != null)
                 {
-                    var parts = new List<string>();
-                    try { if (lobbyItem.PlayerName != null && !string.IsNullOrWhiteSpace(lobbyItem.PlayerName.text)) parts.Add(lobbyItem.PlayerName.text.Trim()); } catch { }
-                    try { if (lobbyItem.RankText != null && !string.IsNullOrWhiteSpace(lobbyItem.RankText.text)) parts.Add($"rank {lobbyItem.RankText.text.Trim()}"); } catch { }
-                    if (parts.Count > 0) return string.Join(", ", parts);
+                    string rank = lobbyItem.RankText != null ? lobbyItem.RankText.text?.Trim() : null;
+                    return string.IsNullOrEmpty(rank) ? null : $"rank {rank}";
                 }
             }
             catch { }

@@ -244,6 +244,15 @@ namespace SuperAutoAccessibility.Patches
                 nameof(SetVictories_Postfix),
                 isPostfix: true,
                 label: "HangarVictories.Set");
+
+            // TallyArenaRank.Play(rank, change): the rank screen after a ranked match
+            PatchMethod(harmony,
+                typeof(Il2CppSpacewood.Unity.TallyArenaRank),
+                "Play",
+                new[] { typeof(int), typeof(int) },
+                nameof(RankPlay_Prefix),
+                isPostfix: false,
+                label: "TallyArenaRank.Play");
         }
 
         /// <summary>
@@ -349,44 +358,142 @@ namespace SuperAutoAccessibility.Patches
             catch { }
         }
 
+        // The rank screen after a ranked match counts its number from the old rank to the new
+        // one, a step every few hundredths of a second, after a pause. Reading each step said
+        // "Rank 1500", "Rank 1499", ... fourteen times. Play(rank, change) gives the end of the
+        // count, which is read at once; without it the screen is read once the count stops.
+        private static int _rankSeen = -1;
+        private static float _rankChangedAt;
+        private static int? _rankTarget;
+        private static int _rankChange;
+
+        private static void RankPlay_Prefix(int __0, int __1)
+        {
+            _rankTarget = __0;
+            _rankChange = __1;
+            _lastArenaRank = -1;
+        }
+
+        /// <summary>The rank screen after a ranked match is up and waits for Enter.</summary>
+        public static bool RankScreenOpen { get; private set; }
+
+        private static Il2CppSpacewood.Unity.TallyArenaRank FindRankScreen()
+        {
+            var tally = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.TallyArenaRank>();
+            if (tally == null || !tally.gameObject.activeInHierarchy) return null;
+            if (tally.Canvas != null && !tally.Canvas.gameObject.activeInHierarchy) return null;
+            return tally;
+        }
+
         /// <summary>
-        /// Polls for TallyArenaRank to detect arena rank changes after a match.
-        /// Called from OnUpdate when the tally screen is visible.
+        /// Polls the rank screen shown after a ranked match. Called every frame.
         /// </summary>
         public static void PollArenaRankChange()
         {
             try
             {
-                var tally = UnityEngine.Object.FindObjectOfType<Il2CppSpacewood.Unity.TallyArenaRank>();
-                if (tally == null || !tally.gameObject.activeInHierarchy) return;
-
-                int rank = tally.ViewRank;
-                if (rank <= 0 || rank == _lastArenaRank) return;
-
-                // Read gain/loss labels from the UI for context
-                string gainText = "";
-                string loseText = "";
-                try
+                var tally = FindRankScreen();
+                if (tally == null)
                 {
-                    if (tally.GainLabel != null && !string.IsNullOrEmpty(tally.GainLabel.text))
-                        gainText = tally.GainLabel.text.Trim();
-                    if (tally.LoseLabel != null && !string.IsNullOrEmpty(tally.LoseLabel.text))
-                        loseText = tally.LoseLabel.text.Trim();
+                    if (RankScreenOpen) _rankTarget = null;
+                    RankScreenOpen = false;
+                    _rankSeen = -1;
+                    _lastArenaRank = -1;
+                    return;
                 }
-                catch { }
+                RankScreenOpen = true;
 
-                string announcement;
-                if (!string.IsNullOrEmpty(gainText))
-                    announcement = $"Rank {rank}. {gainText}";
-                else if (!string.IsNullOrEmpty(loseText))
-                    announcement = $"Rank {rank}. {loseText}";
+                int rank;
+                if (_rankTarget.HasValue)
+                {
+                    rank = _rankTarget.Value;
+                    if (rank == _lastArenaRank) return;
+                }
                 else
-                    announcement = $"Rank {rank}";
+                {
+                    rank = tally.ViewRank;
+                    if (rank <= 0) return;
+                    if (rank != _rankSeen)
+                    {
+                        _rankSeen = rank;
+                        _rankChangedAt = UnityEngine.Time.unscaledTime;
+                        return;
+                    }
+                    // The count starts after a pause of about a second.
+                    if (rank == _lastArenaRank || UnityEngine.Time.unscaledTime - _rankChangedAt < 1.5f) return;
+                }
 
-                AccessibilityManager.Announce(announcement, interrupt: false);
                 _lastArenaRank = rank;
+                AccessibilityManager.CancelAllPending();
+                AccessibilityManager.Announce(TextExtractor.JoinSentences(new[] {
+                    DescribeRank(tally), "Press Enter to continue." }));
             }
             catch { }
+        }
+
+        /// <summary>"Rank points: 1487, down 13".</summary>
+        private static string DescribeRank(Il2CppSpacewood.Unity.TallyArenaRank tally)
+        {
+            string title = "Rank points";
+            try
+            {
+                foreach (var text in tally.GetComponentsInChildren<Il2CppTMPro.TMP_Text>(false))
+                    if (text.name == "Label" && !string.IsNullOrWhiteSpace(text.text)) { title = text.text.Trim(); break; }
+            }
+            catch { }
+
+            string change = null;
+            int rank = tally.ViewRank;
+            if (_rankTarget.HasValue)
+            {
+                rank = _rankTarget.Value;
+                change = _rankChange > 0 ? $"up {_rankChange}" : _rankChange < 0 ? $"down {-_rankChange}" : "no change";
+            }
+            else
+            {
+                try
+                {
+                    // The label not in use keeps its prefab text ("+1000"), so look only at the visible one.
+                    if (tally.GainLabel != null && tally.GainLabel.gameObject.activeInHierarchy)
+                        change = tally.GainLabel.text?.Trim();
+                    else if (tally.LoseLabel != null && tally.LoseLabel.gameObject.activeInHierarchy)
+                        change = tally.LoseLabel.text?.Trim();
+                }
+                catch { }
+            }
+
+            string line = $"{title}: {rank}";
+            return string.IsNullOrEmpty(change) ? line : $"{line}, {change}";
+        }
+
+        /// <summary>
+        /// Keys on the rank screen: Enter or Space continues, R reads it again. True when used.
+        /// </summary>
+        public static bool HandleRankInput()
+        {
+            if (!RankScreenOpen) return false;
+            try
+            {
+                var tally = FindRankScreen();
+                if (tally == null) return false;
+                if (UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.Return) ||
+                    UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.KeypadEnter) ||
+                    UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.Space))
+                {
+                    if (tally.Button != null) tally.HandleSubmit(tally.Button);
+                    return true;
+                }
+                if (UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.R))
+                {
+                    AccessibilityManager.Announce(DescribeRank(tally));
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Warning($"[Rank] Input error: {ex.Message}");
+            }
+            return false;
         }
 
         /// <summary>
