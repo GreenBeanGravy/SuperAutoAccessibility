@@ -147,7 +147,7 @@ namespace SuperAutoAccessibility
             var selected = EventSystem.current.currentSelectedGameObject;
             bool inList = EntryOf(selected) != null;
 
-            if (Input.GetKeyDown(KeyCode.Tab))
+            if (ModInput.GetKeyDown(KeyCode.Tab))
             {
                 if (inList)
                 {
@@ -172,12 +172,12 @@ namespace SuperAutoAccessibility
             int current = list.IndexOf(selected);
             if (current < 0) return false;
             int next = current;
-            if (Input.GetKeyDown(KeyCode.DownArrow)) next = current + 1;
-            else if (Input.GetKeyDown(KeyCode.UpArrow)) next = current - 1;
-            else if (Input.GetKeyDown(KeyCode.PageDown)) next = current + 10;
-            else if (Input.GetKeyDown(KeyCode.PageUp)) next = current - 10;
-            else if (Input.GetKeyDown(KeyCode.Home)) next = 0;
-            else if (Input.GetKeyDown(KeyCode.End)) next = list.Count - 1;
+            if (ModInput.GetKeyDown(KeyCode.DownArrow)) next = current + 1;
+            else if (ModInput.GetKeyDown(KeyCode.UpArrow)) next = current - 1;
+            else if (ModInput.GetKeyDown(KeyCode.PageDown)) next = current + 10;
+            else if (ModInput.GetKeyDown(KeyCode.PageUp)) next = current - 10;
+            else if (ModInput.GetKeyDown(KeyCode.Home)) next = 0;
+            else if (ModInput.GetKeyDown(KeyCode.End)) next = list.Count - 1;
             else return false;
             next = Math.Max(0, Math.Min(next, list.Count - 1));
             if (next == current)

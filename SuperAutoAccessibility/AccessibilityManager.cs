@@ -125,7 +125,7 @@ namespace SuperAutoAccessibility
             // Check for delayed tooltip announcement. Not in a frame where a key went down: the
             // key usually moves on, and Tolk queues, so the old control's tooltip was read
             // before the new control ("Battle against the same 14 teams...", "Versus, button").
-            if (_currentSelectedObject != null && !_tooltipAnnounced && !Input.anyKeyDown)
+            if (_currentSelectedObject != null && !_tooltipAnnounced && !ModInput.anyKeyDown)
             {
                 if (Time.time - _selectionTime > TOOLTIP_DELAY)
                 {
@@ -1298,6 +1298,7 @@ namespace SuperAutoAccessibility
         {
             if (string.IsNullOrEmpty(message)) return;
 
+            message = Gamepad.Hint(message);
             TolkSpeech.Speak(message, interrupt);
             MelonLogger.Msg($"Announced: {message}");
         }

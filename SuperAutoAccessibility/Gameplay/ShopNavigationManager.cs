@@ -40,6 +40,9 @@ namespace SuperAutoAccessibility.Gameplay
     public static class ShopNavigationManager
     {
         private static ShopZone _currentZone = ShopZone.None;
+
+        /// <summary>The zone the player is in (the controller's bumpers step through them).</summary>
+        public static ShopZone CurrentZone => _currentZone;
         private static int _currentIndex = 0;
 
         // Cached slot data for current zone
@@ -248,32 +251,32 @@ namespace SuperAutoAccessibility.Gameplay
             bool turnEnded = IsTurnEnded(hangar);
 
             // Zone switching keys (always allowed)
-            if (Input.GetKeyDown(KeyCode.S)) SwitchToZone(ShopZone.PetShop, hangar);
-            else if (Input.GetKeyDown(KeyCode.F)) SwitchToZone(ShopZone.FoodShop, hangar);
-            else if (Input.GetKeyDown(KeyCode.T)) SwitchToZone(ShopZone.Team, hangar);
-            else if (Input.GetKeyDown(KeyCode.D)) SwitchToZone(ShopZone.Actions, hangar);
+            if (ModInput.GetKeyDown(KeyCode.S)) SwitchToZone(ShopZone.PetShop, hangar);
+            else if (ModInput.GetKeyDown(KeyCode.F)) SwitchToZone(ShopZone.FoodShop, hangar);
+            else if (ModInput.GetKeyDown(KeyCode.T)) SwitchToZone(ShopZone.Team, hangar);
+            else if (ModInput.GetKeyDown(KeyCode.D)) SwitchToZone(ShopZone.Actions, hangar);
 
             // Status query keys (always allowed)
-            else if (Input.GetKeyDown(KeyCode.A)) AnnounceGold(hangar);
-            else if (Input.GetKeyDown(KeyCode.L)) AnnounceLives(hangar);
-            else if (Input.GetKeyDown(KeyCode.N)) AnnounceTurn(hangar);
-            else if (Input.GetKeyDown(KeyCode.W)) AnnounceWins(hangar);
-            else if (Input.GetKeyDown(KeyCode.I)) AnnounceDetailedInfo(hangar);
-            else if (Input.GetKeyDown(KeyCode.O)) OpenScoreboard(hangar);
-            else if (Input.GetKeyDown(KeyCode.V)) SwitchToZone(ShopZone.Bullies, hangar);
+            else if (ModInput.GetKeyDown(KeyCode.A)) AnnounceGold(hangar);
+            else if (ModInput.GetKeyDown(KeyCode.L)) AnnounceLives(hangar);
+            else if (ModInput.GetKeyDown(KeyCode.N)) AnnounceTurn(hangar);
+            else if (ModInput.GetKeyDown(KeyCode.W)) AnnounceWins(hangar);
+            else if (ModInput.GetKeyDown(KeyCode.I)) AnnounceDetailedInfo(hangar);
+            else if (ModInput.GetKeyDown(KeyCode.O)) OpenScoreboard(hangar);
+            else if (ModInput.GetKeyDown(KeyCode.V)) SwitchToZone(ShopZone.Bullies, hangar);
 
             // Global shop action keys â€” blocked if turn ended
-            else if (Input.GetKeyDown(KeyCode.Q))
+            else if (ModInput.GetKeyDown(KeyCode.Q))
             {
                 if (turnEnded) AccessibilityManager.Announce("Turn already ended");
                 else PerformRoll(hangar);
             }
-            else if (Input.GetKeyDown(KeyCode.Z))
+            else if (ModInput.GetKeyDown(KeyCode.Z))
             {
                 if (turnEnded) AccessibilityManager.Announce("Turn already ended");
                 else PerformFreeze(hangar);
             }
-            else if (Input.GetKeyDown(KeyCode.E))
+            else if (ModInput.GetKeyDown(KeyCode.E))
             {
                 if (turnEnded) AccessibilityManager.Announce("Turn already ended");
                 else PerformEndTurn(hangar);
@@ -282,34 +285,34 @@ namespace SuperAutoAccessibility.Gameplay
             // Within-zone navigation (only when in a zone)
             else if (_currentZone != ShopZone.None)
             {
-                if (Input.GetKeyDown(KeyCode.RightArrow)) MoveInZone(1, hangar);
-                else if (Input.GetKeyDown(KeyCode.LeftArrow)) MoveInZone(-1, hangar);
-                else if (Input.GetKeyDown(KeyCode.Home)) MoveToStart(hangar);
-                else if (Input.GetKeyDown(KeyCode.End)) MoveToEnd(hangar);
+                if (ModInput.GetKeyDown(KeyCode.RightArrow)) MoveInZone(1, hangar);
+                else if (ModInput.GetKeyDown(KeyCode.LeftArrow)) MoveInZone(-1, hangar);
+                else if (ModInput.GetKeyDown(KeyCode.Home)) MoveToStart(hangar);
+                else if (ModInput.GetKeyDown(KeyCode.End)) MoveToEnd(hangar);
 
                 // Detail line navigation (Up/Down = browse lines, Space = re-read current)
-                else if (Input.GetKeyDown(KeyCode.DownArrow)) MoveDetailLine(1);
-                else if (Input.GetKeyDown(KeyCode.UpArrow)) MoveDetailLine(-1);
-                else if (Input.GetKeyDown(KeyCode.Space) && !GameplayPhaseDetector.IsBattlePhase())
+                else if (ModInput.GetKeyDown(KeyCode.DownArrow)) MoveDetailLine(1);
+                else if (ModInput.GetKeyDown(KeyCode.UpArrow)) MoveDetailLine(-1);
+                else if (ModInput.GetKeyDown(KeyCode.Space) && !GameplayPhaseDetector.IsBattlePhase())
                 {
                     if (_currentDetailLines.Count > 0 && _currentDetailLineIndex < _currentDetailLines.Count)
                         AccessibilityManager.Announce(_currentDetailLines[_currentDetailLineIndex]);
                 }
 
                 // Action keys (require zone selection) â€” blocked if turn ended
-                else if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+                else if (ModInput.GetKeyDown(KeyCode.Return) || ModInput.GetKeyDown(KeyCode.KeypadEnter))
                 {
                     if (turnEnded) AccessibilityManager.Announce("Turn already ended");
                     else PerformAction(hangar);
                 }
-                else if (Input.GetKeyDown(KeyCode.X) || Input.GetKeyDown(KeyCode.Delete))
+                else if (ModInput.GetKeyDown(KeyCode.X) || ModInput.GetKeyDown(KeyCode.Delete))
                 {
                     if (turnEnded) AccessibilityManager.Announce("Turn already ended");
                     else PerformSell(hangar);
                 }
 
                 // Backspace â€” cancel current action (food targeting, pet focus)
-                else if (Input.GetKeyDown(KeyCode.Backspace))
+                else if (ModInput.GetKeyDown(KeyCode.Backspace))
                 {
                     CancelCurrentAction();
                 }

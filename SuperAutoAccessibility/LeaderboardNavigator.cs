@@ -158,11 +158,11 @@ namespace SuperAutoAccessibility
             if (lb == null || PickerOpen()) return false;
 
             int move = 0;
-            if (Input.GetKeyDown(KeyCode.DownArrow)) move = 1;
-            else if (Input.GetKeyDown(KeyCode.UpArrow)) move = -1;
-            else if (Input.GetKeyDown(KeyCode.PageDown)) move = 10;
-            else if (Input.GetKeyDown(KeyCode.PageUp)) move = -10;
-            bool home = Input.GetKeyDown(KeyCode.Home), end = Input.GetKeyDown(KeyCode.End);
+            if (ModInput.GetKeyDown(KeyCode.DownArrow)) move = 1;
+            else if (ModInput.GetKeyDown(KeyCode.UpArrow)) move = -1;
+            else if (ModInput.GetKeyDown(KeyCode.PageDown)) move = 10;
+            else if (ModInput.GetKeyDown(KeyCode.PageUp)) move = -10;
+            bool home = ModInput.GetKeyDown(KeyCode.Home), end = ModInput.GetKeyDown(KeyCode.End);
             if (move == 0 && !home && !end) return false;
 
             var rows = Rows(lb);

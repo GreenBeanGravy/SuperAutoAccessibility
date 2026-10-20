@@ -407,10 +407,10 @@ namespace SuperAutoAccessibility.Gameplay
 
         /// <summary>A key that moves around the board (not Enter or Space, which the result keeps).</summary>
         public static bool NavigationKeyDown() =>
-            Input.GetKeyDown(KeyCode.Tab) || Input.GetKeyDown(KeyCode.PageDown) || Input.GetKeyDown(KeyCode.PageUp) ||
-            Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow) ||
-            Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) ||
-            Input.GetKeyDown(KeyCode.Home) || Input.GetKeyDown(KeyCode.End);
+            ModInput.GetKeyDown(KeyCode.Tab) || ModInput.GetKeyDown(KeyCode.PageDown) || ModInput.GetKeyDown(KeyCode.PageUp) ||
+            ModInput.GetKeyDown(KeyCode.LeftArrow) || ModInput.GetKeyDown(KeyCode.RightArrow) ||
+            ModInput.GetKeyDown(KeyCode.UpArrow) || ModInput.GetKeyDown(KeyCode.DownArrow) ||
+            ModInput.GetKeyDown(KeyCode.Home) || ModInput.GetKeyDown(KeyCode.End);
 
         private static void Closed()
         {
@@ -451,7 +451,7 @@ namespace SuperAutoAccessibility.Gameplay
             if (_board == null) return false;
             if (_opponents.Count == 0)
             {
-                if (Input.GetKeyDown(KeyCode.Escape) || (Input.GetKeyDown(KeyCode.O) && Time.frameCount != _openedFrame))
+                if (ModInput.GetKeyDown(KeyCode.Escape) || (ModInput.GetKeyDown(KeyCode.O) && Time.frameCount != _openedFrame))
                 {
                     Close();
                     return true;
@@ -459,7 +459,7 @@ namespace SuperAutoAccessibility.Gameplay
                 return false;
             }
 
-            bool shift = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+            bool shift = ModInput.GetKey(KeyCode.LeftShift) || ModInput.GetKey(KeyCode.RightShift);
             if (_waitingForEntry)
             {
                 // The first move enters the board on its first opponent, whatever the key.
@@ -470,18 +470,18 @@ namespace SuperAutoAccessibility.Gameplay
                 Focus($"Scoreboard, {CountText()}. {OpponentIntro()}");
                 return true;
             }
-            if (Input.GetKeyDown(KeyCode.O) && Time.frameCount != _openedFrame) { Close(); return true; }
-            if (Input.GetKeyDown(KeyCode.Tab)) { MoveOpponent(shift ? -1 : 1); return true; }
-            if (Input.GetKeyDown(KeyCode.PageDown)) { MoveOpponent(1); return true; }
-            if (Input.GetKeyDown(KeyCode.PageUp)) { MoveOpponent(-1); return true; }
-            if (Input.GetKeyDown(KeyCode.RightArrow)) { MovePet(_pet + 1); return true; }
-            if (Input.GetKeyDown(KeyCode.LeftArrow)) { MovePet(_pet - 1); return true; }
-            if (Input.GetKeyDown(KeyCode.Home)) { MovePet(0); return true; }
-            if (Input.GetKeyDown(KeyCode.End)) { MovePet(int.MaxValue); return true; }
-            if (Input.GetKeyDown(KeyCode.DownArrow)) { MoveLine(1); return true; }
-            if (Input.GetKeyDown(KeyCode.UpArrow)) { MoveLine(-1); return true; }
-            if (Input.GetKeyDown(KeyCode.Space)) { SpeakLine(); return true; }
-            if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) { SpeakAll(); return true; }
+            if (ModInput.GetKeyDown(KeyCode.O) && Time.frameCount != _openedFrame) { Close(); return true; }
+            if (ModInput.GetKeyDown(KeyCode.Tab)) { MoveOpponent(shift ? -1 : 1); return true; }
+            if (ModInput.GetKeyDown(KeyCode.PageDown)) { MoveOpponent(1); return true; }
+            if (ModInput.GetKeyDown(KeyCode.PageUp)) { MoveOpponent(-1); return true; }
+            if (ModInput.GetKeyDown(KeyCode.RightArrow)) { MovePet(_pet + 1); return true; }
+            if (ModInput.GetKeyDown(KeyCode.LeftArrow)) { MovePet(_pet - 1); return true; }
+            if (ModInput.GetKeyDown(KeyCode.Home)) { MovePet(0); return true; }
+            if (ModInput.GetKeyDown(KeyCode.End)) { MovePet(int.MaxValue); return true; }
+            if (ModInput.GetKeyDown(KeyCode.DownArrow)) { MoveLine(1); return true; }
+            if (ModInput.GetKeyDown(KeyCode.UpArrow)) { MoveLine(-1); return true; }
+            if (ModInput.GetKeyDown(KeyCode.Space)) { SpeakLine(); return true; }
+            if (ModInput.GetKeyDown(KeyCode.Return) || ModInput.GetKeyDown(KeyCode.KeypadEnter)) { SpeakAll(); return true; }
             return false;
         }
 

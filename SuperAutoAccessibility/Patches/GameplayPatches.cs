@@ -475,14 +475,14 @@ namespace SuperAutoAccessibility.Patches
             {
                 var tally = FindRankScreen();
                 if (tally == null) return false;
-                if (UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.Return) ||
-                    UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.KeypadEnter) ||
-                    UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.Space))
+                if (ModInput.GetKeyDown(UnityEngine.KeyCode.Return) ||
+                    ModInput.GetKeyDown(UnityEngine.KeyCode.KeypadEnter) ||
+                    ModInput.GetKeyDown(UnityEngine.KeyCode.Space))
                 {
                     if (tally.Button != null) tally.HandleSubmit(tally.Button);
                     return true;
                 }
-                if (UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.R))
+                if (ModInput.GetKeyDown(UnityEngine.KeyCode.R))
                 {
                     AccessibilityManager.Announce(DescribeRank(tally));
                     return true;

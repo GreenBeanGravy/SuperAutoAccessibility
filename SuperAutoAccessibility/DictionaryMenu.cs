@@ -120,7 +120,7 @@ namespace SuperAutoAccessibility
             _swallowUntilRelease.Clear();
             foreach (var k in _watchedKeys)
             {
-                try { if (Input.GetKey(k)) _swallowUntilRelease.Add(k); }
+                try { if (ModInput.GetKey(k)) _swallowUntilRelease.Add(k); }
                 catch { }
             }
             RestoreGameInput();
@@ -154,7 +154,7 @@ namespace SuperAutoAccessibility
             var stillHeld = new List<KeyCode>();
             foreach (var k in _swallowUntilRelease)
             {
-                try { if (Input.GetKey(k)) stillHeld.Add(k); } catch { }
+                try { if (ModInput.GetKey(k)) stillHeld.Add(k); } catch { }
             }
             _swallowUntilRelease.Clear();
             foreach (var k in stillHeld) _swallowUntilRelease.Add(k);
@@ -225,7 +225,7 @@ namespace SuperAutoAccessibility
         {
             if (_skipFrame) { _skipFrame = false; return; }
 
-            if (Input.GetKeyDown(KeyCode.Escape))
+            if (ModInput.GetKeyDown(KeyCode.Escape))
             {
                 Close();
                 return;
@@ -234,8 +234,8 @@ namespace SuperAutoAccessibility
             // Ctrl+F toggles between Browse and Search mode WITHIN the open overlay.
             // (Ctrl+F never opens the overlay from scratch — that's intentional, so
             // typing Ctrl+F in the regular game doesn't pop up the dictionary.)
-            if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
-                && Input.GetKeyDown(KeyCode.F))
+            if ((ModInput.GetKey(KeyCode.LeftControl) || ModInput.GetKey(KeyCode.RightControl))
+                && ModInput.GetKeyDown(KeyCode.F))
             {
                 if (_mode == Mode.Search) SwitchToBrowseInternal();
                 else SwitchToSearchInternal();
@@ -251,12 +251,12 @@ namespace SuperAutoAccessibility
         private static void HandleBrowseInput()
         {
             // Tab / PageDown: next category. Shift+Tab / PageUp: previous category.
-            bool tabNext = (Input.GetKeyDown(KeyCode.Tab) &&
-                            !(Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)))
-                           || Input.GetKeyDown(KeyCode.PageDown);
-            bool tabPrev = (Input.GetKeyDown(KeyCode.Tab) &&
-                            (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)))
-                           || Input.GetKeyDown(KeyCode.PageUp);
+            bool tabNext = (ModInput.GetKeyDown(KeyCode.Tab) &&
+                            !(ModInput.GetKey(KeyCode.LeftShift) || ModInput.GetKey(KeyCode.RightShift)))
+                           || ModInput.GetKeyDown(KeyCode.PageDown);
+            bool tabPrev = (ModInput.GetKeyDown(KeyCode.Tab) &&
+                            (ModInput.GetKey(KeyCode.LeftShift) || ModInput.GetKey(KeyCode.RightShift)))
+                           || ModInput.GetKeyDown(KeyCode.PageUp);
 
             if (tabNext)
             {
@@ -275,7 +275,7 @@ namespace SuperAutoAccessibility
                 return;
             }
 
-            if (Input.GetKeyDown(KeyCode.DownArrow))
+            if (ModInput.GetKeyDown(KeyCode.DownArrow))
             {
                 var list = CurrentCategoryItems();
                 if (list == null || list.Count == 0) return;
@@ -283,7 +283,7 @@ namespace SuperAutoAccessibility
                 AnnounceCurrentBrowse();
                 return;
             }
-            if (Input.GetKeyDown(KeyCode.UpArrow))
+            if (ModInput.GetKeyDown(KeyCode.UpArrow))
             {
                 var list = CurrentCategoryItems();
                 if (list == null || list.Count == 0) return;
@@ -291,7 +291,7 @@ namespace SuperAutoAccessibility
                 AnnounceCurrentBrowse();
                 return;
             }
-            if (Input.GetKeyDown(KeyCode.Home))
+            if (ModInput.GetKeyDown(KeyCode.Home))
             {
                 var list = CurrentCategoryItems();
                 if (list == null || list.Count == 0) return;
@@ -299,7 +299,7 @@ namespace SuperAutoAccessibility
                 AnnounceCurrentBrowse();
                 return;
             }
-            if (Input.GetKeyDown(KeyCode.End))
+            if (ModInput.GetKeyDown(KeyCode.End))
             {
                 var list = CurrentCategoryItems();
                 if (list == null || list.Count == 0) return;
@@ -307,8 +307,8 @@ namespace SuperAutoAccessibility
                 AnnounceCurrentBrowse();
                 return;
             }
-            if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)
-                || Input.GetKeyDown(KeyCode.Space))
+            if (ModInput.GetKeyDown(KeyCode.Return) || ModInput.GetKeyDown(KeyCode.KeypadEnter)
+                || ModInput.GetKeyDown(KeyCode.Space))
             {
                 AnnounceCurrentBrowse();
                 return;
@@ -358,12 +358,12 @@ namespace SuperAutoAccessibility
 
         private static void HandleSearchInput()
         {
-            if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+            if (ModInput.GetKeyDown(KeyCode.Return) || ModInput.GetKeyDown(KeyCode.KeypadEnter))
             {
                 CommitSearch();
                 return;
             }
-            if (Input.GetKeyDown(KeyCode.Backspace))
+            if (ModInput.GetKeyDown(KeyCode.Backspace))
             {
                 if (_query.Length > 0)
                 {
@@ -377,26 +377,26 @@ namespace SuperAutoAccessibility
             // After a search is committed, arrow keys navigate results.
             if (_searchCommitted)
             {
-                if (Input.GetKeyDown(KeyCode.DownArrow))
+                if (ModInput.GetKeyDown(KeyCode.DownArrow))
                 {
                     if (_searchResults.Count == 0) return;
                     _searchIndex = (_searchIndex + 1) % _searchResults.Count;
                     AnnounceCurrentSearchResult();
                     return;
                 }
-                if (Input.GetKeyDown(KeyCode.UpArrow))
+                if (ModInput.GetKeyDown(KeyCode.UpArrow))
                 {
                     if (_searchResults.Count == 0) return;
                     _searchIndex = (_searchIndex - 1 + _searchResults.Count) % _searchResults.Count;
                     AnnounceCurrentSearchResult();
                     return;
                 }
-                if (Input.GetKeyDown(KeyCode.Home))
+                if (ModInput.GetKeyDown(KeyCode.Home))
                 {
                     if (_searchResults.Count == 0) return;
                     _searchIndex = 0; AnnounceCurrentSearchResult(); return;
                 }
-                if (Input.GetKeyDown(KeyCode.End))
+                if (ModInput.GetKeyDown(KeyCode.End))
                 {
                     if (_searchResults.Count == 0) return;
                     _searchIndex = _searchResults.Count - 1; AnnounceCurrentSearchResult(); return;
@@ -406,7 +406,7 @@ namespace SuperAutoAccessibility
             // Append typed characters to the query but DON'T filter yet.
             // Suppress when Ctrl is held — that means the user is composing a Ctrl+X
             // shortcut, not typing.
-            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) return;
+            if (ModInput.GetKey(KeyCode.LeftControl) || ModInput.GetKey(KeyCode.RightControl)) return;
 
             string typed = Input.inputString;
             if (!string.IsNullOrEmpty(typed))

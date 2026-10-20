@@ -47,7 +47,7 @@ namespace SuperAutoAccessibility
         /// <summary>Once a frame, before the mod's polls: the timed re-read that is due.</summary>
         public static void Tick()
         {
-            if (Input.anyKeyDown) return;
+            if (ModInput.anyKeyDown) return;
             float now = Time.realtimeSinceStartup;
             CacheBase due = null;
             for (int i = 0; i < _caches.Count; i++)

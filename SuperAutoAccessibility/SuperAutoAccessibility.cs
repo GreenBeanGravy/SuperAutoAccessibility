@@ -86,6 +86,7 @@ namespace SuperAutoAccessibility
             TolkSpeech.Speak("Super Auto Pets Accessibility Mod loaded!", true);
 
             DebugLog.Initialize();
+            Gamepad.Initialize();
             // Ability text puts an arrow sprite between trigger and effect ("Faint [arrow] Summon
             // one 1/1 Cricket"); read as a colon, the way the mod's own ability reader says it.
             UnityA11y.Unity.UGuiSource.SpriteText["ArrowRight"] = ":";
@@ -99,6 +100,7 @@ namespace SuperAutoAccessibility
 
                 Patches.SelectableBasePatches.Initialize(_harmony);
                 Patches.EventSystemPatches.Initialize(_harmony);
+                Patches.InputModulePatches.Initialize(_harmony);
                 Patches.PageManagerPatches.Initialize(_harmony);
                 Patches.PopupManagerPatches.Initialize(_harmony);
                 Patches.ModalPatches.Initialize(_harmony);
@@ -250,7 +252,7 @@ namespace SuperAutoAccessibility
             // J: open the dictionary in categorized browse mode. Ctrl+F is only honoured
             // FROM INSIDE the dictionary (see DictionaryMenu.HandleInput) — it is not a
             // global app-wide hotkey.
-            if (Input.GetKeyDown(KeyCode.J))
+            if (ModInput.GetKeyDown(KeyCode.J))
             {
                 var sel = EventSystem.current?.currentSelectedGameObject;
                 if (sel?.GetComponent<InputFieldBase>() == null)
@@ -263,7 +265,7 @@ namespace SuperAutoAccessibility
             // Bootstrap terms input: R reads terms, Enter/Space accepts
             if (_bootstrapTermsDetected && _bootstrap != null)
             {
-                if (Input.GetKeyDown(KeyCode.R))
+                if (ModInput.GetKeyDown(KeyCode.R))
                 {
                     var selected = EventSystem.current?.currentSelectedGameObject;
                     if (selected?.GetComponent<InputFieldBase>() == null)
@@ -286,8 +288,8 @@ namespace SuperAutoAccessibility
                         }
                     }
                 }
-                if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) ||
-                    Input.GetKeyDown(KeyCode.Space))
+                if (ModInput.GetKeyDown(KeyCode.Return) || ModInput.GetKeyDown(KeyCode.KeypadEnter) ||
+                    ModInput.GetKeyDown(KeyCode.Space))
                 {
                     try
                     {
@@ -306,7 +308,7 @@ namespace SuperAutoAccessibility
 
             // R key: Read current context (modal, page, or gameplay)
             // Skip if Bootstrap terms already handled R above
-            if (Input.GetKeyDown(KeyCode.R) && !(_bootstrapTermsDetected && _bootstrap != null))
+            if (ModInput.GetKeyDown(KeyCode.R) && !(_bootstrapTermsDetected && _bootstrap != null))
             {
                 var selected = EventSystem.current?.currentSelectedGameObject;
                 if (selected?.GetComponent<InputFieldBase>() == null)
@@ -337,7 +339,7 @@ namespace SuperAutoAccessibility
             }
 
             // Space key: Re-read last battle announcement (only during/after battle)
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (ModInput.GetKeyDown(KeyCode.Space))
             {
                 var selected = EventSystem.current?.currentSelectedGameObject;
                 if (selected?.GetComponent<InputFieldBase>() == null &&
@@ -359,7 +361,7 @@ namespace SuperAutoAccessibility
             {
                 WatchBattlePause();
 
-                if (Input.GetKeyDown(KeyCode.P))
+                if (ModInput.GetKeyDown(KeyCode.P))
                 {
                     try
                     {
@@ -389,7 +391,7 @@ namespace SuperAutoAccessibility
                         MelonLogger.Warning($"Battle pause/play error: {ex.Message}");
                     }
                 }
-                else if (Input.GetKeyDown(KeyCode.G))
+                else if (ModInput.GetKeyDown(KeyCode.G))
                 {
                     try
                     {
@@ -411,7 +413,7 @@ namespace SuperAutoAccessibility
                         MelonLogger.Warning($"Battle fast forward error: {ex.Message}");
                     }
                 }
-                else if (Input.GetKeyDown(KeyCode.U))
+                else if (ModInput.GetKeyDown(KeyCode.U))
                 {
                     // With autoplay off the game plays one exchange per Play press. The button is
                     // on screen only, so a keyboard player could not switch it back on.
@@ -432,7 +434,7 @@ namespace SuperAutoAccessibility
                         MelonLogger.Warning($"Battle autoplay error: {ex.Message}");
                     }
                 }
-                else if (Input.GetKeyDown(KeyCode.K))
+                else if (ModInput.GetKeyDown(KeyCode.K))
                 {
                     try
                     {
@@ -453,13 +455,13 @@ namespace SuperAutoAccessibility
             }
 
             // F8 key: Dump full scene hierarchy to file (for bug reports)
-            if (Input.GetKeyDown(KeyCode.F8))
+            if (ModInput.GetKeyDown(KeyCode.F8))
             {
                 SceneHierarchyDumper.DumpAndSave();
             }
 
             // M key: Toggle mouse tracking mode (announce elements under cursor)
-            if (Input.GetKeyDown(KeyCode.M))
+            if (ModInput.GetKeyDown(KeyCode.M))
             {
                 var selected = EventSystem.current?.currentSelectedGameObject;
                 if (selected?.GetComponent<InputFieldBase>() == null)
@@ -471,7 +473,7 @@ namespace SuperAutoAccessibility
             }
 
             // N key: Open News page (only from Lobby/main menu)
-            if (Input.GetKeyDown(KeyCode.N))
+            if (ModInput.GetKeyDown(KeyCode.N))
             {
                 var selected = EventSystem.current?.currentSelectedGameObject;
                 if (selected?.GetComponent<InputFieldBase>() == null)
@@ -523,7 +525,7 @@ namespace SuperAutoAccessibility
             }
 
             // B key: read the lobby's snacks counter (the game's word: Stats says "Snacks gained")
-            if (Input.GetKeyDown(KeyCode.B))
+            if (ModInput.GetKeyDown(KeyCode.B))
             {
                 var selected = EventSystem.current?.currentSelectedGameObject;
                 if (selected?.GetComponent<InputFieldBase>() == null)
@@ -533,7 +535,7 @@ namespace SuperAutoAccessibility
             }
 
             // C key: Read turn timer
-            if (Input.GetKeyDown(KeyCode.C))
+            if (ModInput.GetKeyDown(KeyCode.C))
             {
                 var selected = EventSystem.current?.currentSelectedGameObject;
                 if (selected?.GetComponent<InputFieldBase>() == null)
@@ -543,7 +545,7 @@ namespace SuperAutoAccessibility
             }
 
             // H key: Toggle help overlay
-            if (Input.GetKeyDown(KeyCode.H))
+            if (ModInput.GetKeyDown(KeyCode.H))
             {
                 var selected = EventSystem.current?.currentSelectedGameObject;
                 if (selected?.GetComponent<InputFieldBase>() == null)
@@ -564,7 +566,7 @@ namespace SuperAutoAccessibility
 
             // Escape: context-dependent close/back/menu behavior
             // Skip if help overlay is active â€” it handles its own Escape via the input trap below
-            if (Input.GetKeyDown(KeyCode.Escape) && !_helpOverlayActive)
+            if (ModInput.GetKeyDown(KeyCode.Escape) && !_helpOverlayActive)
             {
                 var currentSelected = EventSystem.current?.currentSelectedGameObject;
 
@@ -975,7 +977,7 @@ namespace SuperAutoAccessibility
             if (_pageTransitionCooldown > 0) _pageTransitionCooldown--;
 
             // Detect Enter/Space on ButtonBase to track value changes
-            if (_pageTransitionCooldown <= 0 && (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space)))
+            if (_pageTransitionCooldown <= 0 && (ModInput.GetKeyDown(KeyCode.Return) || ModInput.GetKeyDown(KeyCode.Space)))
             {
                 var go = EventSystem.current?.currentSelectedGameObject;
                 if (go != null)
@@ -1186,21 +1188,21 @@ namespace SuperAutoAccessibility
                     var tips = SceneObjects.Find<Il2CppSpacewood.Unity.MonoBehaviours.Build.Tips>();
                     if (tips != null)
                     {
-                        if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.Return) ||
-                            Input.GetKeyDown(KeyCode.KeypadEnter) || Input.GetKeyDown(KeyCode.Space))
+                        if (ModInput.GetKeyDown(KeyCode.RightArrow) || ModInput.GetKeyDown(KeyCode.Return) ||
+                            ModInput.GetKeyDown(KeyCode.KeypadEnter) || ModInput.GetKeyDown(KeyCode.Space))
                         {
                             tips.Next();
                             // Page change will be detected and announced by PollTips on next frame
                         }
-                        else if (Input.GetKeyDown(KeyCode.LeftArrow))
+                        else if (ModInput.GetKeyDown(KeyCode.LeftArrow))
                         {
                             tips.Prev();
                         }
-                        else if (Input.GetKeyDown(KeyCode.Escape))
+                        else if (ModInput.GetKeyDown(KeyCode.Escape))
                         {
                             tips.Close();
                         }
-                        else if (Input.GetKeyDown(KeyCode.R))
+                        else if (ModInput.GetKeyDown(KeyCode.R))
                         {
                             // Re-read current page
                             string pageText = ReadTipsPage(tips);
@@ -1216,8 +1218,8 @@ namespace SuperAutoAccessibility
             // Handle tier overlay input â€” dismiss with Enter/Space/Escape
             if (_tierOverlayActive)
             {
-                if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) ||
-                    Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Escape))
+                if (ModInput.GetKeyDown(KeyCode.Return) || ModInput.GetKeyDown(KeyCode.KeypadEnter) ||
+                    ModInput.GetKeyDown(KeyCode.Space) || ModInput.GetKeyDown(KeyCode.Escape))
                 {
                     try
                     {
@@ -1246,8 +1248,8 @@ namespace SuperAutoAccessibility
             // Handle IconAlert input â€” dismiss with Enter/Space/Escape, R to re-read
             if (_iconAlertActive)
             {
-                if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) ||
-                    Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Escape))
+                if (ModInput.GetKeyDown(KeyCode.Return) || ModInput.GetKeyDown(KeyCode.KeypadEnter) ||
+                    ModInput.GetKeyDown(KeyCode.Space) || ModInput.GetKeyDown(KeyCode.Escape))
                 {
                     try
                     {
@@ -1258,7 +1260,7 @@ namespace SuperAutoAccessibility
                     // Don't clear _iconAlertActive here â€” let PollIconAlert detect close
                     // so that if another IconAlert appears immediately, it's caught
                 }
-                else if (Input.GetKeyDown(KeyCode.R))
+                else if (ModInput.GetKeyDown(KeyCode.R))
                 {
                     if (!string.IsNullOrEmpty(_lastIconAlertText))
                         AccessibilityManager.Announce(_lastIconAlertText);
@@ -1269,7 +1271,7 @@ namespace SuperAutoAccessibility
             // Handle confirm popup input â€” navigable with arrow/tab between Confirm and Cancel
             if (_confirmPopupActive)
             {
-                if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+                if (ModInput.GetKeyDown(KeyCode.Return) || ModInput.GetKeyDown(KeyCode.KeypadEnter))
                 {
                     if (_confirmFocusOnConfirm)
                     {
@@ -1297,7 +1299,7 @@ namespace SuperAutoAccessibility
                         AccessibilityManager.Announce("Cancelled");
                     }
                 }
-                else if (Input.GetKeyDown(KeyCode.Escape))
+                else if (ModInput.GetKeyDown(KeyCode.Escape))
                 {
                     // Escape always cancels regardless of focus
                     _confirmPopupActive = false;
@@ -1306,8 +1308,8 @@ namespace SuperAutoAccessibility
                     DismissDockConfirmButton();
                     AccessibilityManager.Announce("Cancelled");
                 }
-                else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow) ||
-                         Input.GetKeyDown(KeyCode.Tab))
+                else if (ModInput.GetKeyDown(KeyCode.LeftArrow) || ModInput.GetKeyDown(KeyCode.RightArrow) ||
+                         ModInput.GetKeyDown(KeyCode.Tab))
                 {
                     // Navigate between Confirm and Cancel
                     _confirmFocusOnConfirm = !_confirmFocusOnConfirm;
@@ -1328,8 +1330,8 @@ namespace SuperAutoAccessibility
                 if (Gameplay.ScoreboardNavigator.IsOpen && Gameplay.ScoreboardNavigator.NavigationKeyDown() &&
                     Gameplay.ScoreboardNavigator.HandleInput())
                     return;
-                if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) ||
-                    Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.Escape))
+                if (ModInput.GetKeyDown(KeyCode.Return) || ModInput.GetKeyDown(KeyCode.KeypadEnter) ||
+                    ModInput.GetKeyDown(KeyCode.Space) || ModInput.GetKeyDown(KeyCode.Escape))
                 {
                     try
                     {
@@ -1343,7 +1345,7 @@ namespace SuperAutoAccessibility
                     catch { }
                     _tallyArenaActive = false;
                 }
-                else if (Input.GetKeyDown(KeyCode.R))
+                else if (ModInput.GetKeyDown(KeyCode.R))
                 {
                     // Re-read the result
                     try
@@ -1364,8 +1366,8 @@ namespace SuperAutoAccessibility
             // Handle TallyArenaFinale (end-of-run summary) input â€” exclusive when active
             if (_tallyFinaleActive)
             {
-                if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) ||
-                    Input.GetKeyDown(KeyCode.Space))
+                if (ModInput.GetKeyDown(KeyCode.Return) || ModInput.GetKeyDown(KeyCode.KeypadEnter) ||
+                    ModInput.GetKeyDown(KeyCode.Space))
                 {
                     try
                     {
@@ -1382,7 +1384,7 @@ namespace SuperAutoAccessibility
                     catch { }
                     _tallyFinaleActive = false;
                 }
-                else if (Input.GetKeyDown(KeyCode.R))
+                else if (ModInput.GetKeyDown(KeyCode.R))
                 {
                     // Re-read summary
                     try
@@ -1400,8 +1402,8 @@ namespace SuperAutoAccessibility
             // Handle TallyArenaReward (unlocked item) input â€” exclusive when active
             if (_tallyRewardActive)
             {
-                if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter) ||
-                    Input.GetKeyDown(KeyCode.Space))
+                if (ModInput.GetKeyDown(KeyCode.Return) || ModInput.GetKeyDown(KeyCode.KeypadEnter) ||
+                    ModInput.GetKeyDown(KeyCode.Space))
                 {
                     try
                     {
@@ -1412,7 +1414,7 @@ namespace SuperAutoAccessibility
                     catch { }
                     _tallyRewardActive = false;
                 }
-                else if (Input.GetKeyDown(KeyCode.R))
+                else if (ModInput.GetKeyDown(KeyCode.R))
                 {
                     // Re-read reward
                     try
@@ -1430,7 +1432,7 @@ namespace SuperAutoAccessibility
             // Handle TallyArenaMenu (play again / return to menu) input â€” exclusive when active
             if (_tallyMenuActive)
             {
-                if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+                if (ModInput.GetKeyDown(KeyCode.Return) || ModInput.GetKeyDown(KeyCode.KeypadEnter))
                 {
                     // Activate focused button
                     if (_tallyMenuButtons.Count > 0 && _tallyMenuFocusIndex < _tallyMenuButtons.Count)
@@ -1441,7 +1443,7 @@ namespace SuperAutoAccessibility
                         _tallyMenuActive = false;
                     }
                 }
-                else if (Input.GetKeyDown(KeyCode.Escape))
+                else if (ModInput.GetKeyDown(KeyCode.Escape))
                 {
                     // Escape â†’ return to menu
                     try
@@ -1454,7 +1456,7 @@ namespace SuperAutoAccessibility
                     AccessibilityManager.Announce("Return to menu");
                     _tallyMenuActive = false;
                 }
-                else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.Tab))
+                else if (ModInput.GetKeyDown(KeyCode.DownArrow) || ModInput.GetKeyDown(KeyCode.Tab))
                 {
                     // Navigate down
                     if (_tallyMenuButtons.Count > 0)
@@ -1463,7 +1465,7 @@ namespace SuperAutoAccessibility
                         AccessibilityManager.Announce($"{_tallyMenuButtons[_tallyMenuFocusIndex].label}, {_tallyMenuFocusIndex + 1} of {_tallyMenuButtons.Count}");
                     }
                 }
-                else if (Input.GetKeyDown(KeyCode.UpArrow))
+                else if (ModInput.GetKeyDown(KeyCode.UpArrow))
                 {
                     // Navigate up
                     if (_tallyMenuButtons.Count > 0)
@@ -1483,7 +1485,7 @@ namespace SuperAutoAccessibility
                 {
                     _alert2InputCooldown--;
                     // Suppress Unity's InputModule Submit by deselecting while Enter is held
-                    if (Input.GetKey(KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter))
+                    if (ModInput.GetKey(KeyCode.Return) || ModInput.GetKey(KeyCode.KeypadEnter))
                     {
                         if (EventSystem.current != null)
                             EventSystem.current.SetSelectedGameObject(null);
@@ -1491,7 +1493,7 @@ namespace SuperAutoAccessibility
                     }
                     return; // consume all input during cooldown
                 }
-                if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+                if (ModInput.GetKeyDown(KeyCode.Return) || ModInput.GetKeyDown(KeyCode.KeypadEnter))
                 {
                     try
                     {
@@ -1518,7 +1520,7 @@ namespace SuperAutoAccessibility
                     _alert2Active = false;
                     Gameplay.ShopNavigationManager.IsInputSuppressed = false;
                 }
-                else if (Input.GetKeyDown(KeyCode.Escape))
+                else if (ModInput.GetKeyDown(KeyCode.Escape))
                 {
                     try
                     {
@@ -1534,9 +1536,9 @@ namespace SuperAutoAccessibility
                 // The two buttons sit side by side: Left and Right and Tab move between them
                 // as well as Up and Down (only Up and Down did, so Right said nothing and Enter
                 // then cancelled).
-                else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) ||
-                         Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow) ||
-                         Input.GetKeyDown(KeyCode.Tab))
+                else if (ModInput.GetKeyDown(KeyCode.UpArrow) || ModInput.GetKeyDown(KeyCode.DownArrow) ||
+                         ModInput.GetKeyDown(KeyCode.LeftArrow) || ModInput.GetKeyDown(KeyCode.RightArrow) ||
+                         ModInput.GetKeyDown(KeyCode.Tab))
                 {
                     // Navigate between cancel and confirm buttons with position
                     try
@@ -1576,7 +1578,7 @@ namespace SuperAutoAccessibility
                 return;
 
             // The chooser: T reads the team a reward would join (the shop's T is paused).
-            if (_chooserOpen && Input.GetKeyDown(KeyCode.T))
+            if (_chooserOpen && ModInput.GetKeyDown(KeyCode.T))
             {
                 AccessibilityManager.Announce(Gameplay.ShopOverlays.TeamSummary());
                 return;
@@ -1679,9 +1681,9 @@ namespace SuperAutoAccessibility
             // Handle News detail line navigation â€” Left/Right arrows browse codec details or change lines
             if (_lastNewsOpen)
             {
-                bool leftArrow = Input.GetKeyDown(KeyCode.LeftArrow);
-                bool rightArrow = Input.GetKeyDown(KeyCode.RightArrow);
-                bool space = Input.GetKeyDown(KeyCode.Space);
+                bool leftArrow = ModInput.GetKeyDown(KeyCode.LeftArrow);
+                bool rightArrow = ModInput.GetKeyDown(KeyCode.RightArrow);
+                bool space = ModInput.GetKeyDown(KeyCode.Space);
 
                 if (leftArrow || rightArrow || space)
                 {
@@ -2891,18 +2893,18 @@ namespace SuperAutoAccessibility
             // If ShopNavigationManager is actively navigating, it handles Left/Right/Up/Down
             if (Gameplay.ShopNavigationManager.IsActivelyNavigating()) return;
 
-            bool shiftDown = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
-            bool tab      = Input.GetKeyDown(KeyCode.Tab);
-            bool up       = Input.GetKeyDown(KeyCode.UpArrow);
-            bool down     = Input.GetKeyDown(KeyCode.DownArrow);
-            bool left     = Input.GetKeyDown(KeyCode.LeftArrow);
-            bool right    = Input.GetKeyDown(KeyCode.RightArrow);
-            bool pageUp   = Input.GetKeyDown(KeyCode.PageUp);
-            bool pageDown = Input.GetKeyDown(KeyCode.PageDown);
+            bool shiftDown = ModInput.GetKey(KeyCode.LeftShift) || ModInput.GetKey(KeyCode.RightShift);
+            bool tab      = ModInput.GetKeyDown(KeyCode.Tab);
+            bool up       = ModInput.GetKeyDown(KeyCode.UpArrow);
+            bool down     = ModInput.GetKeyDown(KeyCode.DownArrow);
+            bool left     = ModInput.GetKeyDown(KeyCode.LeftArrow);
+            bool right    = ModInput.GetKeyDown(KeyCode.RightArrow);
+            bool pageUp   = ModInput.GetKeyDown(KeyCode.PageUp);
+            bool pageDown = ModInput.GetKeyDown(KeyCode.PageDown);
             // Home and End jump to either end of the group (they did nothing in menus, the
             // chooser included), except in a text field, where they move the caret.
-            bool home = Input.GetKeyDown(KeyCode.Home);
-            bool end = Input.GetKeyDown(KeyCode.End);
+            bool home = ModInput.GetKeyDown(KeyCode.Home);
+            bool end = ModInput.GetKeyDown(KeyCode.End);
             if (home || end)
             {
                 var selected = EventSystem.current?.currentSelectedGameObject;
@@ -3226,14 +3228,14 @@ namespace SuperAutoAccessibility
                 var items = replayPage.Items;
                 int count = items.Count;
 
-                bool up = UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.UpArrow);
-                bool down = UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.DownArrow);
-                bool left = UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.LeftArrow);
-                bool right = UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.RightArrow);
-                bool enter = UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.Return)
-                          || UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.KeypadEnter);
-                bool home = UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.Home);
-                bool end = UnityEngine.Input.GetKeyDown(UnityEngine.KeyCode.End);
+                bool up = ModInput.GetKeyDown(UnityEngine.KeyCode.UpArrow);
+                bool down = ModInput.GetKeyDown(UnityEngine.KeyCode.DownArrow);
+                bool left = ModInput.GetKeyDown(UnityEngine.KeyCode.LeftArrow);
+                bool right = ModInput.GetKeyDown(UnityEngine.KeyCode.RightArrow);
+                bool enter = ModInput.GetKeyDown(UnityEngine.KeyCode.Return)
+                          || ModInput.GetKeyDown(UnityEngine.KeyCode.KeypadEnter);
+                bool home = ModInput.GetKeyDown(UnityEngine.KeyCode.Home);
+                bool end = ModInput.GetKeyDown(UnityEngine.KeyCode.End);
 
                 if (up || down)
                 {
@@ -3647,6 +3649,7 @@ namespace SuperAutoAccessibility
         private static Il2CppSpacewood.Unity.SideBar _cachedSideBar = null;
         private static int _sidebarCacheFrame = -1;
         private static bool _sidebarActive = false;
+        public static bool SidebarActive => _sidebarActive;
         private static int _sidebarFocusIndex = 0;
         private static readonly List<(string label, GameObject button, System.Action<Il2CppSpacewood.Unity.SideBar> handler)> _sidebarItems =
             new List<(string, GameObject, System.Action<Il2CppSpacewood.Unity.SideBar>)>();
@@ -3793,11 +3796,11 @@ namespace SuperAutoAccessibility
 
             if (_sidebarItems.Count == 0) return;
 
-            bool up = Input.GetKeyDown(KeyCode.UpArrow);
-            bool down = Input.GetKeyDown(KeyCode.DownArrow);
-            bool enter = Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter);
-            bool home = Input.GetKeyDown(KeyCode.Home);
-            bool end = Input.GetKeyDown(KeyCode.End);
+            bool up = ModInput.GetKeyDown(KeyCode.UpArrow);
+            bool down = ModInput.GetKeyDown(KeyCode.DownArrow);
+            bool enter = ModInput.GetKeyDown(KeyCode.Return) || ModInput.GetKeyDown(KeyCode.KeypadEnter);
+            bool home = ModInput.GetKeyDown(KeyCode.Home);
+            bool end = ModInput.GetKeyDown(KeyCode.End);
 
             if (up)
                 FocusSidebarItem(_sidebarFocusIndex <= 0 ? _sidebarItems.Count - 1 : _sidebarFocusIndex - 1, null);
@@ -3860,6 +3863,7 @@ namespace SuperAutoAccessibility
         // --- Help overlay (navigable TTS overlay with categories) ---
 
         private static bool _helpOverlayActive = false;
+        public static bool HelpOverlayActive => _helpOverlayActive;
         private static bool _helpOverlaySkipFrame = false;
         private static int _helpCategoryIndex = 0;
         private static int _helpItemIndex = 0;
@@ -4111,6 +4115,8 @@ namespace SuperAutoAccessibility
         {
             BuildHelpCategories();
             if (_helpCategories.Count == 0) return;
+            if (Gamepad.Connected)
+                _helpCategories.Insert(Gamepad.PadLastUsed ? 0 : _helpCategories.Count, Gamepad.HelpCategory());
 
             _helpOverlayActive = true;
             _helpOverlaySkipFrame = true; // Skip one frame to avoid H key closing immediately
@@ -4156,19 +4162,19 @@ namespace SuperAutoAccessibility
             }
 
             // Close with Escape or H
-            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.H))
+            if (ModInput.GetKeyDown(KeyCode.Escape) || ModInput.GetKeyDown(KeyCode.H))
             {
                 CloseHelpOverlay();
                 return;
             }
 
             // Switch category with Tab / Shift+Tab / PageDown / PageUp
-            bool tab = Input.GetKeyDown(KeyCode.Tab);
-            bool pageDown = Input.GetKeyDown(KeyCode.PageDown);
-            bool pageUp = Input.GetKeyDown(KeyCode.PageUp);
+            bool tab = ModInput.GetKeyDown(KeyCode.Tab);
+            bool pageDown = ModInput.GetKeyDown(KeyCode.PageDown);
+            bool pageUp = ModInput.GetKeyDown(KeyCode.PageUp);
             if (tab || pageDown || pageUp)
             {
-                bool shift = pageUp || (tab && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)));
+                bool shift = pageUp || (tab && (ModInput.GetKey(KeyCode.LeftShift) || ModInput.GetKey(KeyCode.RightShift)));
                 if (shift)
                     _helpCategoryIndex--;
                 else
@@ -4190,7 +4196,7 @@ namespace SuperAutoAccessibility
             var currentCat = _helpCategories[_helpCategoryIndex];
             if (currentCat.items.Count == 0) return;
 
-            if (Input.GetKeyDown(KeyCode.DownArrow))
+            if (ModInput.GetKeyDown(KeyCode.DownArrow))
             {
                 _helpItemIndex++;
                 if (_helpItemIndex >= currentCat.items.Count)
@@ -4200,7 +4206,7 @@ namespace SuperAutoAccessibility
                 string pos = $"{_helpItemIndex + 1} of {currentCat.items.Count}";
                 AccessibilityManager.Announce($"{item}, {pos}");
             }
-            else if (Input.GetKeyDown(KeyCode.UpArrow))
+            else if (ModInput.GetKeyDown(KeyCode.UpArrow))
             {
                 _helpItemIndex--;
                 if (_helpItemIndex < 0) _helpItemIndex = 0;
@@ -4209,7 +4215,7 @@ namespace SuperAutoAccessibility
                 string pos = $"{_helpItemIndex + 1} of {currentCat.items.Count}";
                 AccessibilityManager.Announce($"{item}, {pos}");
             }
-            else if (Input.GetKeyDown(KeyCode.Space))
+            else if (ModInput.GetKeyDown(KeyCode.Space))
             {
                 // Re-read current item
                 if (_helpItemIndex < currentCat.items.Count)
@@ -5318,7 +5324,7 @@ namespace SuperAutoAccessibility
         /// press would have its first control pressed by it.
         /// </summary>
         private static bool SubmitKeyHeld() =>
-            Input.GetKey(KeyCode.Return) || Input.GetKey(KeyCode.KeypadEnter) || Input.GetKey(KeyCode.Space);
+            ModInput.GetKey(KeyCode.Return) || ModInput.GetKey(KeyCode.KeypadEnter) || ModInput.GetKey(KeyCode.Space);
 
         /// <summary>
         /// The chooser: a reward to pick after a pet levels up, a toy, stock food. It came up
@@ -5559,7 +5565,7 @@ namespace SuperAutoAccessibility
             // When on confirm button: Enter confirms, arrows/Tab go back to editing
             if (_namePickerOnConfirm)
             {
-                if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+                if (ModInput.GetKeyDown(KeyCode.Return) || ModInput.GetKeyDown(KeyCode.KeypadEnter))
                 {
                     // Confirm the name
                     try
@@ -5582,9 +5588,9 @@ namespace SuperAutoAccessibility
                         MelonLogger.Warning($"Name picker confirm error: {ex.Message}");
                     }
                 }
-                else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) ||
-                         Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow) ||
-                         Input.GetKeyDown(KeyCode.Tab))
+                else if (ModInput.GetKeyDown(KeyCode.UpArrow) || ModInput.GetKeyDown(KeyCode.DownArrow) ||
+                         ModInput.GetKeyDown(KeyCode.LeftArrow) || ModInput.GetKeyDown(KeyCode.RightArrow) ||
+                         ModInput.GetKeyDown(KeyCode.Tab))
                 {
                     // Go back to editing
                     _namePickerOnConfirm = false;
@@ -5597,7 +5603,7 @@ namespace SuperAutoAccessibility
                 return;
             }
 
-            if (Input.GetKeyDown(KeyCode.LeftArrow))
+            if (ModInput.GetKeyDown(KeyCode.LeftArrow))
             {
                 if (_namePickerOnAdjectives)
                 {
@@ -5613,7 +5619,7 @@ namespace SuperAutoAccessibility
                 }
                 AnnounceCurrentDockBox(dock);
             }
-            else if (Input.GetKeyDown(KeyCode.RightArrow))
+            else if (ModInput.GetKeyDown(KeyCode.RightArrow))
             {
                 if (_namePickerOnAdjectives)
                 {
@@ -5629,12 +5635,12 @@ namespace SuperAutoAccessibility
                 }
                 AnnounceCurrentDockBox(dock);
             }
-            else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow))
+            else if (ModInput.GetKeyDown(KeyCode.UpArrow) || ModInput.GetKeyDown(KeyCode.DownArrow))
             {
                 _namePickerOnAdjectives = !_namePickerOnAdjectives;
                 AnnounceCurrentDockBox(dock);
             }
-            else if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+            else if (ModInput.GetKeyDown(KeyCode.Return) || ModInput.GetKeyDown(KeyCode.KeypadEnter))
             {
                 // Select the currently highlighted DockBox
                 try
