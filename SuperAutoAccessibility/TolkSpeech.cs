@@ -171,11 +171,20 @@ namespace SuperAutoAccessibility
 
             if (Tolk_Output != null)
             {
-                // Never force interrupt â€” always queue speech so announcements don't cut each other off
-                bool result = Tolk_Output(text, false);
-                // Uncomment for debug logging:
-                // MelonLogger.Msg($"Speech output: {text} (success: {result})");
+                // Callers say what they mean: a move through a menu cuts off the one before it,
+                // and a continuation ("Gained 1 gold") queues behind its first line.
+                // Battles are the exception. The narration queues, so a line the player has not
+                // heard yet is not cut off by a screen that opens by itself; only a key the
+                // player just pressed (pause, fast forward) may interrupt it.
+                bool cut = interrupt && (!InBattle() || ModInput.anyKeyDown);
+                Tolk_Output(text, cut);
             }
+        }
+
+        private static bool InBattle()
+        {
+            try { return Gameplay.GameplayPhaseDetector.IsBattlePhase(); }
+            catch { return false; }
         }
 
         public static void Shutdown()

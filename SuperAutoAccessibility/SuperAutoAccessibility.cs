@@ -101,6 +101,7 @@ namespace SuperAutoAccessibility
                 Patches.SelectableBasePatches.Initialize(_harmony);
                 Patches.EventSystemPatches.Initialize(_harmony);
                 Patches.InputModulePatches.Initialize(_harmony);
+                Patches.NotificationPatches.Initialize(_harmony);
                 Patches.PageManagerPatches.Initialize(_harmony);
                 Patches.PopupManagerPatches.Initialize(_harmony);
                 Patches.ModalPatches.Initialize(_harmony);

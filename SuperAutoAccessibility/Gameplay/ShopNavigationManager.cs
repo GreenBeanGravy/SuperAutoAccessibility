@@ -198,7 +198,8 @@ namespace SuperAutoAccessibility.Gameplay
                 if (_autoMoveDelayFrames <= 0)
                 {
                     _pendingAutoMoveToBoard = false;
-                    AutoMoveToBoard(hangar);
+                    AccessibilityManager.QueueOnly = true;
+                    try { AutoMoveToBoard(hangar); } finally { AccessibilityManager.QueueOnly = false; }
                 }
                 // Don't block input â€” let user continue interacting while waiting
             }
@@ -210,7 +211,8 @@ namespace SuperAutoAccessibility.Gameplay
                 if (_combineFocusDelayFrames <= 0)
                 {
                     _pendingCombineFocus = false;
-                    AutoFocusCombineTarget(hangar, _combineTargetEnum);
+                    AccessibilityManager.QueueOnly = true;
+                    try { AutoFocusCombineTarget(hangar, _combineTargetEnum); } finally { AccessibilityManager.QueueOnly = false; }
                 }
             }
 
@@ -1771,8 +1773,11 @@ namespace SuperAutoAccessibility.Gameplay
                     // Snapshot shop state before roll for unchained/food detection
                     SnapshotShopState(hangar);
 
+                    int notified = Patches.NotificationPatches.Count;
                     rollButton.Click();
                     MelonLogger.Msg("[Shop Action] Roll");
+                    // The game said why it did not roll (no gold): that message is all there is to say.
+                    if (Patches.NotificationPatches.Count != notified) return;
                     // This says "Rolled"; the narrator's "Shop rerolled" for the same roll is noise.
                     ShopNarrator.KeyRollAt = Time.time;
 

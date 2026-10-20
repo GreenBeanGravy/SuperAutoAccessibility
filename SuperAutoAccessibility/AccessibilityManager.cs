@@ -1294,9 +1294,17 @@ namespace SuperAutoAccessibility
             _currentSelectedObject = null;
         }
 
+        /// <summary>
+        /// While true, announcements queue instead of cutting off what is being said. For what
+        /// the mod does by itself after the player's action (moving on to the team after a buy):
+        /// it must not talk over "Mosquito summoned".
+        /// </summary>
+        public static bool QueueOnly { get; set; }
+
         public static void Announce(string message, bool interrupt = true)
         {
             if (string.IsNullOrEmpty(message)) return;
+            if (QueueOnly) interrupt = false;
 
             message = Gamepad.Hint(message);
             TolkSpeech.Speak(message, interrupt);
