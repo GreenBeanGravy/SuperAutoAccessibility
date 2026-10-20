@@ -17,8 +17,10 @@ namespace SuperAutoAccessibility.Patches
         public static void Initialize(HarmonyLib.Harmony harmony)
         {
             Patch(harmony, "GetButtonDown", nameof(Down_Postfix));
-            Patch(harmony, "GetButton", nameof(Held_Postfix));
-            Patch(harmony, "GetButtonUp", nameof(Up_Postfix));
+            // The stick also moves the game's own selection through these axes, by a lighter push
+            // than the mod's, and that move is silent. With a pad connected the mod does all the
+            // moving (the D-pad has no native route at all).
+            Patch(harmony, "GetAxisRaw", nameof(Axis_Postfix));
         }
 
         private static void Patch(HarmonyLib.Harmony harmony, string method, string postfix)
@@ -40,19 +42,15 @@ namespace SuperAutoAccessibility.Patches
             }
         }
 
+        private static void Axis_Postfix(string axisName, ref float __result)
+        {
+            if (__result != 0f && Gamepad.Connected && (axisName == "Horizontal" || axisName == "Vertical"))
+                __result = 0f;
+        }
+
         private static void Down_Postfix(string buttonName, ref bool __result)
         {
-            if (!__result) __result = Gamepad.ModuleButton(buttonName, Gamepad.Phase.Down);
-        }
-
-        private static void Held_Postfix(string buttonName, ref bool __result)
-        {
-            if (!__result) __result = Gamepad.ModuleButton(buttonName, Gamepad.Phase.Held);
-        }
-
-        private static void Up_Postfix(string buttonName, ref bool __result)
-        {
-            if (!__result) __result = Gamepad.ModuleButton(buttonName, Gamepad.Phase.Up);
+            if (!__result) __result = Gamepad.ModuleSubmitOrCancel(buttonName);
         }
     }
 }

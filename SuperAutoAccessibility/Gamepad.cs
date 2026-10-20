@@ -177,23 +177,16 @@ namespace SuperAutoAccessibility
         public static bool KeyHeld(KeyCode key) { Poll(); return _heldKeys.ContainsKey(key); }
         public static bool AnyKeyDown() { Poll(); return _down.Count > 0; }
 
-        public enum Phase { Down, Held, Up }
-
         /// <summary>
-        /// Whether the pad presses one of the game's input module buttons: Submit is what Enter
-        /// and Space press, Cancel what Escape presses.
+        /// Whether the pad presses one of the game's input module buttons this frame: Submit is
+        /// what Enter and Space press, Cancel what Escape presses.
         /// </summary>
-        public static bool ModuleButton(string name, Phase phase)
+        public static bool ModuleSubmitOrCancel(string name)
         {
-            if (name == "Submit")
-                return Test(KeyCode.Return, phase) || Test(KeyCode.KeypadEnter, phase) || Test(KeyCode.Space, phase);
-            if (name == "Cancel")
-                return Test(KeyCode.Escape, phase);
+            if (name == "Submit") return KeyDown(KeyCode.Return) || KeyDown(KeyCode.KeypadEnter) || KeyDown(KeyCode.Space);
+            if (name == "Cancel") return KeyDown(KeyCode.Escape);
             return false;
         }
-
-        private static bool Test(KeyCode key, Phase phase) =>
-            phase == Phase.Down ? KeyDown(key) : phase == Phase.Held ? KeyHeld(key) : KeyUp(key);
 
         /// <summary>The buttons held this frame (for tests).</summary>
         public static PadButton Held { get { Poll(); return _held; } }
@@ -209,6 +202,8 @@ namespace SuperAutoAccessibility
             _down.Clear();
             _up.Clear();
             SpeakPending();
+            // The keyboard was used last: hints and help name its keys again.
+            if (Input.anyKeyDown) PadLastUsed = false;
 
             try
             {
@@ -468,7 +463,6 @@ namespace SuperAutoAccessibility
                 case PadButton.RDown: return Keys(KeyCode.End);
                 case PadButton.View: return Keys(KeyCode.H);
                 case PadButton.Start: return Keys(KeyCode.Escape);
-                case PadButton.B: return Keys(KeyCode.Escape);
                 case PadButton.L3: return Keys(KeyCode.J);
             }
 
@@ -486,6 +480,7 @@ namespace SuperAutoAccessibility
             switch (button)
             {
                 case PadButton.A: return Keys(KeyCode.Return);
+                case PadButton.B: return Keys(KeyCode.Escape);
                 case PadButton.X: return Keys(KeyCode.Space);
                 case PadButton.Y: return Keys(KeyCode.R);
                 case PadButton.LB: return Keys(KeyCode.PageUp);
@@ -501,6 +496,7 @@ namespace SuperAutoAccessibility
             {
                 // Return as well as P: the round's result screens are in the battle scene.
                 case PadButton.A: return Keys(KeyCode.Return, KeyCode.P);
+                case PadButton.B: return Keys(KeyCode.Escape);
                 case PadButton.X: return Keys(KeyCode.G);
                 case PadButton.Y: return Keys(KeyCode.U);
                 case PadButton.RT: return Keys(KeyCode.K);
@@ -542,6 +538,7 @@ namespace SuperAutoAccessibility
             switch (button)
             {
                 case PadButton.A: return Keys(KeyCode.Return);
+                case PadButton.B: return Keys(KeyCode.Escape);
                 case PadButton.X: return Keys(KeyCode.X);       // sell
                 case PadButton.Y: return Keys(KeyCode.R);
                 case PadButton.LB: return Keys(NextZoneKey(-1));
