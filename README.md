@@ -22,7 +22,7 @@ In a run, the mod:
 - reads the Versus scoreboard opponent by opponent and pet by pet
 - shows the upcoming bullies in Daily
 
-Press H anywhere for a list of every key on the screen you're on.
+Press H anywhere for a list of every key on the screen you're on. A controller works everywhere the keyboard does.
 
 ## Installing
 
@@ -45,6 +45,7 @@ In `UserData/MelonPreferences.cfg`, under `[SAPAccess]`:
 | Setting | What it does |
 | --- | --- |
 | `UseAccessibilityTree` | `true` (default): your screen reader reads the menus. `false`: the mod speaks them through Tolk. |
+| `ControllerSupport` | `true` (default): a controller works in menus, the shop and battles. `false` turns it off. |
 | `DebugLogging` | `true` writes detailed tracing to the MelonLoader log, for bug reports. Default `false`. |
 
 Change them with the game closed. The game saves this file when it quits.
@@ -119,11 +120,60 @@ Change them with the game closed. The game saves this file when it quits.
 | Enter | Read all of the pet's details |
 | O or Escape | Close |
 
+## Controller
+
+Plug in an Xbox style controller, or any controller that Steam Input presents as one, and play without the keyboard. The mod says "Controller connected" and everything it speaks for the keyboard is spoken for the controller too. Press View for the controller help on the screen you're on.
+
+### Menus
+
+| Button | Action |
+| --- | --- |
+| D-pad or left stick | Previous / next item (left / right adjust sliders) |
+| Left / right bumper | Previous / next section |
+| Right stick up / down | First / last item |
+| A | Activate |
+| B | Back |
+| X | Space (read again, accept) |
+| Y | Read the screen |
+| Start | Back, or the pause menu |
+| View | Open or close help |
+| Left stick click | Dictionary |
+
+### Shop
+
+| Button | Action |
+| --- | --- |
+| Left / right bumper | Previous / next zone: pet shop, food shop, team, actions |
+| D-pad or left stick, left / right | Previous / next slot |
+| D-pad or left stick, up / down | Browse the detail lines |
+| Right stick up / down | First / last slot |
+| A | Buy, select or use |
+| X | Sell |
+| B | Cancel, leave the zone, then the pause menu |
+| Y | Read the whole board |
+| Right stick click | Read the current detail line again |
+| Hold left trigger, then A / B / X / Y | Gold / lives / turn / wins |
+| Hold left trigger, then right / left bumper | Details / scoreboard |
+| Hold right trigger, then A / X / Y | Roll / freeze / end turn |
+
+### Battle
+
+| Button | Action |
+| --- | --- |
+| A | Pause or play, and continue on result screens |
+| X | Fast forward |
+| Y | Autoplay on or off |
+| Right trigger | Skip the battle |
+| Left bumper or right stick click | Repeat the last line |
+| Right bumper | Read the screen |
+| B or Start | Pause menu |
+
 ## Troubleshooting
 
 - The game crashes at startup: Super Auto Pets runs on Unity 6, which needs MelonLoader 0.7.3 or newer. Run the installer again to update it.
 - Menus speak, but your screen reader's own reading of them is missing: check that `UseAccessibilityTree` is `true`. Without it, or if the game window can't be reached, the mod speaks the menus itself.
 - The mod loads twice: an old `SuperAutoPetsMod.dll` is still in `Mods`. Delete it, or run the installer, which removes it.
+- The controller does nothing: the mod reads XInput pads. A PlayStation or Switch controller needs Steam Input turned on for Super Auto Pets (Steam, game properties, Controller), so Steam presents it as an Xbox controller. Check that `ControllerSupport` is `true`.
 - Something else: the log is `MelonLoader/Latest.log` in the game folder. Set `DebugLogging` to `true`, reproduce the problem, and attach the log to an issue.
 
 ## Building from source
