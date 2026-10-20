@@ -172,6 +172,11 @@ namespace SuperAutoAccessibility
         /// <summary>The player's last input came from the controller: hints name its buttons.</summary>
         public static bool PadLastUsed { get; private set; }
 
+        private static int _startFrame = -1;
+
+        /// <summary>Start went down this frame: the pause button, which opens the menu outright.</summary>
+        public static bool StartJustPressed { get { Poll(); return _startFrame == Time.frameCount; } }
+
         public static bool KeyDown(KeyCode key) { Poll(); return _down.Contains(key); }
         public static bool KeyUp(KeyCode key) { Poll(); return _up.Contains(key); }
         public static bool KeyHeld(KeyCode key) { Poll(); return _heldKeys.ContainsKey(key); }
@@ -385,6 +390,7 @@ namespace SuperAutoAccessibility
                 if (isDown && !wasDown)
                 {
                     PadLastUsed = true;
+                    if (button == PadButton.Start) _startFrame = Time.frameCount;
                     var keys = Resolve(button, now);
                     _active[button] = keys;
                     foreach (var key in keys) PressKey(key);
@@ -621,7 +627,7 @@ namespace SuperAutoAccessibility
                 items.Add("X: Space, read again");
                 items.Add("Y: Read the screen");
             }
-            items.Add("Start: Pause menu or back");
+            items.Add(GameplayPhaseDetector.IsShopPhase() ? "Start: Pause menu, even from inside a zone" : "Start: Pause menu or back");
             items.Add("View: Open or close this help");
             items.Add("Left stick click: Dictionary");
             return ("Controller", items);

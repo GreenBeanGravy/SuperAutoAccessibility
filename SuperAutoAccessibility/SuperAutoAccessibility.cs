@@ -837,6 +837,11 @@ namespace SuperAutoAccessibility
                 // 4. GAMEPLAY: During shop phase â€” exit zone first, then open menu
                 if (Gameplay.GameplayPhaseDetector.IsShopPhase())
                 {
+                    // Start is the pause button: it opens the menu from inside a zone too, instead
+                    // of spending its first press on leaving the zone.
+                    if (Gameplay.ShopNavigationManager.IsActivelyNavigating() && Gamepad.StartJustPressed)
+                        Gameplay.ShopNavigationManager.Reset();
+
                     if (Gameplay.ShopNavigationManager.IsActivelyNavigating())
                     {
                         // If in SpellFocus (food targeting) or ArmyMinionFocus, cancel it properly first

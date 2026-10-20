@@ -149,7 +149,8 @@ Plug in an Xbox style controller, or any controller that Steam Input presents as
 | Right stick up / down | First / last slot |
 | A | Buy, select or use |
 | X | Sell |
-| B | Cancel, leave the zone, then the pause menu |
+| B | Cancel, then leave the zone |
+| Start | Pause menu, even from inside a zone |
 | Y | Read the whole board |
 | Right stick click | Read the current detail line again |
 | Hold left trigger, then A / B / X / Y | Gold / lives / turn / wins |
