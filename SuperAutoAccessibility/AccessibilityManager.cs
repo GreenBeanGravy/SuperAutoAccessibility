@@ -339,7 +339,9 @@ namespace SuperAutoAccessibility
                 }
                 else
                 {
-                    SectionManager.FocusFirstSection();
+                    AutomaticFocus = true;
+                    try { SectionManager.FocusFirstSection(); }
+                    finally { AutomaticFocus = false; }
                     landed = SectionManager.SelectionInSections();
                 }
             }
@@ -466,7 +468,7 @@ namespace SuperAutoAccessibility
                             // the control under the pointer from the tree's bounds instead.
                             bool treeSpeaks = fromHover
                                 ? Tree.SapA11y.SpeaksFor(selected)
-                                : Tree.SapA11y.SpeaksFocusChange(selected);
+                                : Tree.SapA11y.SpeaksFocusChange(selected, AutomaticFocus);
                             if (!treeSpeaks)
                                 TolkSpeech.Speak(announcement, true);
 
@@ -1300,6 +1302,9 @@ namespace SuperAutoAccessibility
         /// it must not talk over "Mosquito summoned".
         /// </summary>
         public static bool QueueOnly { get; set; }
+
+        /// <summary>True while the mod moves focus to a page's first control on its own.</summary>
+        private static bool AutomaticFocus { get; set; }
 
         public static void Announce(string message, bool interrupt = true)
         {

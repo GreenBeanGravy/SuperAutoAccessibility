@@ -138,6 +138,7 @@ namespace SuperAutoAccessibility.Tree
         private static ulong _lastFocusId;
         private static float _lastFocusAt = -100f;
         private const float RecentFocusSeconds = 0.5f;
+        private const float AutomaticFocusSeconds = 6f;
 
         /// <summary>
         /// For a focus announcement: true when the screen reader will hear focus arrive on this
@@ -146,11 +147,14 @@ namespace SuperAutoAccessibility.Tree
         /// nothing reaches it and the mod has to speak. Focus that moved here a moment ago (the
         /// game selected it and the mod selected it again) is still being read, so stay quiet.
         /// </summary>
-        public static bool SpeaksFocusChange(GameObject go)
+        public static bool SpeaksFocusChange(GameObject go, bool automatic = false)
         {
             if (!SpeaksFor(go)) return false;
             if (UGuiSource.StableId(go) != _lastFocusId) return true;
-            return Time.realtimeSinceStartup - _lastFocusAt < RecentFocusSeconds;
+            // A page's own first focus (the mod's FocusFirst) is no key press, so the player is not
+            // waiting on a repeat: if the game's selection reached the screen reader a moment
+            // ago, it has already said it. The lobby's "Play" was read twice after sign-in.
+            return Time.realtimeSinceStartup - _lastFocusAt < (automatic ? AutomaticFocusSeconds : RecentFocusSeconds);
         }
 
         /// <summary>

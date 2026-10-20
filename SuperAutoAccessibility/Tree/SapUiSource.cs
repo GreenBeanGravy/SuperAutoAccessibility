@@ -26,7 +26,6 @@ namespace SuperAutoAccessibility.Tree
     {
         private const ulong RootId = 1;
         private const ulong ScreenId = 16;
-        private const ulong PhaseNodeId = 17;
         private const ulong FirstSectionId = 32;
         private const int MaxDescription = 600;
 
@@ -158,15 +157,13 @@ namespace SuperAutoAccessibility.Tree
             string phase = Gameplay.GameplayPhaseDetector.IsBattlePhase() ? "Battle" : "Shop";
             var root = into.Find(RootId);
 
-            var screen = new AccessNode(ScreenId, AccessRole.Dialog) { Label = phase, Focusable = false };
+            // The dialog itself holds focus. A static text node here was exposed with no name, so
+            // closing the pause menu made the screen reader say "text".
+            var screen = new AccessNode(ScreenId, AccessRole.Dialog) { Label = phase, Focusable = true };
             into.Add(screen);
             root.Children.Add(ScreenId);
-
-            var node = new AccessNode(PhaseNodeId, AccessRole.Label) { Label = phase, Focusable = true };
-            into.Add(node);
-            screen.Children.Add(PhaseNodeId);
-            _ring.Add(PhaseNodeId);
-            into.FocusId = PhaseNodeId;
+            _ring.Add(ScreenId);
+            into.FocusId = ScreenId;
         }
 
         private void BuildSectionTree(AccessSnapshot into, List<NavigationSection> sections)
