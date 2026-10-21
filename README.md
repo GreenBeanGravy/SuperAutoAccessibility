@@ -122,7 +122,7 @@ Change them with the game closed. The game saves this file when it quits.
 
 ## Controller
 
-Plug in an Xbox style controller, or any controller that Steam Input presents as one, and play without the keyboard. The mod says "Controller connected" and everything it speaks for the keyboard is spoken for the controller too. Press View for the controller help on the screen you're on.
+Plug in an Xbox style controller, or any controller that Steam Input presents as one, and play without the keyboard. The mod says "Controller connected" and everything it speaks for the keyboard is spoken for the controller too. Press View for the controller help on the screen you're on. Holding a direction repeats it, like holding an arrow key. Hold the left or right trigger before pressing a face button for the shop's extra commands.
 
 ### Menus
 
@@ -168,6 +168,19 @@ Plug in an Xbox style controller, or any controller that Steam Input presents as
 | Left bumper or right stick click | Repeat the last line |
 | Right bumper | Read the screen |
 | B or Start | Pause menu |
+
+### Versus scoreboard, help and dictionary
+
+| Button | Action |
+| --- | --- |
+| Left / right bumper | Previous / next opponent, or previous / next help or dictionary category |
+| D-pad or left stick, left / right | Previous / next pet |
+| D-pad or left stick, up / down | The pet's details, or browse help and dictionary entries |
+| Right stick up / down | First / last |
+| A | Read all of the pet's details |
+| X | Read the current line again |
+| B | Close |
+| View | Open or close help |
 
 ## Troubleshooting
 
