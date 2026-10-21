@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 using HarmonyLib;
 using Il2CppSpacewood.Unity.UI;
 
-[assembly: MelonInfo(typeof(SuperAutoAccessibility.SAPMod), "Super Auto Pets Accessibility Mod", "1.2.0", "GreenBean")]
+[assembly: MelonInfo(typeof(SuperAutoAccessibility.SAPMod), "Super Auto Pets Accessibility Mod", "1.3.0", "GreenBean")]
 [assembly: MelonGame("Team Wood", "Super Auto Pets")]
 
 namespace SuperAutoAccessibility
