@@ -122,7 +122,7 @@ Change them with the game closed. The game saves this file when it quits.
 
 ## Controller
 
-Plug in an Xbox style controller, or any controller that Steam Input presents as one, and play without the keyboard. The mod says "Controller connected" and everything it speaks for the keyboard is spoken for the controller too. Press View for the controller help on the screen you're on. Holding a direction repeats it, like holding an arrow key. Hold the left or right trigger before pressing a face button for the shop's extra commands.
+Plug in any controller, and play without the keyboard. Press View/Minus for the controller help on the screen you're on. Hold the left or right trigger before pressing a face button for the shop's extra commands.
 
 ### Menus
 
