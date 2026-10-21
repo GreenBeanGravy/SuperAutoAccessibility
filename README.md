@@ -153,9 +153,15 @@ Plug in an Xbox style controller, or any controller that Steam Input presents as
 | Start | Pause menu, even from inside a zone |
 | Y | Read the whole board |
 | Right stick click | Read the current detail line again |
-| Hold left trigger, then A / B / X / Y | Gold / lives / turn / wins |
-| Hold left trigger, then right / left bumper | Details / scoreboard |
-| Hold right trigger, then A / X / Y | Roll / freeze / end turn |
+| Hold left trigger, then A | Gold |
+| Hold left trigger, then B | Lives |
+| Hold left trigger, then X | Turn |
+| Hold left trigger, then Y | Wins |
+| Hold left trigger, then right bumper | Details |
+| Hold left trigger, then left bumper | Scoreboard |
+| Hold right trigger, then A | Roll |
+| Hold right trigger, then X | Freeze |
+| Hold right trigger, then Y | End turn |
 
 ### Battle
 
